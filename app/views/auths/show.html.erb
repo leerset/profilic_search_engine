@@ -1,0 +1,3 @@
+auths show <%= @auth.id %>
+<br>user: <%= @user.email %>
+<br>current_user: <%= current_user.try(&:email) %>
