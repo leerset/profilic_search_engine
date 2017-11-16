@@ -3,14 +3,19 @@ rails g model Concept summary:text user:references
 rails g model Solution user:references concept:references summary:text Significance:text
 rails g model User email:string
 rails g model Auth user:references secure_random:string
+rails g controller Auths
 
 rails g model Photo user:references album:references photo_name:string photo_type:string qn_key:string index:integer free:boolean bocket:string is_private:boolean
+
+User.find_each do |u|
+  next if u.auths.any?
+  u.auths.create(secure_random: SecureRandom.base58)
+end
 
 Faker::Internet.email
 100.times do ||
   User.create(email: Faker::Internet.email, password: SecureRandom.base58)
 end and 1
-
 
 User
               Id
