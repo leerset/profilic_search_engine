@@ -6,6 +6,9 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
+# API
+gem 'rack-cors', :require => 'rack/cors'
+
 # Store
 gem 'mysql2'
 gem 'redis'
