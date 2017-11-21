@@ -1,2 +1,3 @@
 Hello
 <br>current_user: <%= current_user.try(&:email) %>
+<br>Magic Link: <a href="<%= @magic_link %>"><%= @magic_link %></a>
