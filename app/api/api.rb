@@ -1,9 +1,8 @@
 require "grape-swagger"
 
 class API < Grape::API
-  prefix 'api'
-  formatter :serializable_hash, Grape::Formatter::ActiveModelSerializers
-  format :json
+  prefix 'API'
+  formatter :json, Grape::Formatter::ActiveModelSerializers
 
   # before do
   #   set_locale

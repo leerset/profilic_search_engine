@@ -1,4 +1,4 @@
-GrapeSwaggerRails.options.url = "/api/v1/swagger_doc"
+GrapeSwaggerRails.options.url = "/API/v1/swagger_doc"
 GrapeSwaggerRails.options.app_url  = '/'
 GrapeSwaggerRails.options.before_action do
   authenticate_user!

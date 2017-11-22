@@ -1,7 +1,17 @@
 module V1
-  class Users < BaseApi
+  class Users < Grape::API
+    version 'v1'
+    format :json
 
     resource :users do
+
+      desc "get user"
+      params do
+      end
+      get :detail do
+        authenticate!
+        resp_ok("user" => UserSerializer.new(current_user).serializable_hash.merge(access_token: current_user.access_token))
+      end
 
       desc "sign up by email"
       params do

@@ -1,8 +1,12 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :id, :email, :password, :access_token, :expect_time
+  attributes :id, :email, :password, :access_token, :expires_time, :magic_link
 
-  def expect_time
-    object.expect_at.to_i
+  def expires_time
+    object.expires_at.to_i
+  end
+
+  def magic_link
+    object.auth.try(:secure_random)
   end
 
 end
