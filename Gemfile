@@ -7,6 +7,10 @@ git_source(:github) do |repo_name|
 end
 
 # API
+gem 'grape', '~>0.19.0'
+gem 'grape-active_model_serializers'
+gem 'grape-swagger'
+gem 'grape-swagger-rails'
 gem 'rack-cors', :require => 'rack/cors'
 
 # Store

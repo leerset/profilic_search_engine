@@ -8,4 +8,7 @@ Rails.application.routes.draw do
 
   get 'auth/sign_out' => 'auths#login_out'
   get 'auth/:id' => 'auths#show'
+
+  mount API => '/'
+  mount GrapeSwaggerRails::Engine => '/swagger'
 end

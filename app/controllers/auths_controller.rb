@@ -1,6 +1,6 @@
 class AuthsController < ApplicationController
   before_action :set_auth, only: [:show]
-  include Devise::Controllers::SignInOut
+  # include Devise::Controllers::SignInOut
 
   def index
   end

@@ -11,10 +11,17 @@ module ProfilicSearchEngine
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
 
+    config.active_record.default_timezone = :local
+    # config.time_zone = ''
+
+    config.paths.add 'app/api', glob: '**/*.rb'
+    config.autoload_paths += Dir["#{config.root}/app/api/*"]
+
     config.middleware.insert_before 0, Rack::Cors do
       allow do
         origins '*'
-        resource '*', :headers => :any, :methods => [:get, :post, :options]
+        # resource '*', :headers => :any, :methods => [:get, :post, :options]
+        resource "*", headers: :any, methods: [:get, :post, :put, :delete, :options, :patch]
       end
     end
     # Settings in config/environments/* take precedence over those specified here.
