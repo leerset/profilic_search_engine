@@ -10,7 +10,7 @@ class User < ApplicationRecord
   after_create :create_auth
 
   def create_auth
-    self.build_auth(secure_random: Auth.generate_secure_random)
+    self.build_auth(secure_random: Auth.generate_secure_random).save!
   end
 
   def expired?

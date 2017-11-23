@@ -21,7 +21,7 @@ module V1
         return resp_error('Bad email format.') if params[:email] !~ //
         user = User.find_by(email: params[:email].downcase)
         return resp_error('This email has been registered.') if user.present?
-        user = User.create(
+        user = User.create!(
           email: params[:email].downcase,
           password: SecureRandom.base58
         )
