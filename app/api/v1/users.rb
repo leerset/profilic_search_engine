@@ -28,11 +28,11 @@ module V1
         resp_ok("user" => UserSerializer.new(user).serializable_hash.merge(access_token: user.access_token))
       end
 
-      desc "login in by magic link"
+      desc "login by magic link"
       params do
         requires :magic_link, type: String, desc: "magic_link"
       end
-      post :login_in do
+      post :login do
         auth = Auth.find_by_secure_random(params[:magic_link])
         return resp_error("Expired magic link") if auth.nil?
         user = auth.user
@@ -40,10 +40,10 @@ module V1
         resp_ok("user" => UserSerializer.new(user).serializable_hash.merge(access_token: user.access_token))
       end
 
-      desc "sign out"
+      desc "logout"
       params do
       end
-      post :sign_out do
+      post :login_out do
         authenticate!
         begin
           current_user.auth.reset_secure_random
