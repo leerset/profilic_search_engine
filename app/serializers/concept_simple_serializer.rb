@@ -1,8 +1,8 @@
-class ConceptDetailSerializer < ActiveModel::Serializer
-  attributes :id, :owner, :title, :summary, :created_by, :created_time, :updated_time
+class ConceptSimpleSerializer < ActiveModel::Serializer
+  attributes :id, :owner, :title, :created_by, :created_time, :updated_time
 
   def self.build_array(array)
-    ArraySerializer.new(array, each_serializer: self)
+    CollectionSerializer.new(array, serializer: self)
   end
 
   def owner

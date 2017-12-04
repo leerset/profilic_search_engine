@@ -13,7 +13,7 @@ module V1
         authenticate!
         concept = Concept.find_by(id: params[:id])
         return resp_error('no concept found.') if concept.nil?
-        resp_ok("concept" => ConceptDetailSerializer.new(concept))
+        resp_ok("concept" => ConceptSerializer.new(concept))
       end
 
       desc "concept versions"
@@ -39,7 +39,7 @@ module V1
         concept.paper_trail.whodunnit(current_user.email) do
           concept.update_attributes(summary: params[:summary])
         end
-        resp_ok("concept" => ConceptDetailSerializer.new(concept))
+        resp_ok("concept" => ConceptSerializer.new(concept))
       end
 
       desc "create concept"
@@ -50,7 +50,7 @@ module V1
         authenticate!
         concept = current_user.concepts.create(summary: params[:summary])
         return resp_error('no concept found.') if concept.nil?
-        resp_ok("concept" => ConceptDetailSerializer.new(concept))
+        resp_ok("concept" => ConceptSerializer.new(concept))
       end
 
       desc "query concept"
@@ -64,7 +64,7 @@ module V1
         end
         concepts = search.results
         return resp_error('no concept found.') if concepts.empty?
-        resp_ok("concepts" => ConceptSerializer.build_array(concepts))
+        resp_ok("concepts" => ConceptSimpleSerializer.build_array(concepts))
       end
 
     end

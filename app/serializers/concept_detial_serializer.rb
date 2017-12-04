@@ -1,4 +1,4 @@
-class ConceptSerializer < ActiveModel::Serializer
+class ConceptDertailSerializer < ActiveModel::Serializer
   attributes :id, :owner, :title, :summary, :created_by, :created_time, :updated_time
 
   def self.build_array(array)
