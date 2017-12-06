@@ -4,6 +4,41 @@ module V1
     format :json
 
     resource :options do
+
+      desc "get organization list"
+      params do
+        optional :page, type: Integer, desc: '当前页数，默认为“1”'
+        optional :size, type: Integer, desc: '每页返回数量，默认为“20”'
+      end
+      get :organizations do
+        page = params[:page].presence || 1
+        size = params[:size].presence || 20
+        organizations = Organization.all.order(id: :desc).page(page).per(size)
+        resp_ok("organizations" => OrganizationSerializer.build_array(organizations))
+      end
+
+      desc "get user list"
+      params do
+        optional :page, type: Integer, desc: '当前页数，默认为“1”'
+        optional :size, type: Integer, desc: '每页返回数量，默认为“20”'
+      end
+      get :users do
+        page = params[:page].presence || 1
+        size = params[:size].presence || 20
+        users = User.all.order(id: :desc).page(page).per(size)
+        resp_ok("users" => UserSerializer.build_array(users))
+      end
+
+      desc "get user"
+      params do
+        requires :user_id, type: Integer, desc: 'user_id'
+      end
+      get :user do
+        user = User.find_by(id: params[:user_id])
+        return service_error('void user') if user.nil?
+        resp_ok("user" => UserSerializer.new(user))
+      end
+
       #
       # desc "get citizenships"
       # params do

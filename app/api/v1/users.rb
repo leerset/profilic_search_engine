@@ -80,7 +80,7 @@ module V1
       end
       get :update do
         authenticate!
-        binding.pry
+        current_user.update(params[:user])
         resp_ok("user" => UserSerializer.new(current_user))
       end
 
