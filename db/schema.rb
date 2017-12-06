@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171122032332) do
+ActiveRecord::Schema.define(version: 20171206015019) do
+
+  create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "address_type"
+    t.boolean "primary"
+    t.string "street_address"
+    t.string "city"
+    t.string "state_province"
+    t.string "country"
+    t.string "postal_code"
+    t.boolean "enable"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_type"], name: "index_addresses_on_address_type"
+    t.index ["enable"], name: "index_addresses_on_enable"
+  end
 
   create_table "auths", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "user_id"
@@ -18,6 +33,15 @@ ActiveRecord::Schema.define(version: 20171122032332) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_auths_on_user_id"
+  end
+
+  create_table "citizenships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.string "code"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_citizenships_on_name"
   end
 
   create_table "concepts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -29,6 +53,46 @@ ActiveRecord::Schema.define(version: 20171122032332) do
     t.datetime "updated_at", null: false
     t.index ["created_by"], name: "index_concepts_on_created_by"
     t.index ["user_id"], name: "index_concepts_on_user_id"
+  end
+
+  create_table "languages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.string "code"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_languages_on_name"
+  end
+
+  create_table "organizations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.string "code"
+    t.string "time_zone"
+    t.string "summary"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_organizations_on_name"
+  end
+
+  create_table "phones", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "address_id"
+    t.string "phone_type"
+    t.string "phone_number"
+    t.boolean "enable"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_phones_on_address_id"
+    t.index ["enable"], name: "index_phones_on_enable"
+    t.index ["phone_type"], name: "index_phones_on_phone_type"
+  end
+
+  create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.string "code"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_roles_on_name"
   end
 
   create_table "solutions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -44,8 +108,62 @@ ActiveRecord::Schema.define(version: 20171122032332) do
     t.index ["updated_by"], name: "index_solutions_on_updated_by"
   end
 
+  create_table "time_zones", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.string "code"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_time_zones_on_name"
+  end
+
+  create_table "user_addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id"
+    t.bigint "address_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_user_addresses_on_address_id"
+    t.index ["user_id"], name: "index_user_addresses_on_user_id"
+  end
+
+  create_table "user_citizenships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id"
+    t.bigint "citizenship_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["citizenship_id"], name: "index_user_citizenships_on_citizenship_id"
+    t.index ["user_id"], name: "index_user_citizenships_on_user_id"
+  end
+
+  create_table "user_languages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id"
+    t.bigint "language_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["language_id"], name: "index_user_languages_on_language_id"
+    t.index ["user_id"], name: "index_user_languages_on_user_id"
+  end
+
+  create_table "user_organizations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id"
+    t.bigint "organization_id"
+    t.bigint "role_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_user_organizations_on_organization_id"
+    t.index ["role_id"], name: "index_user_organizations_on_role_id"
+    t.index ["user_id"], name: "index_user_organizations_on_user_id"
+  end
+
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "firstname"
+    t.string "lastname"
     t.string "email"
+    t.string "screen_name"
+    t.string "employer"
+    t.string "time_zone"
+    t.string "resume_filepath"
+    t.text "personal_summary"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "encrypted_password", default: "", null: false
@@ -59,6 +177,7 @@ ActiveRecord::Schema.define(version: 20171122032332) do
     t.string "last_sign_in_ip"
     t.string "access_token"
     t.datetime "expires_at"
+    t.boolean "enable", default: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

@@ -5,6 +5,7 @@ module V1
 
     mount V1::Users
     mount V1::Concepts
+    mount V1::Options
 
     add_swagger_documentation(
       api_version: 'API/v1',

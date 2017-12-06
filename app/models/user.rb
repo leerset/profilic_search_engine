@@ -6,6 +6,15 @@ class User < ApplicationRecord
   has_many :concepts
   has_one :auth
 
+  has_many :user_addresses
+  has_many :addresses, through: :user_addresses
+  has_many :user_citizenships
+  has_many :citizenships, through: :user_citizenships
+  has_many :user_languages
+  has_many :languages, through: :user_languages
+  has_many :user_organizations
+  has_many :organizations, through: :user_organizations
+
   before_create :generate_access_token
   after_create :create_auth
 
@@ -31,6 +40,11 @@ class User < ApplicationRecord
     end while self.class.exists_access_token?(access_token)
     self.set_expiration
     self.access_token
+  end
+
+  def update_access_token
+    self.generate_access_token
+    self.save
   end
 
   private

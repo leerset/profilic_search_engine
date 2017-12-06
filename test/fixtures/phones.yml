@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  address: one
+  phone_type: MyString
+  phone_number: MyString
+  enable: false
+
+two:
+  address: two
+  phone_type: MyString
+  phone_number: MyString
+  enable: false
