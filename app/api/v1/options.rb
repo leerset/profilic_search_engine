@@ -7,8 +7,8 @@ module V1
 
       desc "get organization list"
       params do
-        optional :page, type: Integer, desc: '当前页数，默认为“1”'
-        optional :size, type: Integer, desc: '每页返回数量，默认为“20”'
+        optional :page, type: Integer, desc: 'curent page index，default: 1'
+        optional :size, type: Integer, desc: 'records count in each page, default: 20'
       end
       get :organizations do
         page = params[:page].presence || 1
@@ -19,8 +19,8 @@ module V1
 
       desc "get user list"
       params do
-        optional :page, type: Integer, desc: '当前页数，默认为“1”'
-        optional :size, type: Integer, desc: '每页返回数量，默认为“20”'
+        optional :page, type: Integer, desc: 'curent page index，default: 1'
+        optional :size, type: Integer, desc: 'records count in each page, default: 20'
       end
       get :users do
         page = params[:page].presence || 1
