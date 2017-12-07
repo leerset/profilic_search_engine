@@ -129,7 +129,7 @@ module V1
                 else
                   phone = address.phones.create(phone_params)
                 end
-              end
+              end if address_params[:phones].present?
             else
               address = current_user.addresses.create(permit_address_params)
               address_params[:phones].each do |phone_params|
@@ -137,7 +137,7 @@ module V1
                   :phone_type, :phone_number
                 ).merge(enable: true)
                 phone = address.phones.create(permit_phone_params)
-              end
+              end if address_params[:phones].present?
             end
           end if params[:addresses].present?
         end
