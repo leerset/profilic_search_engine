@@ -85,7 +85,6 @@ module V1
       end
       post :update do
         authenticate!
-        binding.pry
         ActiveRecord::Base.transaction do
           if params[:user].present?
             permit_user_params = ActionController::Parameters.new(params[:user]).permit(
