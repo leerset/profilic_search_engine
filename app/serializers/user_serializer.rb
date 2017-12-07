@@ -1,7 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :email, :password, :access_token, :expires_time, :magic_link,
     :firstname, :lastname, :screen_name, :employer, :time_zone, :personal_summary,
-    :citizenships, :organizations, :addresses
+    :languages, :citizenships, :organizations, :addresses
 
   def addresses
     AddressSerializer.build_array(object.addresses)
@@ -9,6 +9,10 @@ class UserSerializer < ActiveModel::Serializer
 
   def citizenships
     CitizenshipSerializer.build_array(object.citizenships)
+  end
+
+  def languages
+    LanguageSerializer.build_array(object.languages)
   end
 
   def organizations
