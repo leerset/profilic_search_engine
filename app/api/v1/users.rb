@@ -65,23 +65,23 @@ module V1
           optional 'time_zone', type: String, desc: "time_zone"
           optional 'personal_summary', type: String, desc: "personal_summary"
         end
-        optional 'citizenships', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "citizenship ids"
-        optional 'languages', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "language ids"
+        optional 'citizenships', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "citizenship ids(e.g. '1, 2,3')"
+        optional 'languages', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "language ids(e.g. '1, 2,3')"
         optional 'addresses', type: Array do
-          optional 'address_id', type: Integer, desc: "address_id"
-          optional 'address_type', type: String, desc: "address_type(home, work)"
+          optional 'address_id', type: Integer, desc: "address_id (optional, id = null will create a new record)"
+          optional 'address_type', type: String, desc: "address_type (home, work, etc.)"
           optional 'street_address', type: String, desc: "street_address"
           optional 'city', type: String, desc: "city"
           optional 'state_province', type: String, desc: "state_province"
           optional 'country', type: String, desc: "country"
           optional 'postal_code', type: String, desc: "postal_code"
           optional 'phones', type: Array do
-            optional 'phone_id', type: Integer, desc: "phone_id"
-            optional 'phone_type', type: String, desc: "phone_type(mobile,home)"
-            optional 'phone', type: String, desc: "phone"
+            optional 'phone_id', type: Integer, desc: "phone_id (optional, id = null will create a new record)"
+            optional 'phone_type', type: String, desc: "phone_type (mobile, home, etc.)"
+            optional 'phone_number', type: String, desc: "phone_number"
           end
         end
-        optional 'organizations', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "organization ids"
+        optional 'organizations', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "organization ids(e.g. '1, 2,3')"
       end
       post :update do
         authenticate!
@@ -111,23 +111,32 @@ module V1
             end
           end
           params[:addresses].each do |address_params|
+            permit_address_params = ActionController::Parameters.new(address_params).permit(
+              :address_type, :street_address, :city, :state_province, :country, :postal_code
+            ).merge(enable: true)
             if address_params[:address_id].present?
               address = current_user.addresses.find_by(id: address_params[:address_id])
               return resp_error("no address found") if address.nil?
-              address.update(address_params)
+              address.update(permit_address_params)
               address_params[:phones].each do |phone_params|
                 if phone_params[:phone_id].present?
                   phone = address.phones.find_by(id: phone_params[:phone_id])
                   return resp_error("no phone found") if phone.nil?
-                  phone.update(phone_params)
+                  permit_phone_params = ActionController::Parameters.new(phone_params).permit(
+                    :phone_type, :phone_number
+                  ).merge(enable: true)
+                  phone.update(permit_phone_params)
                 else
                   phone = address.phones.create(phone_params)
                 end
               end
             else
-              address = current_user.addresses.create(address_params)
+              address = current_user.addresses.create(permit_address_params)
               address_params[:phones].each do |phone_params|
-                phone = address.phones.create(phone_params)
+                permit_phone_params = ActionController::Parameters.new(phone_params).permit(
+                  :phone_type, :phone_number
+                ).merge(enable: true)
+                phone = address.phones.create(permit_phone_params)
               end
             end
           end if params[:addresses].present?
