@@ -10,7 +10,7 @@ module V1
         requires :email, type: String, desc: "email"
       end
       post :sign_up do
-        return resp_error('Bad email format.') if params[:email] !~ //
+        return resp_error('Bad email format.') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
         user = User.find_by(email: params[:email].downcase)
         return resp_error('This email has been registered.') if user.present?
         user = User.create!(

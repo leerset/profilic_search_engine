@@ -51,6 +51,7 @@ class API < Grape::API
     def service_unavailable(message = "Service Error，please try again later.")
       {code: 503, message: message}
     end
+
   end
 
   mount V1::BaseApi
