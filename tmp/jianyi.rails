@@ -5,9 +5,45 @@ rails g model User email:string
 rails g model Auth user:references secure_random:string
 rails g migration AddAccessTokenExpireAtToUser
 
+rails g model Address user:references secure_random:string
+
 rails g controller Auths
 
-rails g model Photo user:references album:references photo_name:string photo_type:string qn_key:string index:integer free:boolean bocket:string is_private:boolean
+## base tables
+
+rails g model TimeZone name:string code:string description:string
+rails g model Language name:string code:string description:string
+rails g model Citizenship name:string code:string description:string
+rails g model Organization display_name:string code:string time_zone:string summary:string
+rails g model OrganizationContact organization:references user:references
+
+rails g model Role name:string code:string description:string
+
+## address, phone
+
+rails g model Address address_type:string primary:boolean street_address:string city:string state_province:string country:string postal_code:string enable:boolean
+
+rails g model UserLanguage user:references language:references
+rails g model UserCitizenship user:references citizenship:references
+
+rails g model linkedin_account user:references uuid:string
+rails g model xinova_account user:references uuid:string
+rails g model keon_research_account user:references uuid:string
+
+rails g migration UpdateDetailsToUser
+
+rails g model User firstname:string middlename:string
+lastname:srting suffix:string
+email:string screen_name:string employer:string time_zone:string
+resume_filepath:string personal_summary:text
+enable:boolean
+
+rails g model Phone address:references phone_type:string phone_number:string enable:boolean
+
+rails g model UserOrganization user:references organization:references role:references
+rails g model UserAddress user:references address:references
+rails g model UserAddress user:references address:references
+rails g model OrganizationAddress organization:references address:references
 
 User.find_each do |u|
   next if u.auths.any?
@@ -61,3 +97,40 @@ Concept.search do
   with(:user_id, 1)
   fulltext("pizza")
 end
+
+azure:
+jms
+@8630477Jms1
+
+######## update profile
+{
+	"user": {
+		"firstname": "Accc",
+		"lastname": "Bcdd"
+	},
+	"citizenships": "1,4,7",
+	"languages": "1,2",
+	"organizations": "1,2",
+	"addresses": [
+		{
+			"address_type": "home",
+			"street_address": "Strss44 ds d",
+			"city": "Dadfsdf",
+			"state_province": "CA"
+		},
+		{
+			"address_type": "home",
+			"street_address": "Strss44 ds d",
+			"phones": [
+				{
+					"phone_type": "mobile",
+					"phone_number": "123-2343213"
+				},
+				{
+					"phone_type": "home",
+					"phone_number": "234-2343333"
+				}
+			]
+		}
+	]
+}

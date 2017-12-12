@@ -39,6 +39,9 @@ gem 'aes'
 gem 'faker'
 gem 'paper_trail'
 
+# Upload
+gem 'paperclip'
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.2'
 # Use Puma as the app server

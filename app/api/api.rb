@@ -48,7 +48,7 @@ class API < Grape::API
       {code: 401, message: message}
     end
 
-    def service_unavailable(message = "Service Error，please try again later.")
+      def service_unavailable(message = "Service Error，please try again later.")
       {code: 503, message: message}
     end
 

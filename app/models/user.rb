@@ -18,6 +18,9 @@ class User < ApplicationRecord
   before_create :generate_access_token
   after_create :create_auth
 
+  attr_accessor :resume
+  has_attached_file :resume, :path => ":rails_root/public/resumes/:filename"
+
   def create_auth
     self.build_auth(secure_random: Auth.generate_secure_random).save!
   end
