@@ -102,8 +102,8 @@ module V1
       end
 
       desc "get user"
-        requires :user_id, type: Integer, desc: "user_id"
       params do
+        requires :user_id, type: Integer, desc: "user_id"
       end
       get :detail do
         user = User.find_by(id: params[:user_id])
