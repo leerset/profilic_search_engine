@@ -7,6 +7,7 @@ module V1
     mount V1::Concepts
     mount V1::Options
     mount V1::Organizations
+    mount V1::Test
 
     add_swagger_documentation(
       api_version: 'API/v1',
