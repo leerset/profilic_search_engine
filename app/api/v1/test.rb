@@ -101,29 +101,19 @@ module V1
         resp_ok("user" => UserSerializer.new(user))
       end
 
-      desc "logout / reset magic link and access token"
-      params do
-      end
-      post :login_out do
-        begin
-          current_user.auth.reset_secure_random
-          current_user.update_access_token
-          return resp_ok("sign out sccessful.")
-        rescue => err
-          Rails.logger.debug err.to_s
-          return service_unavailable
-        end
-      end
-
       desc "get user"
+        requires :user_id, type: Integer, desc: "user_id"
       params do
       end
       get :detail do
-        resp_ok("user" => UserSerializer.new(current_user))
+        user = User.find_by(id: params[:user_id])
+        return service_error('void user') if user.nil?
+        resp_ok("user" => UserSerializer.new(user))
       end
 
       desc "update user"
       params do
+        requires :user_id, type: Integer, desc: "user_id"
         optional 'user', type: Hash do
           optional 'firstname', type: String, desc: "first_name"
           optional 'lastname', type: String, desc: "last_name"
@@ -152,30 +142,32 @@ module V1
         optional 'organizations', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "organization ids(e.g. '1, 2,3')"
       end
       post :update do
+        user = User.find_by(id: params[:user_id])
+        return service_error('void user') if user.nil?
         ActiveRecord::Base.transaction do
           if params[:user].present?
             permit_user_params = ActionController::Parameters.new(params[:user]).permit(
               :firstname, :lastname, :screen_name, :employer, :time_zone, :personal_summary
             )
-            current_user.update(permit_user_params)
+            user.update(permit_user_params)
           end
 
           if params[:citizenships].present?
-            current_user.user_citizenships.where.not(citizenship_id: params[:citizenships]).map(&:destroy)
+            user.user_citizenships.where.not(citizenship_id: params[:citizenships]).map(&:destroy)
             params[:citizenships].each do |citizenship_id|
-              current_user.user_citizenships.find_or_create_by(citizenship_id: citizenship_id)
+              user.user_citizenships.find_or_create_by(citizenship_id: citizenship_id)
             end
           end
           if params[:languages].present?
-            current_user.user_languages.where.not(language_id: params[:languages]).map(&:destroy)
+            user.user_languages.where.not(language_id: params[:languages]).map(&:destroy)
             params[:languages].each do |language_id|
-              current_user.user_languages.find_or_create_by(language_id: language_id)
+              user.user_languages.find_or_create_by(language_id: language_id)
             end
           end
           if params[:organizations].present?
-            current_user.user_organizations.where.not(organization_id: params[:organizations]).map(&:destroy)
+            user.user_organizations.where.not(organization_id: params[:organizations]).map(&:destroy)
             params[:organizations].each do |organization_id|
-              current_user.user_organizations.find_or_create_by(organization_id: organization_id)
+              user.user_organizations.find_or_create_by(organization_id: organization_id)
             end
           end
           params[:addresses].each do |address_params|
@@ -183,7 +175,7 @@ module V1
               :address_type, :street_address, :city, :state_province, :country, :postal_code
             ).merge(enable: true)
             if address_params[:address_id].present?
-              address = current_user.addresses.find_by(id: address_params[:address_id])
+              address = user.addresses.find_by(id: address_params[:address_id])
               return resp_error("no address found") if address.nil?
               address.update(permit_address_params)
               address_params[:phones].each do |phone_params|
@@ -199,7 +191,7 @@ module V1
                 end
               end if address_params[:phones].present?
             else
-              address = current_user.addresses.create(permit_address_params)
+              address = user.addresses.create(permit_address_params)
               address_params[:phones].each do |phone_params|
                 permit_phone_params = ActionController::Parameters.new(phone_params).permit(
                   :phone_type, :phone_number
@@ -209,17 +201,8 @@ module V1
             end
           end if params[:addresses].present?
         end
-        resp_ok("user" => UserSerializer.new(current_user))
+        resp_ok("user" => UserSerializer.new(user))
       end
-
-      # desc "delete user"
-      # params do
-      # end
-      # get :delete do
-      #   authenticate!
-      #   current_user.destroy
-      #   resp_ok("deleted")
-      # end
 
     end
   end
