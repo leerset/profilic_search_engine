@@ -104,7 +104,7 @@ module V1
       desc "get user"
       params do
         requires :user_id, type: Integer, desc: "user_id"
-      end
+        end
       get :detail do
         user = User.find_by(id: params[:user_id])
         return service_error('void user') if user.nil?
@@ -150,6 +150,7 @@ module V1
               :firstname, :lastname, :screen_name, :employer, :time_zone, :personal_summary
             )
             user.update(permit_user_params)
+            user.update_resume(params[:user][:resume]) if params[:user][:resume].present?
           end
 
           if params[:citizenships].present?

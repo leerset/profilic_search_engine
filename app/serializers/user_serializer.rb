@@ -1,7 +1,8 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :email, :password, :access_token, :expires_time, :magic_link,
     :firstname, :lastname, :screen_name, :employer, :time_zone, :personal_summary,
-    :languages, :citizenships, :organizations, :addresses
+    :languages, :citizenships, :organizations, :addresses,
+    :resume, :resume_filepath
 
   def addresses
     AddressSerializer.build_array(object.addresses)

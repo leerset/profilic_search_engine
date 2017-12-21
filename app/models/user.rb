@@ -18,8 +18,24 @@ class User < ApplicationRecord
   before_create :generate_access_token
   after_create :create_auth
 
-  attr_accessor :resume
-  has_attached_file :resume, :path => ":rails_root/public/resumes/:filename"
+  has_attached_file :resume,
+    path: ':rails_root/public/user/:id/resume/:filename',
+    url: '/user/:id/resume/:filename'
+  validates_attachment_content_type :resume,
+    :content_type => [ 'image/png', 'image/jpeg',
+      'application/zip',
+      'application/xlsx', 'audio/mpeg', 'audio/mp3' ]
+
+  def update_resume(resume_file)
+    # resume_file[:filename]
+    # resume_file[:type]
+    # resume_file[:tempfile]
+    # binding.pry
+    self.resume = resume_file[:tempfile]
+    self.resume.save
+    self.resume_filepath = self.resume.url
+    self.save!
+  end
 
   def create_auth
     self.build_auth(secure_random: Auth.generate_secure_random).save!
