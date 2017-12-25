@@ -282,9 +282,14 @@ COUNTRIES = %w{
   )
 end and 1
 
-['Lead-Inventor', 'Co-Inventor', 'Mentor', 'Reviewer', 'Leader', 'Member'].each do |o|
+{
+  invention: ['Inventor', 'Co-Inventor', 'Mentor', 'Patent Attorney', 'Reviewer Expert', 'Technical Illustrator'],
+  global: ['God'],
+  organization: ['Organization Administrator', 'Organization Member', 'Inventor LV1', 'Inventor LV2', 'Inventor LV3', 'Inventor LV4']
+}.each_pair do |role_type, name|
   Role.find_or_create_by(
-    name: o,
-    code: o.downcase
+    name: name,
+    code: name.downcase
+    role_type: role_type
   )
 end and 1
