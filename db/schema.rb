@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171221063832) do
+ActiveRecord::Schema.define(version: 20171225145536) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -55,6 +55,14 @@ ActiveRecord::Schema.define(version: 20171221063832) do
     t.index ["user_id"], name: "index_concepts_on_user_id"
   end
 
+  create_table "inventions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "organization_id"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_inventions_on_organization_id"
+  end
+
   create_table "languages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.string "code"
@@ -89,6 +97,7 @@ ActiveRecord::Schema.define(version: 20171221063832) do
   create_table "roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "name"
     t.string "code"
+    t.string "role_type"
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -135,6 +144,17 @@ ActiveRecord::Schema.define(version: 20171221063832) do
     t.index ["user_id"], name: "index_user_citizenships_on_user_id"
   end
 
+  create_table "user_inventions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id"
+    t.bigint "invention_id"
+    t.bigint "role_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invention_id"], name: "index_user_inventions_on_invention_id"
+    t.index ["role_id"], name: "index_user_inventions_on_role_id"
+    t.index ["user_id"], name: "index_user_inventions_on_user_id"
+  end
+
   create_table "user_languages", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "user_id"
     t.bigint "language_id"
@@ -153,6 +173,15 @@ ActiveRecord::Schema.define(version: 20171221063832) do
     t.index ["organization_id"], name: "index_user_organizations_on_organization_id"
     t.index ["role_id"], name: "index_user_organizations_on_role_id"
     t.index ["user_id"], name: "index_user_organizations_on_user_id"
+  end
+
+  create_table "user_roles", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id"
+    t.bigint "role_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["role_id"], name: "index_user_roles_on_role_id"
+    t.index ["user_id"], name: "index_user_roles_on_user_id"
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
