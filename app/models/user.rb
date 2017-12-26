@@ -35,7 +35,11 @@ class User < ApplicationRecord
   end
 
   def god?
-    user.roles.where(code: 'god').any?
+    self.roles.where(code: 'god').any?
+  end
+
+  def oa?(organization)
+    organization_roles(organization).where(code: 'organization_administrator').any?
   end
 
   def organization_roles(organization)

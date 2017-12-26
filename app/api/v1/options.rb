@@ -5,6 +5,20 @@ module V1
 
     resource :options do
 
+      desc "get role list"
+      params do
+        optional :role_type, type: String, desc: 'role type (global, invention, organization)'
+      end
+      get :roles do
+        role_type = params[:role_type]
+        roles = if role_type.present?
+          Role.where(role_type: role_type).map(&:code)
+        else
+          Role.where(role_type: ['global', 'invention', 'organization']).map(&:code)
+        end
+        resp_ok("roles" => roles)
+      end
+
       desc "get organization list"
       params do
         optional :page, type: Integer, desc: 'curent page index，default: 1'
