@@ -7,16 +7,16 @@ module V1
 
       desc "get role list"
       params do
-        optional :role_type, type: String, desc: 'role type (global, invention, organization)'
+        optional :role_type, type: String, values: ['global', 'invention', 'organization'], desc: 'role type'
       end
       get :roles do
         role_type = params[:role_type]
         roles = if role_type.present?
-          Role.where(role_type: role_type).map(&:code)
+          Role.where(role_type: role_type)
         else
-          Role.where(role_type: ['global', 'invention', 'organization']).map(&:code)
+          Role.where(role_type: ['global', 'invention', 'organization'])
         end
-        resp_ok("roles" => roles)
+        resp_ok("roles" => RoleSerializer.build_array(roles))
       end
 
       desc "get organization list"
