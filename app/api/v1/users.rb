@@ -75,10 +75,13 @@ module V1
 
       desc "global roles"
       params do
+        requires 'user_id', type: Integer, desc: "user_id"
       end
       get :global_roles do
         authenticate!
-        resp_ok("global_roles" => RoleSerializer.build_array(current_user.roles))
+        user = invention.users.find_by(id: params[:user_id])
+        return resp_error('no user found.') if user.nil?
+        resp_ok("global_roles" => RoleSerializer.build_array(user.roles))
       end
 
       desc "PEOPLE add"

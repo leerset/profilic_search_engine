@@ -5,6 +5,85 @@ module V1
 
     resource :test do
 
+      desc "change organization user role (user type)"
+      params do
+        requires 'organization_id', type: Integer, desc: "organization id"
+        requires 'user_id', type: Integer, desc: "user_id"
+        requires 'role_id', type: Integer, desc: "new user role id"
+      end
+      patch :change_organization_user_role do
+        # authenticate!
+        # return resp_error('not god, not oa, permission denied.') unless current_user.god? || current_user.oa?(organization.organization)
+        organization = Organization.find_by(id: params[:organization_id])
+        return resp_error('no organization found.') if organization.nil?
+        user = organization.users.find_by(id: params[:user_id])
+        return resp_error('no user found.') if user.nil?
+        role = Role.find_by(id: params[:role_id], role_type: 'organization')
+        return resp_error('no role found.') if role.nil?
+        organization.user_organizations.where(user: user).update_all(role_id: role.id)
+        resp_ok("organization" => OrganizationSerializer.new(organization))
+      end
+
+      desc "change invention user role (user type)"
+      params do
+        requires 'invention_id', type: Integer, desc: "invention id"
+        requires 'user_id', type: Integer, desc: "user_id"
+        requires 'role_id', type: Integer, desc: "new user role id"
+      end
+      patch :change_invention_user_role do
+        # authenticate!
+        # return resp_error('not god, not oa, permission denied.') unless current_user.god? || current_user.oa?(invention.organization)
+        invention = Invention.find_by(id: params[:invention_id])
+        return resp_error('no invention found.') if invention.nil?
+        user = invention.users.find_by(id: params[:user_id])
+        return resp_error('no user found.') if user.nil?
+        role = Role.find_by(id: params[:role_id], role_type: 'invention')
+        return resp_error('no role found.') if role.nil?
+        invention.user_inventions.where(user: user).update_all(role_id: role.id)
+        resp_ok("invention" => InventionSerializer.new(invention))
+      end
+
+      desc "organization roles"
+      params do
+        requires 'organization_id', type: Integer, desc: "organization id"
+        requires 'user_id', type: Integer, desc: "user_id"
+      end
+      get :organization_roles do
+        # authenticate!
+        organization = Organization.find_by(id: params[:organization_id])
+        return resp_error('no organization found.') if organization.nil?
+        user = organization.users.find_by(id: params[:user_id])
+        return resp_error('no user found.') if user.nil?
+        organization_roles = user.organization_roles(organization)
+        resp_ok("organization_roles" => RoleSerializer.build_array(organization_roles))
+      end
+
+      desc "invention roles"
+      params do
+        requires 'invention_id', type: Integer, desc: "invention id"
+        requires 'user_id', type: Integer, desc: "user_id"
+      end
+      get :invention_roles do
+        # authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return resp_error('no invention found.') if invention.nil?
+        user = invention.users.find_by(id: params[:user_id])
+        return resp_error('no user found.') if user.nil?
+        invention_roles = user.invention_roles(invention)
+        resp_ok("invention_roles" => RoleSerializer.build_array(invention_roles))
+      end
+
+      desc "global roles"
+      params do
+        requires 'user_id', type: Integer, desc: "user_id"
+      end
+      get :global_roles do
+        # authenticate!
+        user = invention.users.find_by(id: params[:user_id])
+        return resp_error('no user found.') if user.nil?
+        resp_ok("global_roles" => RoleSerializer.build_array(user.roles))
+      end
+
       desc "PEOPLE add"
       params do
         requires 'first_name', type: String, desc: "first_name"
