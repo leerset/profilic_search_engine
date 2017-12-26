@@ -35,11 +35,15 @@ class User < ApplicationRecord
   end
 
   def god?
-    self.roles.where(code: 'god').any?
+    self.roles.find_by(code: 'god').present?
   end
 
   def oa?(organization)
-    organization_roles(organization).where(code: 'organization_administrator').any?
+    organization_roles(organization).find_by(code: 'organization_administrator').present?
+  end
+
+  def inventor?(invention)
+    invention_roles(invention).find_by(code: 'inventor').present?
   end
 
   def organization_roles(organization)

@@ -11,7 +11,7 @@ module V1
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'role_id', type: Integer, desc: "new user role id"
       end
-      get :change_organization_user_role do
+      patch :change_organization_user_role do
         authenticate!
         return resp_error('not god, not oa, permission denied.') unless current_user.god? || current_user.oa?(organization.organization)
         organization = Organization.find_by(id: params[:organization_id])
@@ -30,7 +30,7 @@ module V1
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'role_id', type: Integer, desc: "new user role id"
       end
-      get :change_invention_user_role do
+      patch :change_invention_user_role do
         authenticate!
         return resp_error('not god, not oa, permission denied.') unless current_user.god? || current_user.oa?(invention.organization)
         invention = Invention.find_by(id: params[:invention_id])

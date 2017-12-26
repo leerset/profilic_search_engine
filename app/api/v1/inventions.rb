@@ -10,7 +10,7 @@ module V1
         requires :organization_id, type: Integer, desc: "organization_id"
         requires :name, type: String, desc: "name"
       end
-      get :create do
+      post :create do
         authenticate!
         organization = Organization.find_by(id: params[:organization_id])
         return resp_error('no organization found.') if organization.nil?
@@ -25,13 +25,11 @@ module V1
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
       end
-      get :delete do
+      post :delete do
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return resp_error('no invention found.') if invention.nil?
-        inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
-        unless current_user.god? ||
-          invention.user_inventions.where(user: current_user, role: inventor_role).any?
+        unless current_user.god? || current_user.inventor?(invention)
           return resp_error('not god, not inventor, permission denied')
         end
         invention.destroy
