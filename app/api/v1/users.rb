@@ -79,7 +79,7 @@ module V1
       end
       get :global_roles do
         authenticate!
-        user = invention.users.find_by(id: params[:user_id])
+        user = User.find_by(id: params[:user_id])
         return resp_error('no user found.') if user.nil?
         resp_ok("global_roles" => RoleSerializer.build_array(user.roles))
       end
