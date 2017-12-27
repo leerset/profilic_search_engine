@@ -19,6 +19,44 @@ module V1
         resp_ok("roles" => RoleSerializer.build_array(roles))
       end
 
+      desc "user organization roles"
+      params do
+        requires 'organization_id', type: Integer, desc: "organization id"
+        requires 'user_id', type: Integer, desc: "user_id"
+      end
+      get :organization_roles do
+        organization = Organization.find_by(id: params[:organization_id])
+        return resp_error(MISSING_ORG) if organization.nil?
+        user = organization.users.find_by(id: params[:user_id])
+        return resp_error(MISSING_USR) if user.nil?
+        organization_roles = user.organization_roles(organization)
+        resp_ok("organization_roles" => RoleSerializer.build_array(organization_roles))
+      end
+
+      desc "user invention roles"
+      params do
+        requires 'invention_id', type: Integer, desc: "invention id"
+        requires 'user_id', type: Integer, desc: "user_id"
+      end
+      get :invention_roles do
+        invention = Invention.find_by(id: params[:invention_id])
+        return resp_error(MISSING_INV) if invention.nil?
+        user = invention.users.find_by(id: params[:user_id])
+        return resp_error(MISSING_USR) if user.nil?
+        invention_roles = user.invention_roles(invention)
+        resp_ok("invention_roles" => RoleSerializer.build_array(invention_roles))
+      end
+
+      desc "user global roles"
+      params do
+        requires 'user_id', type: Integer, desc: "user_id"
+      end
+      get :global_roles do
+        user = User.find_by(id: params[:user_id])
+        return resp_error(MISSING_USR) if user.nil?
+        resp_ok("global_roles" => RoleSerializer.build_array(user.roles))
+      end
+
       desc "get organization list"
       params do
         optional :page, type: Integer, desc: 'curent page index，default: 1'

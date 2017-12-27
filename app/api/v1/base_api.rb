@@ -3,12 +3,14 @@ module V1
     prefix 'API'
     version 'v1', using: :path
 
-    mount V1::Users
     mount V1::Concepts
     mount V1::Options
     mount V1::Organizations
+    mount V1::Users
     mount V1::Test
     mount V1::Inventions
+    mount V1::UserRoles
+    mount V1::TestRoles
 
     add_swagger_documentation(
       api_version: 'API/v1',
