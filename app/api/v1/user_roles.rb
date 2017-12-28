@@ -145,7 +145,7 @@ module V1
       params do
         requires 'user_invention_id', type: Integer, desc: "user_inventions id"
       end
-      post :change_invention_role do
+      post :delete_invention_role do
         authenticate!
         return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(invention.invention)
         user_invention = UserInvention.find_by(id: params[:user_invention_id])
