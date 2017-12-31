@@ -104,12 +104,12 @@ module V1
       desc "logout / reset magic link and access token"
       params do
       end
-      post :login_out do
+      post :logout do
         authenticate!
         begin
           current_user.auth.reset_secure_random
           current_user.update_access_token
-          return resp_ok("sign out sccessful.")
+          return resp_ok("logout sccessful.")
         rescue => err
           Rails.logger.debug err.to_s
           return service_unavailable
