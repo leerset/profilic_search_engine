@@ -111,6 +111,18 @@ module V1
         resp_ok("user" => UserSerializer.new(user))
       end
 
+      desc "get magic_link"
+      params do
+        requires :user_id, type: Integer, desc: "user_id"
+        end
+      get :get_magic_link do
+        user = User.find_by(id: params[:user_id])
+        return service_error('void user') if user.nil?
+        user.update_access_token
+        user.auth.reset_secure_random
+        resp_ok("user" => UserSerializer.new(user))
+      end
+
       desc "update user"
       params do
         requires :user_id, type: Integer, desc: "user_id"
@@ -123,8 +135,8 @@ module V1
           optional 'personal_summary', type: String, desc: "personal_summary"
           optional 'resume', type: File, desc: "resume file"
         end
-        optional 'citizenships', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "citizenship ids(e.g. '1, 2,3')"
-        optional 'languages', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "language ids(e.g. '1, 2,3')"
+        optional 'citizenships', type: Array[Integer], coerce_with: ->(val) { val.split(/&/).map{|a| a.sub(/citizenships=/,'').to_i} }, desc: "citizenship ids(e.g. '1,2,3')"
+        optional 'languages', type: Array[Integer], coerce_with: ->(val) { val.split(/&/).map{|a| a.sub(/languages=/,'').to_i} }, desc: "language ids(e.g. '1,2,3')"
         optional 'addresses', type: Array do
           optional 'address_id', type: Integer, desc: "address_id (optional, id = null will create a new record)"
           optional 'address_type', type: String, desc: "address_type (home, work, etc.)"
@@ -139,7 +151,7 @@ module V1
             optional 'phone_number', type: String, desc: "phone_number"
           end
         end
-        optional 'organizations', type: Array[Integer], coerce_with: ->(val) { val.split(/\s*,\s*/).map(&:to_i) }, desc: "organization ids(e.g. '1, 2,3')"
+        optional 'organizations', type: Array[Integer], coerce_with: ->(val) { val.split(/&/).map{|a| a.sub(/organizations=/,'').to_i} }, desc: "organization ids(e.g. '1,2,3')"
       end
       post :update do
         user = User.find_by(id: params[:user_id])

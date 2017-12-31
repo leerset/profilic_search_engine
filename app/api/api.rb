@@ -44,7 +44,7 @@ class API < Grape::API
     end
 
     # frontend turns to login page.
-    def unauthorized(message = "This account logined in from another device, please login again.")
+    def unauthorized(message = "You are unauthorized to perform that operation.")
       {code: 401, message: message}
     end
 
