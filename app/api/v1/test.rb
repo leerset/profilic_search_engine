@@ -113,10 +113,13 @@ module V1
 
       desc "get magic_link"
       params do
-        requires :user_id, type: Integer, desc: "user_id"
+        optional :user_id, type: Integer, desc: "user_id"
+        optional :email, type: String, desc: "email"
+        at_least_one_of :user_id, :email
         end
       get :get_magic_link do
-        user = User.find_by(id: params[:user_id])
+        user = User.find_by(id: params[:user_id]) if params[:user_id].present?
+        user ||= User.find_by(email: params[:email]) if params[:email].present?
         return service_error('void user') if user.nil?
         user.update_access_token
         user.auth.reset_secure_random
