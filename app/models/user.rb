@@ -42,8 +42,32 @@ class User < ApplicationRecord
     organization_roles(organization).find_by(code: 'organization_administrator').present?
   end
 
+  def all_oa?(organizations)
+    organizations.uniq.map{|a| oa?(a)}.uniq == [true]
+  end
+
   def inventor?(invention)
     invention_roles(invention).find_by(code: 'inventor').present?
+  end
+
+  def invention_roles_hash
+    invention_roles = []
+    self.inventions.uniq.each do |invention|
+      invention_roles(invention).uniq.map(&:id).each do |role_id|
+        invention_roles << {invention_id: invention.id, role_id: role_id}
+      end
+    end
+    {user_id: self.id, invention_roles: invention_roles}
+  end
+
+  def organization_roles_hash
+    organization_roles = []
+    self.organizations.uniq.each do |organization|
+      organization_roles(organization).uniq.map(&:id).each do |role_id|
+        organization_roles << {organization_id: organization.id, role_id: role_id}
+      end
+    end
+    {user_id: self.id, organization_roles: organization_roles}
   end
 
   def organization_roles(organization)
