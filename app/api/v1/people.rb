@@ -73,7 +73,7 @@ module V1
       params do
         requires 'user_id', type: Integer, desc: "user_id"
       end
-      post :organization_statuses do
+      get :organization_statuses do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
