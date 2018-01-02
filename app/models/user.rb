@@ -8,6 +8,7 @@ class User < ApplicationRecord
 
   has_many :user_addresses
   has_many :addresses, through: :user_addresses
+
   has_many :user_citizenships
   has_many :citizenships, through: :user_citizenships
   has_many :user_languages
@@ -18,9 +19,18 @@ class User < ApplicationRecord
   has_many :inventions, through: :user_inventions
   has_many :user_organizations
   has_many :organizations, through: :user_organizations
+  has_many :user_organization_statuses
 
   before_create :generate_access_token
   after_create :create_auth
+
+  def home_address
+    self.addresses.find_by(address_type: 'home')
+  end
+
+  def work_address
+    self.addresses.find_by(address_type: 'work')
+  end
 
   has_attached_file :resume,
     path: ':rails_root/public/user/:id/resume/:filename',
@@ -29,6 +39,22 @@ class User < ApplicationRecord
     :content_type => [ 'image/png', 'image/jpeg',
       'application/zip',
       'application/xlsx', 'audio/mpeg', 'audio/mp3' ]
+
+  def update_home_address(address_params)
+    if self.home_address.present?
+      self.home_address.update_attributes(address_params)
+    else
+      self.addresses.create(address_params.merge(address_type: 'home'))
+    end
+  end
+
+  def update_work_address(address_params)
+    if self.work_address.present?
+      self.work_address.update_attributes(address_params)
+    else
+      self.addresses.create(address_params.merge(address_type: 'work'))
+    end
+  end
 
   def full_name
     screen_name || [firstname, lastname].join(' ')
@@ -39,7 +65,7 @@ class User < ApplicationRecord
   end
 
   def oa?(organization)
-    organization_roles(organization).find_by(code: 'organization_administrator').present?
+    organization_roles(organization).detect{|role| role.code == 'organization_administrator'}.present?
   end
 
   def all_oa?(organizations)

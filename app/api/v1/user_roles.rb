@@ -37,6 +37,60 @@ module V1
 
 ##### organization
 
+      desc "make user OA"
+      params do
+        requires 'user_id', type: Integer, desc: "user_id"
+        requires 'organization_id', type: Integer, desc: "organization id"
+      end
+      post :make_oa do
+        authenticate!
+        user = User.find_by(id: params[:user_id])
+        return resp_error(MISSING_USR) if user.nil?
+        organization = Organization.find_by(id: params[:organization_id])
+        return resp_error(MISSING_ORG) if organization.nil?
+        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        role = Role.find_by(code: 'organization_administrator')
+        user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
+        resp_ok('organization_roles' => user.organization_roles_hash)
+      end
+
+      desc "remove user OA"
+      params do
+        requires 'user_id', type: Integer, desc: "user_id"
+        requires 'organization_id', type: Integer, desc: "organization id"
+      end
+      post :remove_oa do
+        authenticate!
+        user = User.find_by(id: params[:user_id])
+        return resp_error(MISSING_USR) if user.nil?
+        organization = Organization.find_by(id: params[:organization_id])
+        return resp_error(MISSING_ORG) if organization.nil?
+        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        role = Role.find_by(code: 'organization_administrator')
+        return resp_error(MISSING_ROL) if role.nil?
+        user_organization = user.user_organizations.find_by(organization_id: organization.id, role_id: role.id)
+        user_organization.destroy if user_organization.present?
+        resp_ok('organization_roles' => user.organization_roles_hash)
+      end
+
+      desc "add user another organization"
+      params do
+        requires 'user_id', type: Integer, desc: "user_id"
+        requires 'organization_id', type: Integer, desc: "organization id"
+      end
+      post :add_another_organization do
+        authenticate!
+        user = User.find_by(id: params[:user_id])
+        return resp_error(MISSING_USR) if user.nil?
+        organization = Organization.find_by(id: params[:organization_id])
+        return resp_error(MISSING_ORG) if organization.nil?
+        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        role = Role.find_by(code: 'organization_member')
+        return resp_error(MISSING_ROL) if role.nil?
+        user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
+        resp_ok('organization_roles' => user.organization_roles_hash)
+      end
+
       desc "add user organization role"
       params do
         requires 'user_id', type: Integer, desc: "user_id"
@@ -133,7 +187,7 @@ module V1
         end
         resp_ok('organization_roles' => user.organization_roles_hash)
       end
-      
+
 ##### invention
 
     end

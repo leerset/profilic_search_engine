@@ -4,75 +4,75 @@ module V1
     format :json
 
     resource :users do
-
-      desc "PEOPLE add"
-      params do
-        requires 'first_name', type: String, desc: "first_name"
-        requires 'last_name', type: String, desc: "last_name"
-        requires 'email', type: String, desc: "email"
-        requires 'organization', type: String, desc: "organization"
-      end
-      get :add do
-        return resp_error('Bad email format') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
-        user = User.find_by(email: params[:email].downcase)
-        return resp_error("PEOPLE exist with email: #{params[:email]}") if user.present?
-        ActiveRecord::Base.transaction do
-          user = User.create!(
-            email: params[:email].downcase,
-            password: SecureRandom.base58
-          )
-          organization = Organization.find_or_create_by(name: params[:organization])
-          user.update(
-            firstname: params[:first_name],
-            lastname: params[:last_name]
-          )
-          user.user_organizations.find_or_create_by(organization: organization)
-          resp_ok("user" => UserSerializer.new(user))
-        end
-      end
-
-      desc "SGIN IN"
-      params do
-        requires 'email', type: String, desc: "email"
-        requires 'password', type: String, desc: "password"
-      end
-      get :sign_in do
-        user = User.find_by(email: params[:email].downcase)
-        return resp_error('bad email / password') if user.nil?
-        if user.valid_password?(params[:password])
-          user.update(
-            current_sign_in_at: Time.now,
-            current_sign_in_ip: request.env['REMOTE_ADDR'],
-            sign_in_count: user.sign_in_count + 1
-          )
-          return resp_ok("user" => UserSerializer.new(user))
-        else
-          return resp_error('bad email / password')
-        end
-      end
-
-      desc "CREATE ACCOUNT"
-      params do
-        requires :name, type: String, desc: "name"
-        requires :email, type: String, desc: "email"
-        requires :password, type: String, desc: "password"
-        requires :confirm_password, type: String, desc: "confirm_password"
-      end
-      post :create_account do
-        return resp_error('Bad email format.') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
-        return resp_error('different passwords') if params[:password] != params[:confirm_password]
-        user = User.find_by(email: params[:email].downcase)
-        return resp_error('This email has been registered.') if user.present?
-        user = User.create!(
-          email: params[:email].downcase,
-          password: SecureRandom.base58
-        )
-        user.update(
-          password: params[:password],
-          screen_name: params[:name]
-        )
-        resp_ok("user" => UserSerializer.new(user))
-      end
+      # 
+      # desc "PEOPLE add"
+      # params do
+      #   requires 'first_name', type: String, desc: "first_name"
+      #   requires 'last_name', type: String, desc: "last_name"
+      #   requires 'email', type: String, desc: "email"
+      #   requires 'organization', type: String, desc: "organization"
+      # end
+      # get :add do
+      #   return resp_error('Bad email format') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
+      #   user = User.find_by(email: params[:email].downcase)
+      #   return resp_error("PEOPLE exist with email: #{params[:email]}") if user.present?
+      #   ActiveRecord::Base.transaction do
+      #     user = User.create!(
+      #       email: params[:email].downcase,
+      #       password: SecureRandom.base58
+      #     )
+      #     organization = Organization.find_or_create_by(name: params[:organization])
+      #     user.update(
+      #       firstname: params[:first_name],
+      #       lastname: params[:last_name]
+      #     )
+      #     user.user_organizations.find_or_create_by(organization: organization)
+      #     resp_ok("user" => UserSerializer.new(user))
+      #   end
+      # end
+      #
+      # desc "SGIN IN"
+      # params do
+      #   requires 'email', type: String, desc: "email"
+      #   requires 'password', type: String, desc: "password"
+      # end
+      # get :sign_in do
+      #   user = User.find_by(email: params[:email].downcase)
+      #   return resp_error('bad email / password') if user.nil?
+      #   if user.valid_password?(params[:password])
+      #     user.update(
+      #       current_sign_in_at: Time.now,
+      #       current_sign_in_ip: request.env['REMOTE_ADDR'],
+      #       sign_in_count: user.sign_in_count + 1
+      #     )
+      #     return resp_ok("user" => UserSerializer.new(user))
+      #   else
+      #     return resp_error('bad email / password')
+      #   end
+      # end
+      #
+      # desc "CREATE ACCOUNT"
+      # params do
+      #   requires :name, type: String, desc: "name"
+      #   requires :email, type: String, desc: "email"
+      #   requires :password, type: String, desc: "password"
+      #   requires :confirm_password, type: String, desc: "confirm_password"
+      # end
+      # post :create_account do
+      #   return resp_error('Bad email format.') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
+      #   return resp_error('different passwords') if params[:password] != params[:confirm_password]
+      #   user = User.find_by(email: params[:email].downcase)
+      #   return resp_error('This email has been registered.') if user.present?
+      #   user = User.create!(
+      #     email: params[:email].downcase,
+      #     password: SecureRandom.base58
+      #   )
+      #   user.update(
+      #     password: params[:password],
+      #     screen_name: params[:name]
+      #   )
+      #   resp_ok("user" => UserSerializer.new(user))
+      # end
 
       desc "sign up by email / create user"
       params do

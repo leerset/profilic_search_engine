@@ -10,10 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171225145536) do
+ActiveRecord::Schema.define(version: 20180102142823) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
+    t.string "employer"
+    t.string "street1"
+    t.string "street2"
     t.boolean "primary"
     t.string "street_address"
     t.string "city"
@@ -164,6 +167,18 @@ ActiveRecord::Schema.define(version: 20171225145536) do
     t.index ["user_id"], name: "index_user_languages_on_user_id"
   end
 
+  create_table "user_organization_statuses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "user_id"
+    t.bigint "organization_id"
+    t.string "status", default: "Active"
+    t.string "title"
+    t.string "phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organization_id"], name: "index_user_organization_statuses_on_organization_id"
+    t.index ["user_id"], name: "index_user_organization_statuses_on_user_id"
+  end
+
   create_table "user_organizations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "user_id"
     t.bigint "organization_id"
@@ -188,6 +203,8 @@ ActiveRecord::Schema.define(version: 20171225145536) do
     t.string "firstname"
     t.string "lastname"
     t.string "email"
+    t.string "citizenship"
+    t.string "status", default: "Active"
     t.string "screen_name"
     t.string "employer"
     t.string "time_zone"

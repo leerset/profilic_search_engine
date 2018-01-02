@@ -1,8 +1,8 @@
 class AddressSerializer < ActiveModel::Serializer
-  attributes :id, :address_type, :street_address, :city, :state_province, :postal_code, :phones
+  attributes :id, :address_type, :employer, :street1, :street2, :city, :state_province, :postal_code
 
-  def phones
-    PhoneSerializer.build_array(object.phones)
-  end
+  # def phones
+  #   PhoneSerializer.build_array(object.phones)
+  # end
 
 end

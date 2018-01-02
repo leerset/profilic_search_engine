@@ -11,6 +11,7 @@ module V1
     mount V1::Inventions
     mount V1::UserRoles
     mount V1::TestRoles
+    mount V1::People
 
     add_swagger_documentation(
       api_version: 'API/v1',
