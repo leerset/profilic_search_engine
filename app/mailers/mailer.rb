@@ -1,7 +1,9 @@
 class Mailer < ApplicationMailer
   # Rails.application.routes.default_url_options[:host] = Settings.host
-  Rails.application.routes.default_url_options[:host] = 'http://dedi2.cijef.com.hk'
-  default from: 'jianyi.prolific@gmail.com'
+  Rails.application.routes.default_url_options[:host] = 'http://localhost'
+  # Rails.application.routes.default_url_options[:host] = 'http://dedi2.cijef.com.hk'
+  # default from: 'jianyi.prolific@gmail.com'
+  default from: 'jianyi@hydrap.com'
   # default cc: 'jianyi@hydrap.com'
   # default cc: 'jianyi.prolific@gmail.com'
   # layout 'mailer/order_email'
