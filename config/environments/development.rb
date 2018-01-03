@@ -34,11 +34,21 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address:              'smtp.gmail.com',
     port:                 587,
-    domain:               "qq.com",
-    user_name:            'jianyi.prolific@gmail.com',
-    password:             'ProlificAPI',
-    authentication:       'login',
+    domain:               "gmail.com",
+    user_name:            'jianyi.immed@gmail.com',
+    password:             'leer903376',
+    authentication:       :login,
     enable_starttls_auto: true  }
+
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.smtp_settings = {
+  #   address:              'smtp.exmail.qq.com',
+  #   port:                 25,
+  #   domain:               "qq.com",
+  #   user_name:            'order@soloman.co',
+  #   password:             '67yuHJ',
+  #   authentication:       'plain',
+  #   enable_starttls_auto: true  }
 
   config.action_mailer.perform_deliveries = true
   # Don't care if the mailer can't send.
