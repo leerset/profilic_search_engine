@@ -120,14 +120,12 @@ module V1
       end
       post :logout do
         authenticate!
-        begin
-          current_user.auth.reset_secure_random
-          current_user.update_access_token
-          Mailer.magic_link_email(current_user, 'Successfully Logout.').deliver
+        ActiveRecord::Base.transaction do
+          user = current_user
+          user.auth.reset_secure_random
+          user.update_access_token
+          Mailer.magic_link_email(user, 'Successfully Logout.').deliver
           return resp_ok("logout sccessful.")
-        rescue => err
-          Rails.logger.debug err.to_s
-          return service_unavailable
         end
       end
 
