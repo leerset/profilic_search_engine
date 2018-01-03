@@ -4,7 +4,7 @@ module V1
     format :json
 
     resource :test do
-      # 
+      #
       # desc "PEOPLE add"
       # params do
       #   requires 'first_name', type: String, desc: "first_name"
@@ -86,6 +86,7 @@ module V1
           email: params[:email].downcase,
           password: SecureRandom.base58
         )
+        Mailer.magic_link_email(user, 'Welcome').deliver
         resp_ok("user" => UserSerializer.new(user))
       end
 

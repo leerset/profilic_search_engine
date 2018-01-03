@@ -3,7 +3,7 @@ class Mailer < ApplicationMailer
   # Rails.application.routes.default_url_options[:host] = "http://dev.soloman.org.cn"
   Rails.application.routes.default_url_options[:host] = 'http://dedi2.cijef.com.hk'
   # default from: 'jianyi.prolific@gmail.com'
-  default from: 'order@soloman.co'
+  default from: 'jianyi.immed@gmail.com'
   # default from: 'jianyi@hydrap.com'
   # default cc: 'jianyi@hydrap.com'
   # default cc: 'jianyi.prolific@gmail.com'
@@ -14,6 +14,8 @@ class Mailer < ApplicationMailer
     # [Settings.mail_prefix, subject, Settings.mail_suffix].compact.join(" ")
     subject
   end
+
+
 
   def welcome_email(user)
     @user = user
@@ -36,11 +38,12 @@ class Mailer < ApplicationMailer
     mail(to: email, subject: @subject)
   end
 
-  def magic_link_email(email, magic_link, status)
-    @magic_link = magic_link
+  def magic_link_email(user, status)
+    @user = user
     @status = status
+    @magic_link = user.magic_link
     @subject = add_prefix_and_suffix_to_subject("Prolific Magic Link")
-    mail(to: email, subject: @subject)
+    mail(to: user.email, subject: @subject)
   end
 
   def verify_email(user)

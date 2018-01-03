@@ -40,6 +40,10 @@ class User < ApplicationRecord
       'application/zip',
       'application/xlsx', 'audio/mpeg', 'audio/mp3' ]
 
+  def magic_link
+    self.auth.try(:secure_random)
+  end
+
   def update_home_address(address_params)
     if self.home_address.present?
       self.home_address.update_attributes(address_params)
