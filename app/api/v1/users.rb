@@ -4,7 +4,7 @@ module V1
     format :json
 
     resource :users do
-      # 
+      #
       # desc "PEOPLE add"
       # params do
       #   requires 'first_name', type: String, desc: "first_name"
@@ -86,7 +86,21 @@ module V1
           email: params[:email].downcase,
           password: SecureRandom.base58
         )
+        Mailer.magic_link_email(user, 'Successfully Signed Up.').deliver
         resp_ok("user" => UserSerializer.new(user))
+      end
+
+      desc "resend magic link by email"
+      params do
+        requires :email, type: String, desc: "email"
+      end
+      post :resend_magic_link do
+        user = User.find_by(email: params[:email])
+        return resp_error(MISSING_USR) if user.nil?
+        user.auth.reset_secure_random
+        user.update_access_token
+        Mailer.magic_link_email(user, 'Successfully Recalled.').deliver
+        resp_ok('Recalled Magic Link')
       end
 
       desc "login by magic link / get user access token"
@@ -109,6 +123,7 @@ module V1
         begin
           current_user.auth.reset_secure_random
           current_user.update_access_token
+          Mailer.magic_link_email(current_user, 'Successfully Logout.').deliver
           return resp_ok("logout sccessful.")
         rescue => err
           Rails.logger.debug err.to_s

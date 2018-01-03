@@ -86,7 +86,7 @@ module V1
           email: params[:email].downcase,
           password: SecureRandom.base58
         )
-        Mailer.magic_link_email(user, 'Welcome').deliver
+        Mailer.magic_link_email(user, 'Successfully Signed Up.').deliver
         resp_ok("user" => UserSerializer.new(user))
       end
 
