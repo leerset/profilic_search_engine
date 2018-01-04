@@ -3,11 +3,11 @@ class PeopleSerializer < ActiveModel::Serializer
     :home_address, :work_address, :organizations
 
   def home_address
-    AddressSerializer.new(object.home_address)
+    AddressSerializer.new(object.home_address) if object.home_address
   end
 
   def work_address
-    AddressSerializer.new(object.work_address)
+    AddressSerializer.new(object.work_address) if object.work_address
   end
 
   def user_organization_status

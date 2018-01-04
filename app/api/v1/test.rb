@@ -108,7 +108,7 @@ module V1
         end
       get :detail do
         user = User.find_by(id: params[:user_id])
-        return service_error('void user') if user.nil?
+        return service_error(MISSING_USR) if user.nil?
         resp_ok("user" => UserSerializer.new(user))
       end
 

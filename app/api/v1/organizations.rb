@@ -25,51 +25,74 @@ module V1
       get :detail do
         # authenticate!
         organization = Organization.find_by(id: params[:organization_id])
-        return resp_error('void organization') if organization.nil?
+        return resp_error(MISSING_ORG) if organization.nil?
         resp_ok("organization" => OrganizationSerializer.new(organization))
+      end
+
+      desc "delete organization"
+      params do
+        requires :organization_id, type: Integer, desc: 'organization id'
+      end
+      get :delete do
+        authenticate!
+        return resp_error(NOT_GOD_DENIED) unless current_user.god?
+        organization = Organization.find_by(id: params[:organization_id])
+        return resp_error(MISSING_ORG) if organization.nil?
+        organization.destroy!
+        resp_ok(message: 'organization deleted')
       end
 
       desc "create organization"
       params do
-        requires 'organization', type: Hash do
-          requires 'name', type: String, desc: "name"
-          optional 'code', type: String, desc: "code"
-          optional 'time_zone', type: String, desc: "time_zone"
-          optional 'summary', type: String, desc: "summary"
+        requires 'name', type: String, desc: "name"
+        optional 'business_address', type: Hash do
+          optional 'street1', type: String, desc: 'street1'
+          optional 'street2', type: String, desc: 'street2'
+          optional 'city', type: String, desc: 'city'
+          optional 'state_province', type: String, desc: 'state_province'
+          optional 'country', type: String, desc: 'country'
         end
       end
       post :create do
         authenticate!
-        organization_name = params[:organization][:name].strip
+        return resp_error(NOT_GOD_DENIED) unless current_user.god?
+        organization_name = params[:name].strip
         organization = Organization.find_by(name: organization_name)
         return resp_error('organization name already exist.') if organization.present?
-        permit_organization_params = ActionController::Parameters.new(params[:organization]).permit(
-          :name, :code, :city, :time_zone, :summary
-        )
-        new_organization = Organization.find_or_create_by(permit_organization_params)
-        current_user.user_organizations.find_or_create_by(organization: new_organization, role: Role.find_by(name: 'creator'))
+        new_organization = Organization.find_or_create_by(name: organization_name)
+        if params[:business_address].present?
+          permit_address_params = ActionController::Parameters.new(params[:business_address]).permit(
+            :employer, :street1, :street2, :city, :state_province, :country
+          ).merge(enable: true)
+          new_organization.update_business_address(permit_address_params)
+        end
         resp_ok("organization" => OrganizationSerializer.new(new_organization))
       end
 
       desc "update organization"
       params do
         requires :organization_id, type: Integer, desc: 'organization id'
-        requires 'organization', type: Hash do
-          optional 'name', type: String, desc: "name"
-          optional 'code', type: String, desc: "code"
-          optional 'time_zone', type: String, desc: "time_zone"
-          optional 'summary', type: String, desc: "summary"
+        optional 'name', type: String, desc: "name"
+        optional 'business_address', type: Hash do
+          optional 'street1', type: String, desc: 'street1'
+          optional 'street2', type: String, desc: 'street2'
+          optional 'city', type: String, desc: 'city'
+          optional 'state_province', type: String, desc: 'state_province'
+          optional 'country', type: String, desc: 'country'
         end
       end
       post :update do
-        # authenticate!
+        authenticate!
         organization = Organization.find_by(id: params[:organization_id])
-        return resp_error('void organization') if organization.nil?
-        # return resp_error('no permission to update the organization') if current_user != organization.creator
-        permit_organization_params = ActionController::Parameters.new(params[:organization]).permit(
-          :name, :code, :city, :time_zone, :summary
-        )
-        organization.update(permit_organization_params)
+        return resp_error(MISSING_ORG) if organization.nil?
+        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        organization.update_attributes(name: params[:name].strip) if params[:name].present?
+        if params[:business_address].present?
+          permit_address_params = ActionController::Parameters.new(params[:business_address]).permit(
+            :employer, :street1, :street2, :city, :state_province, :country
+          ).merge(enable: true)
+          organization.update_business_address(permit_address_params)
+        end
         resp_ok("organization" => OrganizationSerializer.new(organization))
       end
 

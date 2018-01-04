@@ -100,7 +100,7 @@ module V1
         user.auth.reset_secure_random
         user.update_access_token
         Mailer.magic_link_email(user, 'Successfully Recalled.').deliver
-        resp_ok('Recalled Magic Link')
+        resp_ok(message: 'Recalled Magic Link')
       end
 
       desc "login by magic link / get user access token"
@@ -125,7 +125,7 @@ module V1
           user.auth.reset_secure_random
           user.update_access_token
           Mailer.magic_link_email(user, 'Successfully Logout.').deliver
-          return resp_ok("logout sccessful.")
+          return resp_ok(message: "logout sccessful.")
         end
       end
 

@@ -69,6 +69,16 @@ module V1
         resp_ok("organizations" => OrganizationSerializer.build_array(organizations))
       end
 
+      desc "get organization"
+      params do
+        requires :organization_id, type: Integer, desc: 'organization id'
+      end
+      get :organization do
+        organization = Organization.find_by(id: params[:organization_id])
+        return service_error(MISSING_ORG) if organization.nil?
+        resp_ok("organization" => OrganizationSerializer.new(organization))
+      end
+
       desc "get user list"
       params do
         optional :page, type: Integer, desc: 'curent page index，default: 1'

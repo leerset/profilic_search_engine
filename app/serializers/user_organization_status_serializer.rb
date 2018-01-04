@@ -1,6 +1,10 @@
 class UserOrganizationStatusSerializer < ActiveModel::Serializer
-  attributes :id, :user_id, :organization_id, :status, :title, :phone,
-    :organization_name, :oa
+  attributes :id, :user_id, :user_name, :organization_id, :organization_name,
+    :status, :title, :phone, :oa
+
+  def user_name
+    object.user.full_name
+  end
 
   def organization_name
     object.organization.name

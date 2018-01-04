@@ -10,7 +10,7 @@ class UserOrganizationSerializer < ActiveModel::Serializer
   end
 
   def role
-    RoleSerializer.new(object.role)
+    RoleSerializer.new(object.role) if object.role
   end
 
 end
