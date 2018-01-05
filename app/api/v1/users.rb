@@ -99,8 +99,8 @@ module V1
         return resp_error(MISSING_USR) if user.nil?
         user.auth.reset_secure_random
         user.update_access_token
-        Mailer.magic_link_email(user, 'Successfully Recalled.').deliver
-        resp_ok(message: 'Recalled Magic Link')
+        Mailer.magic_link_email(user, 'Successfully Resent Magic Link.').deliver
+        resp_ok(message: 'Resent Magic Link')
       end
 
       desc "login by magic link / get user access token"
@@ -129,7 +129,7 @@ module V1
         end
       end
 
-      desc "get user"
+      desc "get user my profile"
       params do
       end
       get :detail do

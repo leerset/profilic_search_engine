@@ -10,8 +10,8 @@ class PeopleSerializer < ActiveModel::Serializer
     AddressSerializer.new(object.work_address) if object.work_address
   end
 
-  def user_organization_status
-    OrganizationSerializer.build_array(object.organizations)
+  def organizations
+    OrganizationListSerializer.build_array(object.organizations)
   end
 
 end

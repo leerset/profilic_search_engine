@@ -13,7 +13,9 @@ module V1
       end
       post :get_global_roles do
         authenticate!
-        resp_ok("global_roles" => user.global_roles_hash)
+        user = User.find_by(id: params[:user_id])
+        return resp_error(MISSING_USR) if user.nil?
+        resp_ok("global_roles" => RoleSerializer.build_array(user.global_roles))
       end
 
       desc "set user global roles"
@@ -32,10 +34,10 @@ module V1
         role_ids.each do |role_id|
           user.user_roles.find_or_create_by(role_id: role_id)
         end
-        resp_ok("global_roles" => user.global_roles_hash)
+        resp_ok("global_roles" => RoleSerializer.build_array(user.global_roles))
       end
 
-##### organization
+##### organization OA
 
       desc "make user OA"
       params do
@@ -73,12 +75,14 @@ module V1
         resp_ok('organization_roles' => user.organization_roles_hash)
       end
 
-      desc "add user another organization"
+##### one organization join
+
+      desc "assign user to another organization"
       params do
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'organization_id', type: Integer, desc: "organization id"
       end
-      post :add_another_organization do
+      post :join_organization do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
@@ -88,6 +92,7 @@ module V1
         role = Role.find_by(code: 'organization_member')
         return resp_error(MISSING_ROL) if role.nil?
         user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
+        user.user_organization_statuses.find_or_create_by(organization_id: organization.id).update(status: 'Active')
         resp_ok('organization_roles' => user.organization_roles_hash)
       end
 
@@ -147,6 +152,8 @@ module V1
         user.user_organizations.where(organization: organization).destroy_all
         resp_ok('organization_roles' => user.organization_roles_hash)
       end
+
+##### set / get organizations roles
 
       desc "get organizations roles"
       params do

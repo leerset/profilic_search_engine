@@ -13,4 +13,8 @@ class UserOrganizationSerializer < ActiveModel::Serializer
     RoleSerializer.new(object.role) if object.role
   end
 
+  def status
+    UserOrganizationStatusSerializer.new(object.status) if object.status
+  end
+
 end

@@ -26,6 +26,7 @@ module V1
           optional 'email', type: String, desc: 'email'
           optional 'time_zone', type: String, desc: 'time_zone'
           optional 'citizenship', type: String, desc: 'citizenship'
+          optional 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "global status"
         end
         optional 'home_address', type: Hash do
           optional 'street1', type: String, desc: 'street1'
@@ -47,10 +48,11 @@ module V1
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
+        return resp_error(NOT_GOD_DENIED) unless current_user.god?
         ActiveRecord::Base.transaction do
           if params[:user].present?
             permit_user_params = ActionController::Parameters.new(params[:user]).permit(
-              :firstname, :lastname, :email, :time_zone, :citizenship)
+              :firstname, :lastname, :email, :time_zone, :citizenship, :status)
             user.update(permit_user_params)
           end
           if params[:home_address].present?
@@ -68,6 +70,12 @@ module V1
         end
         resp_ok('user' => PeopleSerializer.new(user))
       end
+
+##### global status
+
+
+
+##### organization status
 
       desc "get user organization status"
       params do
