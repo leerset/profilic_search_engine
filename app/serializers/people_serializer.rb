@@ -1,6 +1,19 @@
 class PeopleSerializer < ActiveModel::Serializer
   attributes :id, :firstname, :lastname, :email, :citizenship, :time_zone, :is_expired,
-    :home_address, :work_address, :organizations
+    :home_address, :work_address, :organizations,
+    :global_roles, :organization_roles, :invention_roles
+
+  def global_roles
+    RoleSerializer.build_array(object.roles)
+  end
+
+  def organization_roles
+    object.organization_roles_hash
+  end
+
+  def invention_roles
+    object.invention_roles_hash
+  end
 
   def is_expired
     object.expired?

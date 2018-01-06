@@ -103,8 +103,13 @@ class User < ApplicationRecord
   def invention_roles_hash
     invention_roles = []
     inventions.uniq.each do |invention|
-      invention_roles(invention).uniq.map(&:id).each do |role_id|
-        invention_roles << {invention_id: invention.id, role_id: role_id}
+      invention_roles(invention).uniq.each do |role|
+        invention_roles << {
+          invention_id: invention.id,
+          invention_name: invention.name,
+          role_id: role.id,
+          role_name: role.name
+        }
       end
     end
     {user_id: self.id, invention_roles: invention_roles}
@@ -113,8 +118,13 @@ class User < ApplicationRecord
   def organization_roles_hash
     organization_roles = []
     organizations.uniq.each do |organization|
-      organization_roles(organization).uniq.map(&:id).each do |role_id|
-        organization_roles << {organization_id: organization.id, role_id: role_id}
+      organization_roles(organization).uniq.each do |role|
+        organization_roles << {
+          organization_id: organization.id,
+          organization_name: organization.name,
+          role_id: role.id,
+          role_name: role.name
+        }
       end
     end
     {user_id: self.id, organization_roles: organization_roles}
