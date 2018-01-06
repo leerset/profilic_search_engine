@@ -1,8 +1,8 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :id, :email, :password, :access_token, :expires_time, :magic_link, :is_expired,
+  attributes :id, :email, :password, :access_token, :expires_time, :magic_link, :is_expired, :status,
     :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
     :home_address, :work_address,
-    # :citizenships, :languages, 
+    # :citizenships, :languages,
     :resume, :resume_filepath,
     :global_roles, :organization_roles, :invention_roles
 

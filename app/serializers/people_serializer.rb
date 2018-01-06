@@ -1,5 +1,5 @@
 class PeopleSerializer < ActiveModel::Serializer
-  attributes :id, :firstname, :lastname, :email, :citizenship, :time_zone, :is_expired,
+  attributes :id, :firstname, :lastname, :email, :citizenship, :time_zone, :is_expired, :status,
     :home_address, :work_address, :organizations,
     :global_roles, :organization_roles, :invention_roles
 
