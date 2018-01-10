@@ -17,6 +17,29 @@ module V1
         )
       end
 
+      desc 'get people'
+      params do
+        requires 'user_id', type: Integer, desc: "user id"
+      end
+      get :user do
+        authenticate!
+        user = User.find_by(id: params[:user_id])
+        return resp_error(MISSING_USR) if user.nil?
+        if current_user.god?
+          resp_ok(
+            'user' => PeopleSerializer.new(current_user),
+            'user_organization_statuses' =>
+              UserOrganizationStatusSerializer.build_array(current_user.user_organization_statuses)
+          )
+        else
+          resp_ok(
+            'user' => PeopleCommonSerializer.new(current_user),
+            'user_organization_statuses' =>
+              UserOrganizationStatusSerializer.build_array(current_user.user_organization_statuses)
+          )
+        end
+      end
+
       desc 'update people'
       params do
         requires 'user_id', type: Integer, desc: "user id"
