@@ -73,8 +73,6 @@ module V1
 
 ##### global status
 
-
-
 ##### organization status
 
       desc "get user organization status"

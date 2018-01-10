@@ -50,7 +50,7 @@ module V1
         return resp_error(MISSING_USR) if user.nil?
         organization = Organization.find_by(id: params[:organization_id])
         return resp_error(MISSING_ORG) if organization.nil?
-        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        return resp_error(NOT_GOD_DENIED) unless current_user.god?
         role = Role.find_by(code: 'organization_administrator')
         user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
         resp_ok('organization_roles' => user.organization_roles_hash)
@@ -67,7 +67,7 @@ module V1
         return resp_error(MISSING_USR) if user.nil?
         organization = Organization.find_by(id: params[:organization_id])
         return resp_error(MISSING_ORG) if organization.nil?
-        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        return resp_error(NOT_GOD_DENIED) unless current_user.god?
         role = Role.find_by(code: 'organization_administrator')
         return resp_error(MISSING_ROL) if role.nil?
         user_organization = user.user_organizations.find_by(organization_id: organization.id, role_id: role.id)

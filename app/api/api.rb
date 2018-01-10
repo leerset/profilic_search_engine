@@ -26,6 +26,7 @@ class API < Grape::API
       return nil unless request.headers['Authorization'].present?
       user = User.where(access_token: request.headers['Authorization']).first
       error!(unauthorized('You have not signed in for a long time, please login again.'), 401) if user && user.expired?
+      error!(unauthorized('Inactive prolific status, should not be allowed to sign in.'), 401) if user && user.prolific_status && user.prolific_status == 'Inactive'
       return user
     end
 

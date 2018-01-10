@@ -28,6 +28,12 @@ class User < ApplicationRecord
     self.build_auth(secure_random: Auth.generate_secure_random).save!
   end
 
+  def prolific_status
+    prolific = Organization.find_by(code: 'prolific')
+    return nil if prolific.nil?
+    self.user_organization_statuses.find_by(organization_id: prolific.id).try(:status)
+  end
+
   def join_prolific_organization
     prolific = Organization.find_by(code: 'prolific')
     return false if prolific.nil?

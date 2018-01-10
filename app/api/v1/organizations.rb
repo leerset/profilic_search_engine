@@ -7,25 +7,36 @@ module V1
 
       desc "get organization list"
       params do
-        optional :page, type: Integer, desc: 'curent page index，default: 1'
-        optional :size, type: Integer, desc: 'records count in each page, default: 20'
       end
       get :list do
-        # authenticate!
-        page = params[:page].presence || 1
-        size = params[:size].presence || 20
-        organizations = Organization.all.order(id: :desc).page(page).per(size)
+        authenticate!
+        return resp_error(NOT_GOD_DENIED) unless current_user.god?
+        organizations = Organization.all
         resp_ok("organizations" => OrganizationSerializer.build_array(organizations))
       end
+
+      # desc "get organization list"
+      # params do
+      #   optional :page, type: Integer, desc: 'curent page index，default: 1'
+      #   optional :size, type: Integer, desc: 'records count in each page, default: 20'
+      # end
+      # get :paged_list do
+      #   # authenticate!
+      #   page = params[:page].presence || 1
+      #   size = params[:size].presence || 20
+      #   organizations = Organization.all.order(id: :desc).page(page).per(size)
+      #   resp_ok("organizations" => OrganizationSerializer.build_array(organizations))
+      # end
 
       desc "get organization"
       params do
         requires :organization_id, type: Integer, desc: 'organization id'
       end
       get :detail do
-        # authenticate!
+        authenticate!
         organization = Organization.find_by(id: params[:organization_id])
         return resp_error(MISSING_ORG) if organization.nil?
+        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         resp_ok("organization" => OrganizationSerializer.new(organization))
       end
 
