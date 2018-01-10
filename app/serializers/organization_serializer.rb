@@ -1,10 +1,6 @@
 class OrganizationSerializer < ActiveModel::Serializer
-  attributes :id, :organization_name, :business_address, :created_time, :updated_time,
+  attributes :id, :name, :business_address, :created_time, :updated_time,
     :administrators_statuses
-
-  def organization_name
-    object.name
-  end
 
   def business_address
     AddressSerializer.new(object.business_address) if object.business_address
