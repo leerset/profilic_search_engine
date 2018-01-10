@@ -9,7 +9,7 @@ module V1
       params do
         requires 'user_id', type: Integer, desc: "user_id"
       end
-      post :get_global_roles do
+      get :get_global_roles do
         resp_ok("global_roles" => user.global_roles_hash)
       end
 
@@ -18,7 +18,7 @@ module V1
         requires 'user_id', type: Integer, desc: "user_role id"
         requires 'role_ids', type: Array[Integer], desc: "new user role ids"
       end
-      post :set_global_roles do
+      put :set_global_roles do
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
         role_ids = params[:role_ids].uniq
@@ -55,7 +55,7 @@ module V1
         requires 'organization_id', type: Integer, desc: "organization id"
         requires 'role_ids', type: Array[Integer], desc: "new user role ids"
       end
-      post :change_organization_roles do
+      put :change_organization_roles do
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
         organization = Organization.find_by(id: params[:organization_id])
@@ -74,7 +74,7 @@ module V1
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'organization_id', type: Integer, desc: "organization id"
       end
-      post :delete_organization_roles do
+      delete :delete_organization_roles do
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
         organization = Organization.find_by(id: params[:organization_id])
@@ -101,7 +101,7 @@ module V1
           requires 'role_id', type: Integer, desc: "role id"
         end
       end
-      post :set_organizations_roles do
+      put :set_organizations_roles do
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
         organization_roles_params = params[:organization_roles]

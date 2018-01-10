@@ -33,7 +33,7 @@ module V1
       params do
         requires :organization_id, type: Integer, desc: 'organization id'
       end
-      get :delete do
+      delete :delete do
         authenticate!
         return resp_error(NOT_GOD_DENIED) unless current_user.god?
         organization = Organization.find_by(id: params[:organization_id])
@@ -81,7 +81,7 @@ module V1
           optional 'country', type: String, desc: 'country'
         end
       end
-      post :update do
+      put :update do
         authenticate!
         organization = Organization.find_by(id: params[:organization_id])
         return resp_error(MISSING_ORG) if organization.nil?

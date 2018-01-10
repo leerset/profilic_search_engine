@@ -11,7 +11,7 @@ module V1
       params do
         requires 'user_id', type: Integer, desc: "user_id"
       end
-      post :get_global_roles do
+      get :get_global_roles do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
@@ -23,7 +23,7 @@ module V1
         requires 'user_id', type: Integer, desc: "user_role id"
         requires 'role_ids', type: Array[Integer], desc: "new user role ids"
       end
-      post :set_global_roles do
+      put :set_global_roles do
         authenticate!
         return resp_error(NOT_GOD_DENIED) unless current_user.god?
         user = User.find_by(id: params[:user_id])
@@ -44,7 +44,7 @@ module V1
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'organization_id', type: Integer, desc: "organization id"
       end
-      post :make_oa do
+      put :make_oa do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
@@ -61,7 +61,7 @@ module V1
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'organization_id', type: Integer, desc: "organization id"
       end
-      post :remove_oa do
+      delete :remove_oa do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
@@ -121,7 +121,7 @@ module V1
         requires 'organization_id', type: Integer, desc: "organization id"
         requires 'role_ids', type: Array[Integer], desc: "new user role ids"
       end
-      post :change_organization_roles do
+      put :change_organization_roles do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
@@ -142,7 +142,7 @@ module V1
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'organization_id', type: Integer, desc: "organization id"
       end
-      post :delete_organization_roles do
+      delete :delete_organization_roles do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
@@ -174,7 +174,7 @@ module V1
           requires 'role_id', type: Integer, desc: "role id"
         end
       end
-      post :set_organizations_roles do
+      put :set_organizations_roles do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?

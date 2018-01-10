@@ -44,7 +44,7 @@ module V1
           optional 'country', type: String, desc: 'country'
         end
       end
-      post :update do
+      put :update do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
@@ -97,7 +97,7 @@ module V1
         optional 'title', type: String, desc: "title"
         optional 'phone', type: String, desc: "phone"
       end
-      post :save_organization_status do
+      put :save_organization_status do
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?

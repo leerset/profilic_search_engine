@@ -32,7 +32,7 @@ module V1
         requires :id, type: Integer, desc: "concept id"
         requires :summary, type: String, desc: "summary"
       end
-      get :update do
+      put :update do
         authenticate!
         concept = Concept.find_by(id: params[:id])
         return resp_error('no concept found.') if concept.nil?
@@ -46,7 +46,7 @@ module V1
       params do
         requires :summary, type: String, desc: "summary"
       end
-      get :create do
+      post :create do
         authenticate!
         concept = current_user.concepts.create(summary: params[:summary])
         return resp_error('no concept found.') if concept.nil?

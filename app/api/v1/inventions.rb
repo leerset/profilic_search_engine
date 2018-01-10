@@ -25,7 +25,7 @@ module V1
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
       end
-      post :delete do
+      delete :delete do
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return resp_error(MISSING_INV) if invention.nil?
