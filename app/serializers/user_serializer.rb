@@ -7,15 +7,15 @@ class UserSerializer < ActiveModel::Serializer
     :global_roles, :organization_roles, :invention_roles
 
   def global_roles
-    RoleSerializer.build_array(object.roles)
+    object.global_roles_array
   end
 
   def organization_roles
-    object.organization_roles_hash
+    object.organization_roles_array
   end
 
   def invention_roles
-    object.invention_roles_hash
+    object.invention_roles_array
   end
 
   def is_expired
