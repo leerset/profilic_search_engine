@@ -1,7 +1,12 @@
 class PeopleSerializer < ActiveModel::Serializer
   attributes :id, :firstname, :lastname, :email, :citizenship, :time_zone, :is_expired, :status,
     :home_address, :work_address, :organizations,
-    :global_roles, :organization_roles, :invention_roles
+    :global_roles, :organization_roles, :invention_roles,
+    :user_organization_statuses
+
+  def user_organization_statuses
+    UserOrganizationStatusSerializer.build_array(object.user_organization_statuses)
+  end
 
   def global_roles
     object.global_roles_array

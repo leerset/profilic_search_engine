@@ -27,15 +27,11 @@ module V1
         return resp_error(MISSING_USR) if user.nil?
         if current_user.god?
           resp_ok(
-            'user' => PeopleSerializer.new(current_user),
-            'user_organization_statuses' =>
-              UserOrganizationStatusSerializer.build_array(current_user.user_organization_statuses)
+            'user' => PeopleSerializer.new(current_user)
           )
         else
           resp_ok(
-            'user' => PeopleCommonSerializer.new(current_user),
-            'user_organization_statuses' =>
-              UserOrganizationStatusSerializer.build_array(current_user.user_organization_statuses)
+            'user' => PeopleCommonSerializer.new(current_user)
           )
         end
       end
