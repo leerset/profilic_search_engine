@@ -15,8 +15,6 @@ class Mailer < ApplicationMailer
     subject
   end
 
-
-
   def welcome_email(user)
     @user = user
     email = @user.email

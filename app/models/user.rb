@@ -100,11 +100,11 @@ class User < ApplicationRecord
     invention_roles(invention).find_by(code: 'inventor').present?
   end
 
-  def invention_roles_hash
-    invention_roles = []
+  def invention_roles_array
+    inv_roles = []
     inventions.uniq.each do |invention|
       invention_roles(invention).uniq.each do |role|
-        invention_roles << {
+        inv_roles << {
           invention_id: invention.id,
           invention_name: invention.name,
           role_id: role.id,
@@ -112,14 +112,14 @@ class User < ApplicationRecord
         }
       end
     end
-    {user_id: self.id, invention_roles: invention_roles}
+    inv_roles
   end
 
-  def organization_roles_hash
-    organization_roles = []
+  def organization_roles_array
+    org_roles = []
     organizations.uniq.each do |organization|
       organization_roles(organization).uniq.each do |role|
-        organization_roles << {
+        org_roles << {
           organization_id: organization.id,
           organization_name: organization.name,
           role_id: role.id,
@@ -127,11 +127,18 @@ class User < ApplicationRecord
         }
       end
     end
-    {user_id: self.id, organization_roles: organization_roles}
+    org_roles
   end
 
-  def global_roles
-    self.roles
+  def global_roles_array
+    glo_roles = []
+    self.roles.uniq.each do |role|
+      glo_roles << {
+        role_id: role.id,
+        role_name: role.name
+      }
+    end
+    glo_roles
   end
 
   def organization_roles(organization)
