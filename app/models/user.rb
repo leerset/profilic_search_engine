@@ -37,16 +37,14 @@ class User < ApplicationRecord
   def join_prolific_organization
     prolific = Organization.find_by(code: 'prolific')
     return false if prolific.nil?
-    organization_member_role = Role.find_by(code: 'organization_member')
-    return false if organization_member_role.nil?
-    user_organizations.find_or_create_by(organization_id: prolific.id, role_id: organization_member_role.id)
-    return true
+    join_organization(prolific)
   end
 
   def join_organization(organization)
     organization_member_role = Role.find_by(code: 'organization_member')
     return false if organization_member_role.nil?
     user_organizations.find_or_create_by(organization_id: organization.id, role_id: organization_member_role.id)
+    user_organization_statuses.find_or_create_by(organization_id: organization.id).update(status: 'Active')
     return true
   end
 

@@ -91,8 +91,7 @@ module V1
         return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         role = Role.find_by(code: 'organization_member')
         return resp_error(MISSING_ROL) if role.nil?
-        user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
-        user.user_organization_statuses.find_or_create_by(organization_id: organization.id).update(status: 'Active')
+        user.join_organization(organization)
         resp_ok('organization_roles' => user.organization_roles_array)
       end
 
