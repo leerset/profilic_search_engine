@@ -1,6 +1,8 @@
 class PeopleCommonSerializer < ActiveModel::Serializer
-  attributes :id, :firstname, :lastname, :email, :citizenship, :time_zone, :is_expired, :status,
-    :home_address, :work_address
+  attributes :id, :email, :password, :access_token, :expires_time, :magic_link, :is_expired, :status,
+    :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
+    :home_address, :work_address,
+    :resume, :resume_filepath
 
   def is_expired
     object.expired?
@@ -12,6 +14,10 @@ class PeopleCommonSerializer < ActiveModel::Serializer
 
   def work_address
     AddressSerializer.new(object.work_address) if object.work_address
+  end
+
+  def expires_time
+    object.expires_at.to_i
   end
 
 end

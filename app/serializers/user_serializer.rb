@@ -1,10 +1,14 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :email, :password, :access_token, :expires_time, :magic_link, :is_expired, :status,
     :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
-    :home_address, :work_address,
-    # :citizenships, :languages,
+    :home_address, :work_address, :organizations,
     :resume, :resume_filepath,
-    :global_roles, :organization_roles, :invention_roles
+    :global_roles, :organization_roles, :invention_roles,
+    :user_organization_statuses
+
+  def user_organization_statuses
+    UserOrganizationStatusSerializer.build_array(object.user_organization_statuses)
+  end
 
   def global_roles
     object.global_roles_array
@@ -33,14 +37,6 @@ class UserSerializer < ActiveModel::Serializer
   def organizations
     OrganizationListSerializer.build_array(object.organizations)
   end
-
-  # def citizenships
-  #   CitizenshipSerializer.build_array(object.citizenships)
-  # end
-  #
-  # def languages
-  #   LanguageSerializer.build_array(object.languages)
-  # end
 
   def expires_time
     object.expires_at.to_i

@@ -11,9 +11,7 @@ module V1
       get :detail do
         authenticate!
         resp_ok(
-          'user' => PeopleSerializer.new(current_user),
-          'user_organization_statuses' =>
-            UserOrganizationStatusSerializer.build_array(current_user.user_organization_statuses)
+          'user' => PeopleSerializer.new(current_user)
         )
       end
 
