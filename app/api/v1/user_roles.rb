@@ -15,7 +15,7 @@ module V1
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_USR) if user.nil?
-        resp_ok("global_roles" => RoleSerializer.build_array(user.global_roles))
+        resp_ok("global_roles" => user.global_roles_array)
       end
 
       desc "set user global roles"
@@ -34,7 +34,7 @@ module V1
         role_ids.each do |role_id|
           user.user_roles.find_or_create_by(role_id: role_id)
         end
-        resp_ok("global_roles" => RoleSerializer.build_array(user.global_roles))
+        resp_ok("global_roles" => user.global_roles_array)
       end
 
 ##### organization OA
@@ -53,7 +53,7 @@ module V1
         return resp_error(NOT_GOD_DENIED) unless current_user.god?
         role = Role.find_by(code: 'organization_administrator')
         user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
-        resp_ok('organization_roles' => user.organization_roles_hash)
+        resp_ok('organization_roles' => user.organization_roles_array)
       end
 
       desc "remove user OA"
@@ -72,7 +72,7 @@ module V1
         return resp_error(MISSING_ROL) if role.nil?
         user_organization = user.user_organizations.find_by(organization_id: organization.id, role_id: role.id)
         user_organization.destroy if user_organization.present?
-        resp_ok('organization_roles' => user.organization_roles_hash)
+        resp_ok('organization_roles' => user.organization_roles_array)
       end
 
 ##### one organization join
@@ -93,7 +93,7 @@ module V1
         return resp_error(MISSING_ROL) if role.nil?
         user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
         user.user_organization_statuses.find_or_create_by(organization_id: organization.id).update(status: 'Active')
-        resp_ok('organization_roles' => user.organization_roles_hash)
+        resp_ok('organization_roles' => user.organization_roles_array)
       end
 
       desc "add user organization role"
@@ -112,7 +112,7 @@ module V1
         role = Role.find_by(role_type: 'organization', id: params[:role_id])
         return resp_error(MISSING_ROL) if role.nil?
         user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
-        resp_ok('organization_roles' => user.organization_roles_hash)
+        resp_ok('organization_roles' => user.organization_roles_array)
       end
 
       desc "change user organization roles"
@@ -134,7 +134,7 @@ module V1
         role_ids.each do |role_id|
           user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role_id)
         end
-        resp_ok('organization_roles' => user.organization_roles_hash)
+        resp_ok('organization_roles' => user.organization_roles_array)
       end
 
       desc "delete user organization roles"
@@ -150,7 +150,7 @@ module V1
         return resp_error(MISSING_ORG) if organization.nil?
         return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         user.user_organizations.where(organization: organization).destroy_all
-        resp_ok('organization_roles' => user.organization_roles_hash)
+        resp_ok('organization_roles' => user.organization_roles_array)
       end
 
 ##### set / get organizations roles
@@ -163,7 +163,7 @@ module V1
         authenticate!
         user = User.find_by(id: params[:user_id])
         return resp_error(MISSING_ORG_USR) if user.nil?
-        resp_ok('organization_roles' => user.organization_roles_hash)
+        resp_ok('organization_roles' => user.organization_roles_array)
       end
 
       desc "set organizations roles"
@@ -192,7 +192,7 @@ module V1
             user.user_organizations.find_or_create_by(organization_id: organization_id, role_id: role_id)
           end
         end
-        resp_ok('organization_roles' => user.organization_roles_hash)
+        resp_ok('organization_roles' => user.organization_roles_array)
       end
 
 ##### invention
