@@ -6,6 +6,9 @@
   <body>
     <h1><%= @status %></h1>
     <p>User: <%= @user.full_name %></p>
-    <p>Magic Link to visit Prolific: <%= @magic_link %></p>
+    <p>Magic Link to visit Prolific: </p>
+    <a href="https://prolific-dev.herokuapp.com/#/signin?magic_link=<%= @magic_link %>">prolific-dev.herokuapp.com</a>
+    <p>Magic Link to visit Prolific: </p>
+    <a href="http://localhost:8080/signin?magic_link=<%= @magic_link %>">localhost:8080</a>
   </body>
 </html>
