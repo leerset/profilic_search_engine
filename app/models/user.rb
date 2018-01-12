@@ -111,8 +111,8 @@ class User < ApplicationRecord
     inventions.uniq.each do |invention|
       invention_roles(invention).uniq.each do |role|
         inv_roles << {
-          invention_id: invention.id,
-          invention_name: invention.name,
+          id: invention.id,
+          name: invention.name,
           role_id: role.id,
           role_name: role.name
         }
@@ -126,8 +126,8 @@ class User < ApplicationRecord
     organizations.uniq.each do |organization|
       organization_roles(organization).uniq.each do |role|
         org_roles << {
-          organization_id: organization.id,
-          organization_name: organization.name,
+          id: organization.id,
+          name: organization.name,
           role_id: role.id,
           role_name: role.name
         }
