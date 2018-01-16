@@ -5,17 +5,17 @@ module V1
 
     resource :organizations do
 
-      desc "get organization list"
+      desc "get organization list GOD(get all) OA(get related) NUL(get empty array)"
       params do
       end
       get :list do
         authenticate!
-        return resp_error(NOT_GOD_DENIED) unless current_user.god?
-        organizations = Organization.all
+        # return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa_organizations.any?
+        organizations = current_user.managed_organizations
         resp_ok("organizations" => OrganizationSerializer.build_array(organizations))
       end
 
-      # desc "get organization list"
+      # desc "get paged organization list"
       # params do
       #   optional :page, type: Integer, desc: 'curent page index，default: 1'
       #   optional :size, type: Integer, desc: 'records count in each page, default: 20'
@@ -46,9 +46,9 @@ module V1
       end
       delete :delete do
         authenticate!
-        return resp_error(NOT_GOD_DENIED) unless current_user.god?
         organization = Organization.find_by(id: params[:organization_id])
         return resp_error(MISSING_ORG) if organization.nil?
+        return resp_error(NOT_GOD_DENIED) unless current_user.god?
         organization.destroy!
         resp_ok(message: 'organization deleted')
       end

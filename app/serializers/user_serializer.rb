@@ -35,7 +35,7 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def organizations
-    OrganizationListSerializer.build_array(object.organizations)
+    OrganizationListSerializer.build_array(object.managed_organizations)
   end
 
   def expires_time

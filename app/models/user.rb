@@ -100,6 +100,14 @@ class User < ApplicationRecord
     organizations.uniq.map{|a| oa?(a)}.uniq == [true]
   end
 
+  def managed_organizations
+    if self.god?
+      Organization.all
+    else
+      self.user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_administrator'}).map(&:organization).uniq.sort
+    end
+  end
+
   def inventor?(invention)
     invention_roles(invention).find_by(code: 'inventor').present?
   end
