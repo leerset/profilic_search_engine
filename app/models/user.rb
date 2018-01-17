@@ -129,7 +129,7 @@ class User < ApplicationRecord
 
   def invention_roles_array_in_organizations(orgs)
     inv_roles = []
-    inventions.includes(:organizations).where.not(organization: orgs).uniq.each do |invention|
+    inventions.includes(:organization).where.not(organization: orgs).uniq.each do |invention|
       invention_roles(invention).uniq.each do |role|
         inv_roles << {
           id: invention.id,
@@ -159,7 +159,7 @@ class User < ApplicationRecord
 
   def organization_roles_array_in_organizations(orgs)
     org_roles = []
-    organizations.where.not(id: orgs.map(&:id)).uniq.each do |organization|
+    organizations.where(id: orgs.map(&:id)).uniq.each do |organization|
       organization_roles(organization).uniq.each do |role|
         org_roles << {
           id: organization.id,
