@@ -127,9 +127,39 @@ class User < ApplicationRecord
     inv_roles
   end
 
+  def invention_roles_array_in_organizations(orgs)
+    inv_roles = []
+    inventions.includes(:organizations).where.not(organization: orgs).uniq.each do |invention|
+      invention_roles(invention).uniq.each do |role|
+        inv_roles << {
+          id: invention.id,
+          name: invention.name,
+          role_id: role.id,
+          role_name: role.name
+        }
+      end
+    end
+    inv_roles
+  end
+
   def organization_roles_array
     org_roles = []
     organizations.uniq.each do |organization|
+      organization_roles(organization).uniq.each do |role|
+        org_roles << {
+          id: organization.id,
+          name: organization.name,
+          role_id: role.id,
+          role_name: role.name
+        }
+      end
+    end
+    org_roles
+  end
+
+  def organization_roles_array_in_organizations(orgs)
+    org_roles = []
+    organizations.where.not(id: orgs.mpa(&:id)).uniq.each do |organization|
       organization_roles(organization).uniq.each do |role|
         org_roles << {
           id: organization.id,
@@ -173,6 +203,7 @@ class User < ApplicationRecord
   end
 
   def expired?
+    set_expiration if self.expires_at.nil?
     DateTime.now >= self.expires_at
   end
 

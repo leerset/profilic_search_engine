@@ -85,10 +85,19 @@ module V1
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
       end
       get :users do
+        authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
-        users = User.all.order(id: :desc).page(page).per(size)
-        resp_ok("users" => UserSerializer.build_array(users))
+        if current_user.god?
+          users = User.all.order(id: :desc).page(page).per(size)
+          resp_ok("users" => UserSerializer.build_array(users))
+        elsif current_user.managed_organizations.any?
+          users = User.includes(:organizations).where(organizations: {id: current_user.managed_organizations.map(&:id)})
+          users = users.order(id: :desc).page(page).per(size)
+          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
+        else
+          return resp_error(NOT_GOD_OA_DENIED)
+        end
       end
 
       desc "get user"
@@ -96,9 +105,18 @@ module V1
         requires :user_id, type: Integer, desc: 'user_id'
       end
       get :user do
+        authenticate!
         user = User.find_by(id: params[:user_id])
-        return service_error('void user') if user.nil?
-        resp_ok("user" => UserSerializer.new(user))
+        return service_error(MISSING_USR) if user.nil?
+        orgs = (current_user.managed_organizations - user.organizations)
+        return resp_error(NOT_GOD_OA_DENIED) if !current_user.god? && orgs.empty?
+        if current_user.god?
+          resp_ok("user" => UserSerializer.new(user))
+        elsif current_user.managed_organizations.any?
+          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
+        else
+          return resp_error(NOT_GOD_OA_DENIED)
+        end
       end
 
       desc "get citizenships"

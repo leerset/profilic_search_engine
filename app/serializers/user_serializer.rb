@@ -7,7 +7,13 @@ class UserSerializer < ActiveModel::Serializer
     :user_organization_statuses
 
   def user_organization_statuses
-    UserOrganizationStatusSerializer.build_array(object.user_organization_statuses)
+    manage_organizations = instance_options[:manage_organizations]
+    current_user_organization_statuses = if manage_organizations
+      object.user_organization_statuses.where(organization: manage_organizations)
+    else
+      object.user_organization_statuses
+    end
+    UserOrganizationStatusSerializer.build_array(current_user_organization_statuses)
   end
 
   def global_roles
@@ -15,11 +21,21 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def organization_roles
-    object.organization_roles_array
+    manage_organizations = instance_options[:manage_organizations]
+    if manage_organizations
+      object.organization_roles_array_in_organizations(manage_organizations)
+    else
+      object.organization_roles_array
+    end
   end
 
   def invention_roles
-    object.invention_roles_array
+    manage_organizations = instance_options[:manage_organizations]
+    if manage_organizations
+      object.invention_roles_array_in_organizations(manage_organizations)
+    else
+      object.invention_roles_array
+    end
   end
 
   def is_expired
@@ -35,7 +51,13 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def organizations
-    OrganizationListSerializer.build_array(object.managed_organizations)
+    manage_organizations = instance_options[:manage_organizations]
+    current_organizations = if manage_organizations
+      manage_organizations.where.not(id: object.organizations.map(&:id))
+    else
+      object.organizations.uniq
+    end
+    OrganizationListSerializer.build_array(current_organizations)
   end
 
   def expires_time
