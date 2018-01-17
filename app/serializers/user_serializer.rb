@@ -7,7 +7,6 @@ class UserSerializer < ActiveModel::Serializer
     :user_organization_statuses
 
   def user_organization_statuses
-    binding.pry
     manage_organizations = instance_options[:managed_organizations]
     current_user_organization_statuses = if manage_organizations
       object.user_organization_statuses.where(organization: manage_organizations)
