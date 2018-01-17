@@ -108,7 +108,7 @@ module V1
         authenticate!
         user = User.find_by(id: params[:user_id])
         return service_error(MISSING_USR) if user.nil?
-        orgs = (current_user.managed_organizations - user.organizations)
+        orgs = (current_user.managed_organizations & user.organizations)
         return resp_error(NOT_GOD_OA_DENIED) if !current_user.god? && orgs.empty?
         if current_user.god?
           resp_ok("user" => UserSerializer.new(user))
