@@ -7,7 +7,8 @@ class UserSerializer < ActiveModel::Serializer
     :user_organization_statuses
 
   def user_organization_statuses
-    manage_organizations = instance_options[:manage_organizations]
+    binding.pry
+    manage_organizations = instance_options[:managed_organizations]
     current_user_organization_statuses = if manage_organizations
       object.user_organization_statuses.where(organization: manage_organizations)
     else
@@ -21,7 +22,7 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def organization_roles
-    manage_organizations = instance_options[:manage_organizations]
+    manage_organizations = instance_options[:managed_organizations]
     if manage_organizations
       object.organization_roles_array_in_organizations(manage_organizations)
     else
@@ -30,7 +31,7 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def invention_roles
-    manage_organizations = instance_options[:manage_organizations]
+    manage_organizations = instance_options[:managed_organizations]
     if manage_organizations
       object.invention_roles_array_in_organizations(manage_organizations)
     else
@@ -51,9 +52,9 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def organizations
-    manage_organizations = instance_options[:manage_organizations]
+    manage_organizations = instance_options[:managed_organizations]
     current_organizations = if manage_organizations
-      manage_organizations.where.not(id: object.organizations.map(&:id))
+      object.organizations.where(id: manage_organizations.map(&:id))
     else
       object.organizations.uniq
     end

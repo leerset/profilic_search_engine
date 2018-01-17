@@ -159,7 +159,7 @@ class User < ApplicationRecord
 
   def organization_roles_array_in_organizations(orgs)
     org_roles = []
-    organizations.where.not(id: orgs.mpa(&:id)).uniq.each do |organization|
+    organizations.where.not(id: orgs.map(&:id)).uniq.each do |organization|
       organization_roles(organization).uniq.each do |role|
         org_roles << {
           id: organization.id,
