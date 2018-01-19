@@ -77,6 +77,8 @@ module V1
       desc "sign up by email / create user"
       params do
         requires :email, type: String, desc: "email"
+        optional :firstname, type: String, desc: "firstname"
+        optional :lastname, type: String, desc: "lastname"
       end
       post :sign_up do
         return resp_error('Bad email format.') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
@@ -84,6 +86,8 @@ module V1
         return resp_error('This email has been registered.') if user.present?
         user = User.create!(
           email: params[:email].downcase,
+          firstname: params[:firstname],
+          lastname: params[:lastname],
           password: SecureRandom.base58
         )
         Mailer.magic_link_email(user, 'Successfully Signed Up.').deliver
