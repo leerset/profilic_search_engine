@@ -175,7 +175,7 @@ module V1
         ActiveRecord::Base.transaction do
           if params[:user].present?
             permit_user_params = ActionController::Parameters.new(params[:user]).permit(
-              :firstname, :lastname, :screen_name, :employer, :time_zone, :personal_summary
+              :firstname, :lastname, :screen_name, :employer, :time_zone, :personal_summary, :resume
             )
             current_user.update(permit_user_params)
           end
