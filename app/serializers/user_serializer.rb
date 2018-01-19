@@ -1,10 +1,19 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :email, :password, :access_token, :expires_time, :magic_link, :is_expired, :status,
     :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
+    :drafts_amount, :inventions_amount,
     :home_address, :work_address, :organizations,
     :resume, :resume_filepath,
     :global_roles, :organization_roles, :invention_roles,
     :user_organization_statuses
+
+  def drafts_amount
+    0
+  end
+
+  def inventions_amount
+    object.inventions.uniq.count
+  end
 
   def user_organization_statuses
     manage_organizations = instance_options[:managed_organizations]
