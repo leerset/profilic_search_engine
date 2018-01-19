@@ -100,6 +100,46 @@ module V1
         end
       end
 
+      desc "get Users List Filtering"
+      params do
+        optional 'name', type: String, desc: "name"
+        requires 'organization_id', type: Integer, default: 0, desc: "organization_id, default: 0 for all"
+        requires 'status', type: String, default: 'All', desc: "status, default: 'All' for all"
+        optional :page, type: Integer, desc: 'curent page index，default: 1'
+        optional :size, type: Integer, desc: 'records count in each page, default: 20'
+      end
+      get :filter_users do
+        authenticate!
+        page = params[:page].presence || 1
+        size = params[:size].presence || 20
+        organizations = if params[:organization_id] == 0
+          Organization.all
+        else
+          Organization.where(id: params[:organization_id])
+        end
+        if !current_user.god? && current_user.managed_organizations.any?
+          organizations = (organizations & current_user.managed_organizations)
+        end
+        uoss = if params[:status] == 'All'
+          UserOrganizationStatus.where(organization_id: organizations.map(&:id))
+        else
+          UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
+        end
+        users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
+        if params[:name].present?
+          name = params[:name].strip
+          users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email)", name, name, name)
+        end
+        users = users.order(id: :desc).page(page).per(size)
+        if current_user.god?
+          resp_ok("users" => UserSerializer.build_array(users))
+        elsif current_user.managed_organizations.any?
+          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
+        else
+          return resp_error(NOT_GOD_OA_DENIED)
+        end
+      end
+
       desc "get user"
       params do
         requires :user_id, type: Integer, desc: 'user_id'
