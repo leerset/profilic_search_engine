@@ -13,8 +13,8 @@ module V1
       post :create do
         authenticate!
         organization = Organization.find_by(id: params[:organization_id])
-        return resp_error(MISSING_ORG) if organization.nil?
-        return resp_error(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
+        return data_not_found(MISSING_ORG) if organization.nil?
+        return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
         invention = organization.inventions.create(name: params[:name])
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
         invention.user_inventions.create(user: current_user, role: inventor_role)
@@ -28,9 +28,9 @@ module V1
       delete :delete do
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
-        return resp_error(MISSING_INV) if invention.nil?
+        return data_not_found(MISSING_INV) if invention.nil?
         unless current_user.god? || current_user.inventor?(invention)
-          return resp_error(NOT_GOD_INVENTOR_DENIED)
+          return permission_denied(NOT_GOD_INVENTOR_DENIED)
         end
         invention.destroy
         resp_ok
@@ -69,7 +69,7 @@ module V1
         page = params[:page].presence || 1
         size = params[:size].presence || 20
         invention = Invention.find_by(id: params[:invention_id])
-        return resp_error(MISSING_INV) if invention.nil?
+        return data_not_found(MISSING_INV) if invention.nil?
         user_inventions = invention.user_inventions
         paged_user_inventions = user_inventions.order(id: :desc).page(page).per(size)
         resp_ok("participants" => ParticipantSerializer.build_array(paged_user_inventions))

@@ -22,7 +22,7 @@ module V1
       get :user do
         authenticate!
         user = User.find_by(id: params[:user_id])
-        return resp_error(MISSING_USR) if user.nil?
+        return data_not_found(MISSING_USR) if user.nil?
         if current_user.god?
           resp_ok(
             'user' => PeopleSerializer.new(current_user)
@@ -66,8 +66,8 @@ module V1
       put :update do
         authenticate!
         user = User.find_by(id: params[:user_id])
-        return resp_error(MISSING_USR) if user.nil?
-        return resp_error(NOT_GOD_DENIED) unless current_user.god?
+        return data_not_found(MISSING_USR) if user.nil?
+        return permission_denied(NOT_GOD_DENIED) unless current_user.god?
         ActiveRecord::Base.transaction do
           if params[:user].present?
             permit_user_params = ActionController::Parameters.new(params[:user]).permit(
@@ -101,7 +101,7 @@ module V1
       get :organization_statuses do
         authenticate!
         user = User.find_by(id: params[:user_id])
-        return resp_error(MISSING_USR) if user.nil?
+        return data_not_found(MISSING_USR) if user.nil?
         resp_ok('user_organization_statuses' =>
           UserOrganizationStatusSerializer.build_array(user.user_organization_statuses))
       end
@@ -117,10 +117,10 @@ module V1
       put :save_organization_status do
         authenticate!
         user = User.find_by(id: params[:user_id])
-        return resp_error(MISSING_USR) if user.nil?
+        return data_not_found(MISSING_USR) if user.nil?
         organization = Organization.find_by(id: params[:organization_id])
-        return resp_error(MISSING_ORG) if organization.nil?
-        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        return data_not_found(MISSING_ORG) if organization.nil?
+        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         user_organization_status = user.user_organization_statuses.find_or_create_by(organization_id: organization.id)
         user_organization_status.update(
           status: params[:status],

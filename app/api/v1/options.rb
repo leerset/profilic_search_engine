@@ -26,9 +26,9 @@ module V1
       end
       get :organization_roles do
         organization = Organization.find_by(id: params[:organization_id])
-        return resp_error(MISSING_ORG) if organization.nil?
+        return data_not_found(MISSING_ORG) if organization.nil?
         user = organization.users.find_by(id: params[:user_id])
-        return resp_error(MISSING_USR) if user.nil?
+        return data_not_found(MISSING_USR) if user.nil?
         organization_roles = user.organization_roles(organization)
         resp_ok("organization_roles" => RoleSerializer.build_array(organization_roles))
       end
@@ -40,9 +40,9 @@ module V1
       end
       get :invention_roles do
         invention = Invention.find_by(id: params[:invention_id])
-        return resp_error(MISSING_INV) if invention.nil?
+        return data_not_found(MISSING_INV) if invention.nil?
         user = invention.users.find_by(id: params[:user_id])
-        return resp_error(MISSING_USR) if user.nil?
+        return data_not_found(MISSING_USR) if user.nil?
         invention_roles = user.invention_roles(invention)
         resp_ok("invention_roles" => RoleSerializer.build_array(invention_roles))
       end
@@ -53,7 +53,7 @@ module V1
       end
       get :global_roles do
         user = User.find_by(id: params[:user_id])
-        return resp_error(MISSING_USR) if user.nil?
+        return data_not_found(MISSING_USR) if user.nil?
         resp_ok("global_roles" => RoleSerializer.build_array(user.roles))
       end
 
@@ -75,7 +75,7 @@ module V1
       end
       get :organization do
         organization = Organization.find_by(id: params[:organization_id])
-        return service_error(MISSING_ORG) if organization.nil?
+        return data_not_found(MISSING_ORG) if organization.nil?
         resp_ok("organization" => OrganizationSerializer.new(organization))
       end
 
@@ -96,7 +96,7 @@ module V1
           users = users.order(id: :desc).page(page).per(size)
           resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
         else
-          return resp_error(NOT_GOD_OA_DENIED)
+          return permission_denied(NOT_GOD_OA_DENIED)
         end
       end
 
@@ -136,7 +136,7 @@ module V1
         elsif current_user.managed_organizations.any?
           resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
         else
-          return resp_error(NOT_GOD_OA_DENIED)
+          return permission_denied(NOT_GOD_OA_DENIED)
         end
       end
 
@@ -147,15 +147,15 @@ module V1
       get :user do
         authenticate!
         user = User.find_by(id: params[:user_id])
-        return service_error(MISSING_USR) if user.nil?
+        return data_not_found(MISSING_USR) if user.nil?
         orgs = (current_user.managed_organizations & user.organizations)
-        return resp_error(NOT_GOD_OA_DENIED) if !current_user.god? && orgs.empty?
+        return permission_denied(NOT_GOD_OA_DENIED) if !current_user.god? && orgs.empty?
         if current_user.god?
           resp_ok("user" => UserSerializer.new(user))
         elsif current_user.managed_organizations.any?
           resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
         else
-          return resp_error(NOT_GOD_OA_DENIED)
+          return permission_denied(NOT_GOD_OA_DENIED)
         end
       end
 

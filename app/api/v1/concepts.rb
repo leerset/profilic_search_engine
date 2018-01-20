@@ -12,7 +12,7 @@ module V1
       get :detail do
         authenticate!
         concept = Concept.find_by(id: params[:id])
-        return resp_error('no concept found.') if concept.nil?
+        return data_not_found(MISSING_CONCEPT) if concept.nil?
         resp_ok("concept" => ConceptSerializer.new(concept))
       end
 
@@ -23,7 +23,7 @@ module V1
       get :versions do
         authenticate!
         concept = Concept.find_by(id: params[:id])
-        return resp_error('no concept found.') if concept.nil?
+        return data_not_found(MISSING_CONCEPT) if concept.nil?
         resp_ok("versions" => ConceptSerializer.build_array(concept.versions.map(&:reify).compact))
       end
 
@@ -35,7 +35,7 @@ module V1
       put :update do
         authenticate!
         concept = Concept.find_by(id: params[:id])
-        return resp_error('no concept found.') if concept.nil?
+        return data_not_found(MISSING_CONCEPT) if concept.nil?
         concept.paper_trail.whodunnit(current_user.email) do
           concept.update_attributes(summary: params[:summary])
         end
@@ -49,7 +49,7 @@ module V1
       post :create do
         authenticate!
         concept = current_user.concepts.create(summary: params[:summary])
-        return resp_error('no concept found.') if concept.nil?
+        return data_not_found(MISSING_CONCEPT) if concept.nil?
         resp_ok("concept" => ConceptSerializer.new(concept))
       end
 
@@ -63,7 +63,7 @@ module V1
           fulltext params[:query_content]
         end
         concepts = search.results
-        return resp_error('no concept found.') if concepts.empty?
+        return data_not_found(MISSING_CONCEPT) if concepts.empty?
         resp_ok("concepts" => ConceptSimpleSerializer.build_array(concepts))
       end
 

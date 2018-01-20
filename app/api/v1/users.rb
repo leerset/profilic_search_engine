@@ -4,75 +4,6 @@ module V1
     format :json
 
     resource :users do
-      #
-      # desc "PEOPLE add"
-      # params do
-      #   requires 'first_name', type: String, desc: "first_name"
-      #   requires 'last_name', type: String, desc: "last_name"
-      #   requires 'email', type: String, desc: "email"
-      #   requires 'organization', type: String, desc: "organization"
-      # end
-      # get :add do
-      #   return resp_error('Bad email format') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
-      #   user = User.find_by(email: params[:email].downcase)
-      #   return resp_error("PEOPLE exist with email: #{params[:email]}") if user.present?
-      #   ActiveRecord::Base.transaction do
-      #     user = User.create!(
-      #       email: params[:email].downcase,
-      #       password: SecureRandom.base58
-      #     )
-      #     organization = Organization.find_or_create_by(name: params[:organization])
-      #     user.update(
-      #       firstname: params[:first_name],
-      #       lastname: params[:last_name]
-      #     )
-      #     user.user_organizations.find_or_create_by(organization: organization)
-      #     resp_ok("user" => UserSerializer.new(user))
-      #   end
-      # end
-      #
-      # desc "SGIN IN"
-      # params do
-      #   requires 'email', type: String, desc: "email"
-      #   requires 'password', type: String, desc: "password"
-      # end
-      # get :sign_in do
-      #   user = User.find_by(email: params[:email].downcase)
-      #   return resp_error('bad email / password') if user.nil?
-      #   if user.valid_password?(params[:password])
-      #     user.update(
-      #       current_sign_in_at: Time.now,
-      #       current_sign_in_ip: request.env['REMOTE_ADDR'],
-      #       sign_in_count: user.sign_in_count + 1
-      #     )
-      #     return resp_ok("user" => UserSerializer.new(user))
-      #   else
-      #     return resp_error('bad email / password')
-      #   end
-      # end
-      #
-      # desc "CREATE ACCOUNT"
-      # params do
-      #   requires :name, type: String, desc: "name"
-      #   requires :email, type: String, desc: "email"
-      #   requires :password, type: String, desc: "password"
-      #   requires :confirm_password, type: String, desc: "confirm_password"
-      # end
-      # post :create_account do
-      #   return resp_error('Bad email format.') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
-      #   return resp_error('different passwords') if params[:password] != params[:confirm_password]
-      #   user = User.find_by(email: params[:email].downcase)
-      #   return resp_error('This email has been registered.') if user.present?
-      #   user = User.create!(
-      #     email: params[:email].downcase,
-      #     password: SecureRandom.base58
-      #   )
-      #   user.update(
-      #     password: params[:password],
-      #     screen_name: params[:name]
-      #   )
-      #   resp_ok("user" => UserSerializer.new(user))
-      # end
 
       desc "sign up by email / create user"
       params do
@@ -81,9 +12,9 @@ module V1
         optional :lastname, type: String, desc: "lastname"
       end
       post :sign_up do
-        return resp_error('Bad email format.') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
+        return unauthorized('Bad email format.') if params[:email] !~ /^([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+$/i
         user = User.find_by(email: params[:email].downcase)
-        return resp_error('This email has been registered.') if user.present?
+        return unauthorized('This email has been registered.') if user.present?
         user = User.create!(
           email: params[:email].downcase,
           firstname: params[:firstname],
@@ -100,7 +31,7 @@ module V1
       end
       post :resend_magic_link do
         user = User.find_by(email: params[:email])
-        return resp_error(MISSING_USR) if user.nil?
+        return data_not_found(MISSING_USR) if user.nil?
         user.auth.reset_secure_random
         user.update_access_token
         Mailer.magic_link_email(user, 'Successfully Resent Magic Link.').deliver
@@ -113,7 +44,7 @@ module V1
       end
       post :login do
         auth = Auth.find_by_secure_random(params[:magic_link])
-        return resp_error("Expired magic link") if auth.nil?
+        return unauthorized("Expired magic link") if auth.nil?
         user = auth.user
         user.update_access_token
         resp_ok("user" => UserSerializer.new(user))
@@ -128,7 +59,8 @@ module V1
           user = current_user
           user.auth.reset_secure_random
           user.update_access_token
-          Mailer.magic_link_email(user, 'Successfully Logout.').deliver
+          # Remove "Sign Out" e-mail
+          # Mailer.magic_link_email(user, 'Successfully Logout.').deliver
           return resp_ok(message: "logout sccessful.")
         end
       end
@@ -204,12 +136,12 @@ module V1
             ).merge(enable: true)
             if address_params[:address_id].present?
               address = current_user.addresses.find_by(id: address_params[:address_id])
-              return resp_error("no address found") if address.nil?
+              return data_not_found(MISSING_ADDRESS) if address.nil?
               address.update(permit_address_params)
               address_params[:phones].each do |phone_params|
                 if phone_params[:phone_id].present?
                   phone = address.phones.find_by(id: phone_params[:phone_id])
-                  return resp_error("no phone found") if phone.nil?
+                  return data_not_found(MISSING_PHONE) if phone.nil?
                   permit_phone_params = ActionController::Parameters.new(phone_params).permit(
                     :phone_type, :phone_number
                   ).merge(enable: true)
@@ -231,15 +163,6 @@ module V1
         end
         resp_ok("user" => UserSerializer.new(current_user))
       end
-
-      # desc "delete user"
-      # params do
-      # end
-      # get :delete do
-      #   authenticate!
-      #   current_user.destroy
-      #   resp_ok("deleted")
-      # end
 
     end
   end

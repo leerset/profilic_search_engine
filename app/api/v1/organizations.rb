@@ -35,8 +35,8 @@ module V1
       get :detail do
         authenticate!
         organization = Organization.find_by(id: params[:organization_id])
-        return resp_error(MISSING_ORG) if organization.nil?
-        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        return data_not_found(MISSING_ORG) if organization.nil?
+        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         resp_ok("organization" => OrganizationSerializer.new(organization))
       end
 
@@ -47,8 +47,8 @@ module V1
       delete :delete do
         authenticate!
         organization = Organization.find_by(id: params[:organization_id])
-        return resp_error(MISSING_ORG) if organization.nil?
-        return resp_error(NOT_GOD_DENIED) unless current_user.god?
+        return data_not_found(MISSING_ORG) if organization.nil?
+        return permission_denied(NOT_GOD_DENIED) unless current_user.god?
         organization.destroy!
         resp_ok(message: 'organization deleted')
       end
@@ -66,10 +66,10 @@ module V1
       end
       post :create do
         authenticate!
-        return resp_error(NOT_GOD_DENIED) unless current_user.god?
+        return permission_denied(NOT_GOD_DENIED) unless current_user.god?
         organization_name = params[:name].strip
         organization = Organization.find_by(name: organization_name)
-        return resp_error('organization name already exist.') if organization.present?
+        return data_exist(EXIST_ORG) if organization.present?
         new_organization = Organization.find_or_create_by(name: organization_name)
         if params[:business_address].present?
           permit_address_params = ActionController::Parameters.new(params[:business_address]).permit(
@@ -95,8 +95,8 @@ module V1
       put :update do
         authenticate!
         organization = Organization.find_by(id: params[:organization_id])
-        return resp_error(MISSING_ORG) if organization.nil?
-        return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        return data_not_found(MISSING_ORG) if organization.nil?
+        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         organization.update_attributes(name: params[:name].strip) if params[:name].present?
         if params[:business_address].present?
           permit_address_params = ActionController::Parameters.new(params[:business_address]).permit(

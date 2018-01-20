@@ -18,7 +18,7 @@ class API < Grape::API
 
     def authenticate!
       Rails.logger.debug request.headers['Authorization']
-      error!(unauthorized, 401) unless current_user
+      unauthorized unless current_user
     end
 
     def current_user
@@ -26,8 +26,8 @@ class API < Grape::API
       return nil unless request.headers['Authorization'].present?
       user = User.where(access_token: request.headers['Authorization']).first
       # error!(unauthorized('You have not signed in for a long time, please login again.'), 401) if user && user.expired?
-      error!(unauthorized('You have not signed in for a long time, please login again.'), 401) if user && user.expired?
-      error!(unauthorized('Inactive prolific status, should not be allowed to sign in.'), 401) if user && user.prolific_status && user.prolific_status == 'Inactive'
+      unauthorized('You have not signed in for a long time, please login again.') if user && user.expired?
+      unauthorized('Suspended prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'suspended'
       return user
     end
 
@@ -38,21 +38,37 @@ class API < Grape::API
 
     # frontend only displays the messages
     def resp_error(message = '')
-      {code: 300, message: message}
+      # {code: 300, message: message}
+      error!({code: 300, message: message}, 300)
+    end
+
+    # forbidden 403
+    def data_exist(message = '')
+      # {code: 300, message: message}
+      error!({code: 400, message: message}, 400)
+    end
+
+    # forbidden 403
+    def permission_denied(message = '')
+      # {code: 300, message: message}
+      error!({code: 403, message: message}, 403)
     end
 
     # do not use
     def data_not_found(message = '')
-      {code: 404, message: message}
+      # {code: 404, message: message}
+      error!({code: 404, message: message}, 404)
     end
 
     # frontend turns to login page.
     def unauthorized(message = 'You are unauthorized to perform that operation')
-      {code: 401, message: message}
+      # {code: 401, message: message}
+      error!({code: 401, message: message}, 401)
     end
 
-      def service_unavailable(message = 'Service Error，please try again later.')
-      {code: 503, message: message}
+    def service_unavailable(message = 'Service Error，please try again later.')
+      # {code: 503, message: message}
+      error!({code: 503, message: message}, 503)
     end
 
   end
