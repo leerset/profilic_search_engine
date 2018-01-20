@@ -90,6 +90,59 @@ module V1
         resp_ok('user' => PeopleSerializer.new(user))
       end
 
+      desc 'update people himself'
+      params do
+        optional 'user', type: Hash do
+          optional 'firstname', type: String, desc: 'first_name'
+          optional 'lastname', type: String, desc: 'last_name'
+          optional 'email', type: String, desc: 'email'
+          optional 'time_zone', type: String, desc: 'time_zone'
+          optional 'citizenship', type: String, desc: 'citizenship'
+          optional 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "global status"
+        end
+        optional 'home_address', type: Hash do
+          optional 'street1', type: String, desc: 'street1'
+          optional 'street2', type: String, desc: 'street2'
+          optional 'city', type: String, desc: 'city'
+          optional 'state_province', type: String, desc: 'state_province'
+          optional 'country', type: String, desc: 'country'
+          optional 'postal_code', type: String, desc: 'postal_code'
+        end
+        optional 'work_address', type: Hash do
+          optional 'employer', type: String, desc: 'employer'
+          optional 'street1', type: String, desc: 'street1'
+          optional 'street2', type: String, desc: 'street2'
+          optional 'city', type: String, desc: 'city'
+          optional 'state_province', type: String, desc: 'state_province'
+          optional 'country', type: String, desc: 'country'
+          optional 'postal_code', type: String, desc: 'postal_code'
+        end
+      end
+      put :self_update do
+        authenticate!
+        user = current_user
+        ActiveRecord::Base.transaction do
+          if params[:user].present?
+            permit_user_params = ActionController::Parameters.new(params[:user]).permit(
+              :firstname, :lastname, :email, :time_zone, :citizenship, :status)
+            user.update(permit_user_params)
+          end
+          if params[:home_address].present?
+            permit_address_params = ActionController::Parameters.new(params[:home_address]).permit(
+              :employer, :street1, :street2, :city, :state_province, :country, :postal_code
+            ).merge(enable: true)
+            user.update_home_address(permit_address_params)
+          end
+          if params[:work_address].present?
+            permit_address_params = ActionController::Parameters.new(params[:work_address]).permit(
+              :employer, :street1, :street2, :city, :state_province, :country, :postal_code
+            ).merge(enable: true)
+            user.update_work_address(permit_address_params)
+          end
+        end
+        resp_ok('user' => PeopleSerializer.new(user))
+      end
+
 ##### global status
 
 ##### organization status
