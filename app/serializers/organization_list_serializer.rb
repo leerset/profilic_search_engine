@@ -1,5 +1,22 @@
 class OrganizationListSerializer < ActiveModel::Serializer
-  attributes :id, :name, :business_address, :created_time, :updated_time
+  attributes :id, :name, :business_address, :created_time, :updated_time,
+    :admins_amount, :inventors_amount, :submissions_amount, :inventions_amount
+
+  def admins_amount
+    object.administrators.count
+  end
+
+  def inventors_amount
+    object.inventors.count
+  end
+
+  def submissions_amount
+    0
+  end
+
+  def inventions_amount
+    object.inventions.count
+  end
 
   def business_address
     AddressSerializer.new(object.business_address) if object.business_address

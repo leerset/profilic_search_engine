@@ -8,6 +8,10 @@ class Organization < ApplicationRecord
 
   has_many :user_organization_statuses
 
+  def inventors
+    self.user_organizations.where(role: Role.find_by(code: (1..4).map{|i| "inventor_lv#{i}"})).map(&:user).uniq
+  end
+
   def administrators_statuses
     self.user_organization_statuses.where(user: administrators)
   end
@@ -17,7 +21,7 @@ class Organization < ApplicationRecord
   end
 
   def administrators
-    self.user_organizations.where(role: Role.find_by(code: 'organization_administrator')).map(&:user)
+    self.user_organizations.where(role: Role.find_by(code: 'organization_administrator')).map(&:user).uniq
   end
 
   def update_business_address(address_params)
