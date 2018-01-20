@@ -50,7 +50,7 @@ module V1
         return data_not_found(MISSING_USR) if user.nil?
         organization = Organization.find_by(id: params[:organization_id])
         return data_not_found(MISSING_ORG) if organization.nil?
-        return permission_denied(NOT_GOD_DENIED) unless current_user.god?
+        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         role = Role.find_by(code: 'organization_administrator')
         user.user_organizations.find_or_create_by(organization_id: organization.id, role_id: role.id)
         resp_ok('organization_roles' => user.organization_roles_array)
@@ -67,7 +67,7 @@ module V1
         return data_not_found(MISSING_USR) if user.nil?
         organization = Organization.find_by(id: params[:organization_id])
         return data_not_found(MISSING_ORG) if organization.nil?
-        return permission_denied(NOT_GOD_DENIED) unless current_user.god?
+        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         role = Role.find_by(code: 'organization_administrator')
         return data_not_found(MISSING_ROL) if role.nil?
         user_organization = user.user_organizations.find_by(organization_id: organization.id, role_id: role.id)
