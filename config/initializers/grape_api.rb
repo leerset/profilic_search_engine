@@ -1,11 +1,14 @@
 class Grape::API
 
+  # permission_denied
   NOT_GOD_DENIED = 'not GOD, permission denied.'
   NOT_GOD_OA_DENIED = 'not GOD, not OA, permission denied.'
   NOT_INVENTOR_DENIED = 'not INVENTOR, permission denied.'
   NOT_GOD_INVENTOR_DENIED = 'not GOD, not INVENTOR, permission denied.'
   NOT_ORG_USR_DENIED = 'not organization user, permission denied.'
 
+  # data_not_found
+  MISSING_CONCEPT = 'no concept found'
   MISSING_ORG = 'no organization found.'
   MISSING_INV = 'no invention found.'
   MISSING_ORG_USR = 'no organization user found.'
@@ -15,7 +18,10 @@ class Grape::API
   MISSING_USR_ORG = 'no user organization found.'
   MISSING_USR_INV = 'no user invention found.'
   MISSING_USR_ROL = 'no user role found.'
+  MISSING_ADDRESS = 'no address found.'
+  MISSING_PHONE = 'no phone found.'
 
-  HAS_ROL = 'already has role'
-
+  # data_exist
+  EXIST_ROL = 'role name already exist.'
+  EXIST_ORG = 'organization name already exist.'
 end

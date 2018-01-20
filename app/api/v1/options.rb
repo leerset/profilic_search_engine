@@ -79,8 +79,32 @@ module V1
         resp_ok("organization" => OrganizationSerializer.new(organization))
       end
 
-      desc "get user list"
+      # desc "get user list"
+      # params do
+      #   optional :page, type: Integer, desc: 'curent page index，default: 1'
+      #   optional :size, type: Integer, desc: 'records count in each page, default: 20'
+      # end
+      # get :users do
+      #   authenticate!
+      #   page = params[:page].presence || 1
+      #   size = params[:size].presence || 20
+      #   if current_user.god?
+      #     users = User.all.order(id: :desc).page(page).per(size)
+      #     resp_ok("users" => UserSerializer.build_array(users))
+      #   elsif current_user.managed_organizations.any?
+      #     users = User.includes(:organizations).where(organizations: {id: current_user.managed_organizations.map(&:id)})
+      #     users = users.order(id: :desc).page(page).per(size)
+      #     resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
+      #   else
+      #     return permission_denied(NOT_GOD_OA_DENIED)
+      #   end
+      # end
+
+      desc "get Users List Filtering"
       params do
+        optional 'name', type: String, desc: "name"
+        optional 'organization_id', type: Integer, desc: "organization_id, null for all"
+        optional 'status', type: String, desc: "status, null for all"
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
       end
@@ -88,12 +112,28 @@ module V1
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
+        organizations = if params[:organization_id]
+          Organization.where(id: params[:organization_id])
+        else
+          Organization.all
+        end
+        if !current_user.god? && current_user.managed_organizations.any?
+          organizations = (organizations & current_user.managed_organizations)
+        end
+        uoss = if params[:status]
+          UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
+        else
+          UserOrganizationStatus.where(organization_id: organizations.map(&:id))
+        end
+        users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
+        if params[:name].present?
+          name = params[:name].strip
+          users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email)", name, name, name)
+        end
+        users = users.order(id: :desc).page(page).per(size)
         if current_user.god?
-          users = User.all.order(id: :desc).page(page).per(size)
           resp_ok("users" => UserSerializer.build_array(users))
         elsif current_user.managed_organizations.any?
-          users = User.includes(:organizations).where(organizations: {id: current_user.managed_organizations.map(&:id)})
-          users = users.order(id: :desc).page(page).per(size)
           resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
         else
           return permission_denied(NOT_GOD_OA_DENIED)
@@ -103,8 +143,8 @@ module V1
       desc "get Users List Filtering"
       params do
         optional 'name', type: String, desc: "name"
-        requires 'organization_id', type: Integer, default: 0, desc: "organization_id, default: 0 for all"
-        requires 'status', type: String, default: 'All', desc: "status, default: 'All' for all"
+        optional 'organization_id', type: Integer, desc: "organization_id, null for all"
+        optional 'status', type: String, desc: "status, null for all"
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
       end
@@ -112,18 +152,18 @@ module V1
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
-        organizations = if params[:organization_id] == 0
-          Organization.all
-        else
+        organizations = if params[:organization_id]
           Organization.where(id: params[:organization_id])
+        else
+          Organization.all
         end
         if !current_user.god? && current_user.managed_organizations.any?
           organizations = (organizations & current_user.managed_organizations)
         end
-        uoss = if params[:status] == 'All'
-          UserOrganizationStatus.where(organization_id: organizations.map(&:id))
-        else
+        uoss = if params[:status]
           UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
+        else
+          UserOrganizationStatus.where(organization_id: organizations.map(&:id))
         end
         users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
         if params[:name].present?
