@@ -62,7 +62,7 @@ class UserSerializer < ActiveModel::Serializer
   def organizations
     manage_organizations = instance_options[:managed_organizations]
     current_organizations = if manage_organizations
-      object.organizations.where(id: manage_organizations.map(&:id))
+      object.organizations.where(id: manage_organizations.map(&:id)).uniq
     else
       object.organizations.uniq
     end
