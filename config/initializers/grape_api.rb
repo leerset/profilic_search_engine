@@ -20,8 +20,11 @@ class Grape::API
   MISSING_USR_ROL = 'no user role found.'
   MISSING_ADDRESS = 'no address found.'
   MISSING_PHONE = 'no phone found.'
+  MISSING_FILE = 'no file found.'
+  MISSING_IO = 'no invention opportunity found.'
 
   # data_exist
   EXIST_ROL = 'role name already exist.'
   EXIST_ORG = 'organization name already exist.'
+  EXIST_IO_TITLE = 'invention opportunity title already exist.'
 end

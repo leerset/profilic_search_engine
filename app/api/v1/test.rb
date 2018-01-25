@@ -1,9 +1,26 @@
 module V1
   class Test < Grape::API
     version 'v1'
-    format :json
+    default_format :json
 
     resource :test do
+
+      desc "download user resume"
+      params do
+        requires :user_id, type: Integer, desc: "user_id"
+      end
+      get :download_resume do
+        # authenticate!
+        user = User.find_by(id: params[:user_id])
+        return data_not_found(MISSING_USR) if user.nil?
+        resume = user.resume
+        return data_not_found(MISSING_FILE) unless resume.present?
+        filename = user.resume_file_name
+        content_type user.resume_content_type
+        env['api.format'] = :binary
+        header 'Content-Disposition', "attachment; filename*=UTF-8''#{CGI.escape(filename)}"
+        File.open(resume.path).read
+      end
 
       desc "sign up by email / create user"
       params do
@@ -97,9 +114,11 @@ module V1
               :firstname, :lastname, :screen_name, :employer, :time_zone, :personal_summary
             )
             user.update(permit_user_params)
-            user.update_resume(params[:user][:resume]) if params[:user][:resume].present?
+            if (resume_file = params[:user][:resume]).present?
+              bad_request('resume file type is invalid') unless User::RESUME_CONTENT_TYPES.include?(resume_file[:type])
+              user.update_resume(resume_file)
+            end
           end
-
           if params[:citizenships].present?
             user.user_citizenships.where.not(citizenship_id: params[:citizenships]).map(&:destroy)
             params[:citizenships].each do |citizenship_id|

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180103091419) do
+ActiveRecord::Schema.define(version: 20180125010816) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -56,6 +56,31 @@ ActiveRecord::Schema.define(version: 20180103091419) do
     t.datetime "updated_at", null: false
     t.index ["created_by"], name: "index_concepts_on_created_by"
     t.index ["user_id"], name: "index_concepts_on_user_id"
+  end
+
+  create_table "invention_opportunities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "organization_id"
+    t.string "title"
+    t.date "closing_date"
+    t.string "short_description"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["closing_date"], name: "index_invention_opportunities_on_closing_date"
+    t.index ["organization_id"], name: "index_invention_opportunities_on_organization_id"
+    t.index ["status"], name: "index_invention_opportunities_on_status"
+    t.index ["title"], name: "index_invention_opportunities_on_title"
+  end
+
+  create_table "invention_opportunity_upload_files", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "invention_opportunity_id"
+    t.bigint "upload_file_id"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invention_opportunity_id"], name: "invention_opportunity_id"
+    t.index ["status"], name: "index_invention_opportunity_upload_files_on_status"
+    t.index ["upload_file_id"], name: "index_invention_opportunity_upload_files_on_upload_file_id"
   end
 
   create_table "inventions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -136,6 +161,22 @@ ActiveRecord::Schema.define(version: 20180103091419) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_time_zones_on_name"
+  end
+
+  create_table "upload_files", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "name"
+    t.string "code"
+    t.string "filepath"
+    t.boolean "enable"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "upload_file_name"
+    t.string "upload_content_type"
+    t.integer "upload_file_size"
+    t.datetime "upload_updated_at"
+    t.index ["enable"], name: "index_upload_files_on_enable"
+    t.index ["filepath"], name: "index_upload_files_on_filepath"
+    t.index ["name"], name: "index_upload_files_on_name"
   end
 
   create_table "user_addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

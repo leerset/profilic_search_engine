@@ -42,10 +42,16 @@ class API < Grape::API
       error!({code: 300, message: message}, 300)
     end
 
-    # forbidden 403
+    # bad_request 400
+    def bad_request(message = '')
+      # {code: 300, message: message}
+      error!({code: 400, message: message, error: message}, 400)
+    end
+
+    # conflict 409
     def data_exist(message = '')
       # {code: 300, message: message}
-      error!({code: 400, message: message}, 400)
+      error!({code: 409, message: message}, 409)
     end
 
     # forbidden 403

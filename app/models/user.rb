@@ -1,6 +1,13 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
+  RESUME_CONTENT_TYPES = [
+    # 'image/png', 'image/jpeg',
+    # 'text/plain',
+    # 'audio/mpeg', 'audio/mp3',
+    'application/zip', 'application/msword', 'application/pdf', 'application/xlsx'
+  ]
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
   has_many :concepts
@@ -23,6 +30,23 @@ class User < ApplicationRecord
 
   before_create :generate_access_token
   after_create :create_auth, :join_prolific_organization
+
+  has_attached_file :resume,
+    path: ':rails_root/upload/users/:id/resume/:filename',
+    url: '/users/:id/resume/:filename'
+  validates_attachment_content_type :resume,
+    :content_type => RESUME_CONTENT_TYPES
+
+  def update_resume(resume_file)
+    # resume_file[:filename]
+    # resume_file[:type]
+    # resume_file[:tempfile]
+    # binding.pry
+    self.resume = resume_file[:tempfile]
+    self.resume.save
+    self.resume_filepath = self.resume.url
+    self.save!
+  end
 
   def create_auth
     self.build_auth(secure_random: Auth.generate_secure_random).save!
@@ -55,14 +79,6 @@ class User < ApplicationRecord
   def work_address
     addresses.find_by(address_type: 'work')
   end
-
-  has_attached_file :resume,
-    path: ':rails_root/public/user/:id/resume/:filename',
-    url: '/user/:id/resume/:filename'
-  validates_attachment_content_type :resume,
-    :content_type => [ 'image/png', 'image/jpeg',
-      'application/zip',
-      'application/xlsx', 'audio/mpeg', 'audio/mp3' ]
 
   def magic_link
     auth.try(:secure_random)
@@ -189,17 +205,6 @@ class User < ApplicationRecord
 
   def invention_roles(invention)
     user_inventions.where(invention: invention).map(&:role)
-  end
-
-  def update_resume(resume_file)
-    # resume_file[:filename]
-    # resume_file[:type]
-    # resume_file[:tempfile]
-    # binding.pry
-    self.resume = resume_file[:tempfile]
-    self.resume.save
-    self.resume_filepath = self.resume.url
-    self.save!
   end
 
   def expired?
