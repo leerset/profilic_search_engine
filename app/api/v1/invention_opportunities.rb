@@ -64,7 +64,7 @@ module V1
           end
           if (upload = params[:upload]).present?
             bad_request('upload file type is invalid') unless InventionOpportunity::IO_CONTENT_TYPES.include?(upload[:type])
-            upload_file = UploadFile.create
+            upload_file = invention_opportunity.upload_file || UploadFile.create
             upload_file.update_upload(upload)
             invention_opportunity.update(upload_file: upload_file)
           end
