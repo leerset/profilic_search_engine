@@ -58,6 +58,7 @@ ActiveRecord::Schema.define(version: 20180125010816) do
     t.index ["user_id"], name: "index_concepts_on_user_id"
   end
 
+<<<<<<< Updated upstream
   create_table "invention_opportunities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "organization_id"
     t.string "title"
