@@ -72,9 +72,10 @@ module V1
         resp_ok("invention_opportunity" => InventionOpportunitySerializer.new(invention_opportunity))
       end
 
-      desc "list invention opportunities"
+      desc "filter list invention opportunities"
       params do
         optional :organization_id, type: Integer, desc: "organization_id"
+        optional :status, type: String, desc: "status"
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
       end
@@ -93,7 +94,11 @@ module V1
         else
           organizations = current_user.managed_organizations
         end
-        invention_opportunities = InventionOpportunity.where(organization: organizations)
+        invention_opportunities = if params[:status]
+          InventionOpportunity.where(organization: organizations, status: params[:status])
+        else
+          InventionOpportunity.where(organization: organizations)
+        end
         paged_invention_opportunities = invention_opportunities.order(id: :desc).page(page).per(size)
         resp_ok("invention_opportunities" => InventionOpportunitySerializer.build_array(paged_invention_opportunities))
       end
