@@ -16,7 +16,6 @@ class UploadFile < ApplicationRecord
     # resume_file[:filename]
     # resume_file[:type]
     # resume_file[:tempfile]
-    binding.pry
     self.upload = upload_file[:tempfile]
     self.upload.save
     self.filepath = self.upload.path
