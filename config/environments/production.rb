@@ -14,6 +14,27 @@ Rails.application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
 
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              'smtp.gmail.com',
+    port:                 587,
+    domain:               "gmail.com",
+    user_name:            'jianyi.immed@gmail.com',
+    password:             'leer903376',
+    authentication:       :login,
+    enable_starttls_auto: true  }
+
+
+  config.action_mailer.perform_deliveries = true
+  # Don't care if the mailer can't send.
+  config.action_mailer.raise_delivery_errors = false
+
+  config.action_mailer.perform_caching = false
+
+  config.action_mailer.default_url_options = { host: 'dedi2.cijef.com.hk', port: 3000 }
+
+
   # Attempt to read encrypted secrets from `config/secrets.yml.enc`.
   # Requires an encryption key in `ENV["RAILS_MASTER_KEY"]` or
   # `config/secrets.yml.key`.

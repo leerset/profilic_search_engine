@@ -6,7 +6,7 @@ default: &default
   reconnect: true
 
   username: root
-  password:
+  password: dev
   host: localhost
   port: 3306
 
