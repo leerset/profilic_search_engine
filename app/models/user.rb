@@ -230,7 +230,7 @@ class User < ApplicationRecord
 
   def update_access_token
     self.generate_access_token
-    self.save
+    self.save!
   end
 
   private

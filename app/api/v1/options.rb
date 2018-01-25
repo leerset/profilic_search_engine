@@ -169,7 +169,8 @@ module V1
         users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
         if params[:name].present?
           name = params[:name].strip
-          users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email)", name, name, name)
+          nameparts = name.gsub(/\s/,'%')
+          users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email) OR CONCAT(firstname,' ', lastname) LIKE ?", name, name, name, nameparts)
         end
         users = users.order(id: :desc).page(page).per(size)
         if current_user.god?
