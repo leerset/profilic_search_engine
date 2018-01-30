@@ -6,7 +6,8 @@ class InventionOpportunitySerializer < ActiveModel::Serializer
   end
 
   def closing_time
-    object.closing_date.to_i
+    return nil if object.closing_date.nil?
+    object.closing_date.to_time.to_i
   end
 
   def uploaded_filename
