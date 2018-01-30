@@ -1,12 +1,12 @@
 class InventionOpportunitySerializer < ActiveModel::Serializer
-  attributes :id, :title, :street, :expires, :status, :uploaded_filename, :organization
+  attributes :id, :title, :short_description, :closing_time, :status, :uploaded_filename, :organization
 
-  def street
+  def short_description
     object.short_description
   end
 
-  def expires
-    object.closing_date.strftime('%b %d, %Y')
+  def closing_time
+    object.closing_date.to_i
   end
 
   def uploaded_filename

@@ -99,7 +99,7 @@ module V1
         else
           InventionOpportunity.where(organization: organizations)
         end
-        paged_invention_opportunities = invention_opportunities.order(id: :desc).page(page).per(size)
+        paged_invention_opportunities = invention_opportunities.order(status: :asc).page(page).per(size)
         resp_ok("invention_opportunities" => InventionOpportunitySerializer.build_array(paged_invention_opportunities))
       end
 
