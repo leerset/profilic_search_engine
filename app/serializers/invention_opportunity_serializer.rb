@@ -1,5 +1,5 @@
 class InventionOpportunitySerializer < ActiveModel::Serializer
-  attributes :id, :title, :short_description, :closing_time, :status, :uploaded_filename, :organization
+  attributes :id, :title, :short_description, :closing_date, :closing_time, :status, :uploaded_filename, :organization
 
   def short_description
     object.short_description
