@@ -4,8 +4,9 @@ class InventionOpportunity < ApplicationRecord
   has_one :upload_file, through: :invention_opportunity_upload_file
 
   IO_CONTENT_TYPES = [
-    'application/msword', 'application/pdf'
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/pdf'
   ]
-
 
 end
