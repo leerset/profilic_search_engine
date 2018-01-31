@@ -64,7 +64,7 @@ module V1
           end
           if (upload = params[:upload]).present?
             bad_request('upload file type is invalid') unless InventionOpportunity::IO_CONTENT_TYPES.include?(upload[:type])
-            upload_file = invention_opportunity.upload_file || UploadFile.create
+            upload_file = UploadFile.create
             upload_file.update_upload(upload)
             invention_opportunity.update(upload_file: upload_file)
           end
@@ -144,7 +144,7 @@ module V1
         content_type upload_file.upload_content_type
         env['api.format'] = :binary
         header 'Content-Disposition', "attachment; filename=#{CGI.escape(filename)}"
-        File.open(upload_file.upload.path)
+        File.open(upload_file.upload.path).read
       end
 
       desc "test download invention opportunity uploaded file"
@@ -160,7 +160,7 @@ module V1
         content_type upload_file.upload_content_type
         env['api.format'] = :binary
         header 'Content-Disposition', "attachment; filename=#{CGI.escape(filename)}"
-        File.open(upload_file.upload.path)
+        File.open(upload_file.upload.path).read
       end
 
     end
