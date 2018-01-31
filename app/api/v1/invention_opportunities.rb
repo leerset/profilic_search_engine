@@ -10,7 +10,7 @@ module V1
         requires :organization_id, type: Integer, desc: "organization_id"
         requires :invention_opportunity, type: Hash do
           requires :title, type: String, desc: "OPPORTUNITY TITLE"
-          requires :closing_date, type: Date, desc: "EXPIRES: closing_date"
+          requires :closing_date, type: Integer, desc: "EXPIRES: closing_date (timestamp)"
           requires :short_description, type: String, desc: "STREET: short_description"
           optional :status, type: String, desc: "STATUS"
         end
@@ -23,6 +23,8 @@ module V1
         return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         invention_opportunity = organization.invention_opportunities.find_by(title: params[:invention_opportunity][:title])
         return data_exist(EXIST_IO_TITLE) if invention_opportunity.present?
+        close_date_timestamp = params[:invention_opportunity][:closing_date]
+        params[:invention_opportunity][:closing_date] = (Time.new('1970-01-01') + close_date_timestamp).to_date
         ActiveRecord::Base.transaction do
           permit_io_params = ActionController::Parameters.new(params[:invention_opportunity]).permit(
             :title, :closing_date, :short_description, :status
@@ -43,7 +45,7 @@ module V1
         requires :invention_opportunity_id, type: Integer, desc: "invention_opportunity id"
         optional :invention_opportunity, type: Hash do
           optional :title, type: String, desc: "OPPORTUNITY TITLE"
-          optional :closing_date, type: Date, desc: "EXPIRES: closing_date"
+          optional :closing_date, type: Integer, desc: "EXPIRES: closing_date (timestamp)"
           optional :short_description, type: String, desc: "STREET: short_description"
           optional :status, type: String, desc: "STATUS"
         end
@@ -55,6 +57,10 @@ module V1
         return data_not_found(MISSING_IO) if invention_opportunity.nil?
         organization = invention_opportunity.organization
         return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        close_date_timestamp = params[:invention_opportunity][:closing_date]
+        if close_date_timestamp.present?
+          params[:invention_opportunity][:closing_date] = (Time.new('1970-01-01') + close_date_timestamp).to_date
+        end
         ActiveRecord::Base.transaction do
           if params[:invention_opportunity].present?
             permit_io_params = ActionController::Parameters.new(params[:invention_opportunity]).permit(
