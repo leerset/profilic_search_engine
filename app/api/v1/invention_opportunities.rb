@@ -82,13 +82,17 @@ module V1
       params do
         optional :organization_id, type: Integer, desc: "organization_id"
         optional :status, type: String, desc: "status"
-        optional :page, type: Integer, desc: 'curent page index，default: 1'
+        optional :page, type: Integer, desc: 'curent page index, default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
+        optional :sort_column, type: String, desc: 'sort column default: by id'
+        optional :sort_order, type: String, desc: 'sort order (desc for descending), default: ascending'
       end
       get :list do
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
+        sortcolumn = InventionOpportunity.columns_hash[params[:sort_column]] ? params[:sort_column] : "id"
+        sortorder = params[:sort_order] && params[:sort_order].downcase == "desc" ? "desc": nil
         organizations = []
         if params[:organization_id].present?
           organizations = Organization.where(id: params[:organization_id])
@@ -105,7 +109,7 @@ module V1
         else
           InventionOpportunity.where(organization: organizations)
         end
-        paged_invention_opportunities = invention_opportunities.order(status: :asc).page(page).per(size)
+        paged_invention_opportunities = invention_opportunities.order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("invention_opportunities" => InventionOpportunitySerializer.build_array(paged_invention_opportunities))
       end
 
