@@ -7,58 +7,57 @@ class UploadFile < ApplicationRecord
     'audio/mp3',
     'application/pdf',
     'application/xlsx',
-    'application/vnd.ms-excel',
-    #\.doc
+    #.doc
     'application/msword',
-    #\.dot
+    #.dot
     'application/msword',
-    #\.docx
+    #.docx
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    #\.dotx
+    #.dotx
     'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
-    #\.docm
+    #.docm
     'application/vnd.ms-word.document.macroEnabled.12',
-    #\.dotm
+    #.dotm
     'application/vnd.ms-word.template.macroEnabled.12',
-    #\.xls
+    #.xls
     'application/vnd.ms-excel',
-    #\.xlt
+    #.xlt
     'application/vnd.ms-excel',
-    #\.xla
+    #.xla
     'application/vnd.ms-excel',
-    #\.xlsx
+    #.xlsx
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    #\.xltx
+    #.xltx
     'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
-    #\.xlsm
+    #.xlsm
     'application/vnd.ms-excel.sheet.macroEnabled.12',
-    #\.xltm
+    #.xltm
     'application/vnd.ms-excel.template.macroEnabled.12',
-    #\.xlam
+    #.xlam
     'application/vnd.ms-excel.addin.macroEnabled.12',
-    #\.xlsb
+    #.xlsb
     'application/vnd.ms-excel.sheet.binary.macroEnabled.12',
-    #\.ppt
+    #.ppt
     'application/vnd.ms-powerpoint',
-    #\.pot
+    #.pot
     'application/vnd.ms-powerpoint',
-    #\.pps
+    #.pps
     'application/vnd.ms-powerpoint',
-    #\.ppa
+    #.ppa
     'application/vnd.ms-powerpoint',
-    #\.pptx
+    #.pptx
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    #\.potx
+    #.potx
     'application/vnd.openxmlformats-officedocument.presentationml.template',
-    #\.ppsx
+    #.ppsx
     'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
-    #\.ppam
+    #.ppam
     'application/vnd.ms-powerpoint.addin.macroEnabled.12',
-    #\.pptm
+    #.pptm
     'application/vnd.ms-powerpoint.presentation.macroEnabled.12',
-    #\.potm
+    #.potm
     'application/vnd.ms-powerpoint.presentation.macroEnabled.12',
-    #\.ppsm
+    #.ppsm
     'application/vnd.ms-powerpoint.slideshow.macroEnabled.12'
   ]
 

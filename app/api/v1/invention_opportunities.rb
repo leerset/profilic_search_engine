@@ -143,8 +143,24 @@ module V1
         filename = upload_file.upload_file_name
         content_type upload_file.upload_content_type
         env['api.format'] = :binary
-        header 'Content-Disposition', "attachment; filename*=UTF-8''#{CGI.escape(filename)}"
-        File.open(upload_file.upload.path).read
+        header 'Content-Disposition', "attachment; filename=#{CGI.escape(filename)}"
+        File.open(upload_file.upload.path)
+      end
+
+      desc "test download invention opportunity uploaded file"
+      params do
+        requires :invention_opportunity_id, type: Integer, desc: 'invention_opportunity id'
+      end
+      get :download_test do
+        invention_opportunity = InventionOpportunity.find_by(id: params[:invention_opportunity_id])
+        return data_not_found(MISSING_IO) if invention_opportunity.nil?
+        upload_file = invention_opportunity.upload_file
+        return data_not_found(MISSING_FILE) unless upload_file.present? && upload_file.upload.present?
+        filename = upload_file.upload_file_name
+        content_type upload_file.upload_content_type
+        env['api.format'] = :binary
+        header 'Content-Disposition', "attachment; filename=#{CGI.escape(filename)}"
+        File.open(upload_file.upload.path)
       end
 
     end
