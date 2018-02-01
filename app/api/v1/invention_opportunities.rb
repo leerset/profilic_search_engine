@@ -92,7 +92,7 @@ module V1
         page = params[:page].presence || 1
         size = params[:size].presence || 20
         sortcolumn = InventionOpportunity.columns_hash[params[:sort_column]] ? params[:sort_column] : "id"
-        sortorder = params[:sort_order] && params[:sort_order].downcase == "desc" ? "desc": nil
+        sortorder = params[:sort_order] && params[:sort_order].downcase == "desc" ? "desc" : nil
         organizations = []
         if params[:organization_id].present?
           organizations = Organization.where(id: params[:organization_id])
@@ -109,7 +109,7 @@ module V1
         else
           InventionOpportunity.where(organization: organizations)
         end
-        paged_invention_opportunities = invention_opportunities.order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
+        paged_invention_opportunities = invention_opportunities.order("#{sortcolumn} #{sortorder}, status").page(page).per(size)
         resp_ok("invention_opportunities" => InventionOpportunitySerializer.build_array(paged_invention_opportunities))
       end
 
