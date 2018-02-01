@@ -12,7 +12,7 @@ module V1
           requires :title, type: String, desc: "OPPORTUNITY TITLE"
           requires :closing_date, type: Integer, desc: "EXPIRES: closing_date (timestamp)"
           requires :short_description, type: String, desc: "STREET: short_description"
-          optional :status, type: String, desc: "STATUS"
+          optional :status, type: String, default: 'Active', desc: "STATUS"
         end
         optional :upload, type: File, desc: "upload file"
       end
@@ -81,7 +81,7 @@ module V1
       desc "filter list invention opportunities"
       params do
         optional :organization_id, type: Integer, desc: "organization_id"
-        optional :status, type: String, default: 'Active', desc: "status"
+        optional :status, type: String, desc: "status"
         optional :page, type: Integer, desc: 'curent page index, default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
         optional :sort_column, type: String, desc: 'sort column default: by id'
