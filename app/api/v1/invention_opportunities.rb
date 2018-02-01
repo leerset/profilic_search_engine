@@ -81,7 +81,7 @@ module V1
       desc "filter list invention opportunities"
       params do
         optional :organization_id, type: Integer, desc: "organization_id"
-        optional :status, type: String, desc: "status"
+        optional :status, type: String, default: 'Active', desc: "status"
         optional :page, type: Integer, desc: 'curent page index, default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
         optional :sort_column, type: String, desc: 'sort column default: by id'
