@@ -24,7 +24,7 @@ module V1
         invention_opportunity = organization.invention_opportunities.find_by(title: params[:invention_opportunity][:title])
         return data_exist(EXIST_IO_TITLE) if invention_opportunity.present?
         close_date_timestamp = params[:invention_opportunity][:closing_date]
-        params[:invention_opportunity][:closing_date] = (Time.new('1970-01-01') + close_date_timestamp).to_date
+        params[:invention_opportunity][:closing_date] = Time.at(close_date_timestamp).to_date
         status = (params[:invention_opportunity][:status].downcase == 'inactive') ? 'Inactive' : 'Active'
         params[:invention_opportunity][:status] = status
         ActiveRecord::Base.transaction do
@@ -61,7 +61,7 @@ module V1
         return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         close_date_timestamp = params[:invention_opportunity][:closing_date]
         if close_date_timestamp.present?
-          params[:invention_opportunity][:closing_date] = (Time.new('1970-01-01') + close_date_timestamp).to_date
+          params[:invention_opportunity][:closing_date] = Time.at(close_date_timestamp).to_date
         end
         ActiveRecord::Base.transaction do
           if params[:invention_opportunity].present?
@@ -153,6 +153,7 @@ module V1
         authenticate!
         invention_opportunity = InventionOpportunity.find_by(id: params[:invention_opportunity_id])
         return data_not_found(MISSING_IO) if invention_opportunity.nil?
+        organization = invention_opportunity.organization
         return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         upload_file = invention_opportunity.upload_file
         return data_not_found(MISSING_FILE) unless upload_file.present? && upload_file.upload.present?
