@@ -101,14 +101,14 @@ module V1
         sortorder = params[:sort_order] && params[:sort_order].downcase == "desc" ? "desc" : nil
         organizations = []
         if params[:organization_id].present?
-          organizations = Organization.where(id: params[:organization_id])
-          return data_not_found(MISSING_ORG) if organizations.empty?
-          return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+          organization = Organization.find_by(id: params[:organization_id])
+          return data_not_found(MISSING_ORG) if organization.nil?
+          organizations << organization
         end
         if organizations.any?
-          organizations &= current_user.managed_organizations
+          organizations &= (current_user.managed_organizations | current_user.member_organizations)
         else
-          organizations = current_user.managed_organizations
+          organizations = (current_user.managed_organizations | current_user.member_organizations)
         end
         invention_opportunities = if params[:status]
           InventionOpportunity.where(organization: organizations, status: params[:status])
@@ -128,7 +128,8 @@ module V1
         invention_opportunity = InventionOpportunity.find_by(id: params[:invention_opportunity_id])
         return data_not_found(MISSING_IO) if invention_opportunity.nil?
         organization = invention_opportunity.organization
-        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        # Members should definitely be read only
+        return permission_denied(NOT_GOD_OA_MEMBER_DENIED) unless current_user.god? || current_user.oa?(organization) || current_user.member?(organization)
         resp_ok("invention_opportunity" => InventionOpportunitySerializer.new(invention_opportunity))
       end
 
@@ -154,7 +155,8 @@ module V1
         invention_opportunity = InventionOpportunity.find_by(id: params[:invention_opportunity_id])
         return data_not_found(MISSING_IO) if invention_opportunity.nil?
         organization = invention_opportunity.organization
-        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        # Members should definitely be read only
+        return permission_denied(NOT_GOD_OA_MEMBER_DENIED) unless current_user.god? || current_user.oa?(organization) || current_user.member?(organization)
         upload_file = invention_opportunity.upload_file
         return data_not_found(MISSING_FILE) unless upload_file.present? && upload_file.upload.present?
         filename = upload_file.upload_file_name

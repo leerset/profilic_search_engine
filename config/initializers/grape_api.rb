@@ -3,6 +3,7 @@ class Grape::API
   # permission_denied
   NOT_GOD_DENIED = 'not GOD, permission denied.'
   NOT_GOD_OA_DENIED = 'not GOD, not OA, permission denied.'
+  NOT_GOD_OA_MEMBER_DENIED = 'not GOD, not OA, not member, permission denied.'
   NOT_INVENTOR_DENIED = 'not INVENTOR, permission denied.'
   NOT_GOD_INVENTOR_DENIED = 'not GOD, not INVENTOR, permission denied.'
   NOT_ORG_USR_DENIED = 'not organization user, permission denied.'

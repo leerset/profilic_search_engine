@@ -112,6 +112,10 @@ class User < ApplicationRecord
     organization_roles(organization).detect{|role| role.code == 'organization_administrator'}.present?
   end
 
+  def member?(organization)
+    organization_roles(organization).detect{|role| role.code == 'organization_member'}.present?
+  end
+
   def all_oa?(organizations)
     organizations.uniq.map{|a| oa?(a)}.uniq == [true]
   end
@@ -122,6 +126,10 @@ class User < ApplicationRecord
     else
       self.user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_administrator'}).map(&:organization).uniq.sort
     end
+  end
+
+  def member_organizations
+    self.user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_member'}).map(&:organization).uniq.sort
   end
 
   def inventor?(invention)
