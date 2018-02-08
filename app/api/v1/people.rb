@@ -99,7 +99,7 @@ module V1
           optional 'email', type: String, desc: 'email'
           optional 'time_zone', type: String, desc: 'time_zone'
           optional 'citizenship', type: String, desc: 'citizenship'
-          optional 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "global status"
+          # optional 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "global status"
         end
         optional 'home_address', type: Hash do
           optional 'street1', type: String, desc: 'street1'
@@ -125,7 +125,7 @@ module V1
         ActiveRecord::Base.transaction do
           if params[:user].present?
             permit_user_params = ActionController::Parameters.new(params[:user]).permit(
-              :firstname, :lastname, :email, :time_zone, :citizenship, :status)
+              :firstname, :lastname, :email, :time_zone, :citizenship)
             user.update(permit_user_params)
           end
           if params[:home_address].present?
