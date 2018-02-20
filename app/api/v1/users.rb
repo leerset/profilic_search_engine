@@ -46,6 +46,12 @@ module V1
         auth = Auth.find_by_secure_random(params[:magic_link])
         return unauthorized("Expired magic link") if auth.nil?
         user = auth.user
+        if user.expired?
+          user.auth.reset_secure_random
+          user.update_access_token
+          Mailer.magic_link_email(user, 'Successfully Resent Magic Link.').deliver
+          return unauthorized("This link has expired, the new link has been sent to your mailbox, please sign in again")
+        end
         user.update_access_token
         resp_ok("user" => UserSerializer.new(user))
       end
@@ -94,6 +100,7 @@ module V1
           optional 'state_province', type: String, desc: "state_province"
           optional 'country', type: String, desc: "country"
           optional 'postal_code', type: String, desc: "postal_code"
+          optional 'phone_number', type: String, desc: "phone_number"
           optional 'phones', type: Array do
             optional 'phone_id', type: Integer, desc: "phone_id (optional, id = null will create a new record)"
             optional 'phone_type', type: String, desc: "phone_type (mobile, home, etc.)"
@@ -132,7 +139,7 @@ module V1
           end
           params[:addresses].each do |address_params|
             permit_address_params = ActionController::Parameters.new(address_params).permit(
-              :address_type, :street_address, :city, :state_province, :country, :postal_code
+              :address_type, :street_address, :city, :state_province, :country, :postal_code, :phone_number
             ).merge(enable: true)
             if address_params[:address_id].present?
               address = current_user.addresses.find_by(id: address_params[:address_id])

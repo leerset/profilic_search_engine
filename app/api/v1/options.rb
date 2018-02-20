@@ -137,7 +137,7 @@ module V1
         elsif current_user.managed_organizations.any?
           resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
         else
-          return permission_denied(NOT_GOD_OA_DENIED)
+          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: []))
         end
       end
 
@@ -178,7 +178,7 @@ module V1
         elsif current_user.managed_organizations.any?
           resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
         else
-          return permission_denied(NOT_GOD_OA_DENIED)
+          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: []))
         end
       end
 

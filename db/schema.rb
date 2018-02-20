@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180125010816) do
+ActiveRecord::Schema.define(version: 20180220050250) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 20180125010816) do
     t.string "state_province"
     t.string "country"
     t.string "postal_code"
+    t.string "phone_number"
     t.boolean "enable"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -58,7 +59,6 @@ ActiveRecord::Schema.define(version: 20180125010816) do
     t.index ["user_id"], name: "index_concepts_on_user_id"
   end
 
-<<<<<<< Updated upstream
   create_table "invention_opportunities", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "organization_id"
     t.string "title"

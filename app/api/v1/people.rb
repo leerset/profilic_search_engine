@@ -52,6 +52,7 @@ module V1
           optional 'state_province', type: String, desc: 'state_province'
           optional 'country', type: String, desc: 'country'
           optional 'postal_code', type: String, desc: 'postal_code'
+          optional 'phone_number', type: String, desc: 'phone_number'
         end
         optional 'work_address', type: Hash do
           optional 'employer', type: String, desc: 'employer'
@@ -61,6 +62,7 @@ module V1
           optional 'state_province', type: String, desc: 'state_province'
           optional 'country', type: String, desc: 'country'
           optional 'postal_code', type: String, desc: 'postal_code'
+          optional 'phone_number', type: String, desc: 'phone_number'
         end
       end
       put :update do
@@ -77,13 +79,13 @@ module V1
           end
           if params[:home_address].present?
             permit_address_params = ActionController::Parameters.new(params[:home_address]).permit(
-              :employer, :street1, :street2, :city, :state_province, :country, :postal_code
+              :employer, :street1, :street2, :city, :state_province, :country, :postal_code, :phone_number
             ).merge(enable: true)
             user.update_home_address(permit_address_params)
           end
           if params[:work_address].present?
             permit_address_params = ActionController::Parameters.new(params[:work_address]).permit(
-              :employer, :street1, :street2, :city, :state_province, :country, :postal_code
+              :employer, :street1, :street2, :city, :state_province, :country, :postal_code, :phone_number
             ).merge(enable: true)
             user.update_work_address(permit_address_params)
           end
@@ -108,6 +110,7 @@ module V1
           optional 'state_province', type: String, desc: 'state_province'
           optional 'country', type: String, desc: 'country'
           optional 'postal_code', type: String, desc: 'postal_code'
+          optional 'phone_number', type: String, desc: 'phone_number'
         end
         optional 'work_address', type: Hash do
           optional 'employer', type: String, desc: 'employer'
@@ -117,6 +120,7 @@ module V1
           optional 'state_province', type: String, desc: 'state_province'
           optional 'country', type: String, desc: 'country'
           optional 'postal_code', type: String, desc: 'postal_code'
+          optional 'phone_number', type: String, desc: 'phone_number'
         end
       end
       put :self_update do
@@ -130,13 +134,13 @@ module V1
           end
           if params[:home_address].present?
             permit_address_params = ActionController::Parameters.new(params[:home_address]).permit(
-              :employer, :street1, :street2, :city, :state_province, :country, :postal_code
+              :employer, :street1, :street2, :city, :state_province, :country, :postal_code, :phone_number
             ).merge(enable: true)
             user.update_home_address(permit_address_params)
           end
           if params[:work_address].present?
             permit_address_params = ActionController::Parameters.new(params[:work_address]).permit(
-              :employer, :street1, :street2, :city, :state_province, :country, :postal_code
+              :employer, :street1, :street2, :city, :state_province, :country, :postal_code, :phone_number
             ).merge(enable: true)
             user.update_work_address(permit_address_params)
           end
