@@ -28,6 +28,7 @@ class API < Grape::API
       # error!(unauthorized('You have not signed in for a long time, please login again.'), 401) if user && user.expired?
       unauthorized('You have not signed in for a long time, please login again.') if user && user.expired?
       unauthorized('Suspended prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'suspended'
+      unauthorized('Deleted prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'deleted'
       return user
     end
 

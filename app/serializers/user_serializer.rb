@@ -7,6 +7,13 @@ class UserSerializer < ActiveModel::Serializer
     :global_roles, :organization_roles, :invention_roles,
     :user_organization_statuses
 
+  def email
+    if (manage_organizations = instance_options[:managed_organizations]).present?
+      return object.email if (object.organizations & manage_organizations).any?
+    end
+    return nil
+  end
+
   def drafts_amount
     0
   end
@@ -66,7 +73,7 @@ class UserSerializer < ActiveModel::Serializer
     else
       object.organizations.uniq
     end
-    OrganizationListSerializer.build_array(current_organizations)
+    OrganizationSerializer.build_array(current_organizations)
   end
 
   def expires_time

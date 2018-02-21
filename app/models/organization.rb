@@ -25,6 +25,10 @@ class Organization < ApplicationRecord
     self.user_organizations.where(role: Role.find_by(code: 'organization_administrator')).map(&:user).uniq
   end
 
+  def members
+    self.user_organizations.where(role: Role.find_by(code: 'organization_member')).map(&:user).uniq
+  end
+
   def update_business_address(address_params)
     if self.business_address.present?
       self.business_address.update_attributes(address_params)

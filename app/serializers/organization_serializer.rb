@@ -1,6 +1,7 @@
 class OrganizationSerializer < ActiveModel::Serializer
   attributes :id, :name, :business_address, :created_time, :updated_time,
-    :admins_amount, :inventors_amount, :submissions_amount, :inventions_amount,
+    :admins_amount, :inventors_amount, :members_amount,
+    :submissions_amount, :inventions_amount, :invention_opportunities_amount,
     :administrators_statuses
 
   def admins_amount
@@ -11,12 +12,20 @@ class OrganizationSerializer < ActiveModel::Serializer
     object.inventors.count
   end
 
+  def members_amount
+    object.members.count
+  end
+
   def submissions_amount
     0
   end
 
   def inventions_amount
     object.inventions.count
+  end
+
+  def invention_opportunities_amount
+    object.invention_opportunities.count
   end
 
   def business_address
