@@ -36,6 +36,17 @@ module V1
         resp_ok
       end
 
+      desc "detail invention"
+      params do
+        requires :invention_id, type: Integer, desc: "invention_id"
+      end
+      get :detail do
+        authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return data_not_found(MISSING_INV) if invention.nil?
+        resp_ok("invention" => InventionSerializer.new(invention))
+      end
+
       desc "list inventions"
       params do
         optional :page, type: Integer, desc: 'curent page index，default: 1'
