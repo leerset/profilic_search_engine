@@ -136,6 +136,18 @@ class User < ApplicationRecord
     invention_roles(invention).find_by(code: 'inventor').present?
   end
 
+  def co_inventor?(invention)
+    invention_roles(invention).find_by(code: 'co-inventor').present?
+  end
+
+  def co_inventors
+    array = []
+    inventions.uniq.each do |invention|
+      array += invention.user_invetions.includes(:user).joins(:role).where(roles: {code: ['inventor', 'co-inventor']}).map(&:user).uniq.sort
+    end
+    array.uniq.select{|user| user.id != self.id}
+  end
+
   def invention_roles_array
     inv_roles = []
     inventions.uniq.each do |invention|

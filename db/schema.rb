@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180220050250) do
+ActiveRecord::Schema.define(version: 20180224085355) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -84,11 +84,26 @@ ActiveRecord::Schema.define(version: 20180220050250) do
     t.index ["upload_file_id"], name: "index_invention_opportunity_upload_files_on_upload_file_id"
   end
 
-  create_table "inventions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.bigint "organization_id"
-    t.string "name"
+  create_table "invention_upload_files", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "invention_id"
+    t.bigint "upload_file_id"
+    t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["invention_id"], name: "index_invention_upload_files_on_invention_id"
+    t.index ["status"], name: "index_invention_upload_files_on_status"
+    t.index ["upload_file_id"], name: "index_invention_upload_files_on_upload_file_id"
+  end
+
+  create_table "inventions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "invention_opportunity_id"
+    t.bigint "organization_id"
+    t.string "name"
+    t.string "title"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invention_opportunity_id"], name: "index_inventions_on_invention_opportunity_id"
     t.index ["organization_id"], name: "index_inventions_on_organization_id"
   end
 
