@@ -59,7 +59,7 @@ module V1
         optional :co_inventors, type: Array, desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
       end
-      post :update do
+      put :update do
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
