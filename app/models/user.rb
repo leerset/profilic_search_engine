@@ -104,6 +104,10 @@ class User < ApplicationRecord
     screen_name || [firstname, lastname].join(' ')
   end
 
+  def auth?(object)
+    object.respond_to?(:user_id) && object.user_id == self.id
+  end
+
   def god?
     roles.find_by(code: 'god').present?
   end
