@@ -19,10 +19,10 @@ module V1
       end
       post :create do
         authenticate!
-        organization = Organization.find_by(id: params[:organization_id])
+        organization = Organization.find_by(id: params[:invention][:organization_id])
         return data_not_found(MISSING_ORG) if organization.nil?
         return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
-        invention_opportunity = InventionOpportunity.find_by(id: params[:invention_opportunity_id])
+        invention_opportunity = InventionOpportunity.find_by(id: params[:invention][:invention_opportunity_id])
         return data_not_found(MISSING_IO) if invention_opportunity.nil?
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
           :invention_opportunity_id, :organization_id, :title, :description, :action
