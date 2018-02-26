@@ -13,8 +13,11 @@ class InventionSerializer < ActiveModel::Serializer
   end
 
   def role
-    return object.user_role(user_id) if (user_id = instance_options[:user_id]).present?
-    nil
+    if (user_id = instance_options[:user_id]).present?
+      return object.user_role(user_id)
+    else
+      nil
+    end
   end
 
   def uploaded_filename
