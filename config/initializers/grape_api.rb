@@ -7,6 +7,7 @@ class Grape::API
   NOT_INVENTOR_DENIED = 'not INVENTOR, permission denied.'
   NOT_GOD_INVENTOR_DENIED = 'not GOD, not INVENTOR, permission denied.'
   NOT_ORG_USR_DENIED = 'not organization user, permission denied.'
+  NOT_GOD_AUTH_DENIED = 'not GOD, not Auth, permission denied.'
 
   # data_not_found
   MISSING_CONCEPT = 'no concept found'
@@ -23,6 +24,7 @@ class Grape::API
   MISSING_PHONE = 'no phone found.'
   MISSING_FILE = 'no file found.'
   MISSING_IO = 'no invention opportunity found.'
+  MISSING_COMMENT = 'no comment found.'
 
   # data_exist
   EXIST_ROL = 'role name already exist.'
