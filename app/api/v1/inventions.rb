@@ -41,7 +41,7 @@ module V1
           bad_request('upload file type is invalid') unless Invention::IN_CONTENT_TYPES.include?(upload[:type])
           upload_file = UploadFile.create
           upload_file.update_upload(upload)
-          invention.invention_upload_files.find_or_create_by(upload_file: upload_file)
+          invention.update(upload_file: upload_file)
         end
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
@@ -93,7 +93,7 @@ module V1
             bad_request('upload file type is invalid') unless Invention::IN_CONTENT_TYPES.include?(upload[:type])
             upload_file = UploadFile.create
             upload_file.update_upload(upload)
-            invention.invention_upload_files.find_or_create_by(upload_file: upload_file)
+            invention.update(upload_file: upload_file)
           end
         end
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
