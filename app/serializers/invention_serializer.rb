@@ -2,7 +2,11 @@ class InventionSerializer < ActiveModel::Serializer
   attributes :id, :title, :description, :created_time, :updated_time,
     :action, :role, :uploaded_filename,
     :inventor, :co_inventors,
-    :organization, :opportunity
+    :organization, :opportunity, :comments
+
+  def comments
+    CommentSerializer.build_array(object.comments)
+  end
 
   def inventor
     UserSerializer.new(object.inventor)

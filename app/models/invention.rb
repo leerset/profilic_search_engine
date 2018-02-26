@@ -5,6 +5,8 @@ class Invention < ApplicationRecord
   has_many :users, through: :user_inventions
   has_one :invention_upload_file
   has_one :upload_file, through: :invention_upload_file
+  has_many :invention_comments
+  has_many :comments, through: :invention_comments
 
   IN_CONTENT_TYPES = [
     'application/msword',

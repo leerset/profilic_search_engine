@@ -146,7 +146,7 @@ module V1
           current_user.inventions
         end
         paged_inventions = inventions.order(id: :desc).page(page).per(size)
-        resp_ok("inventions" => InventionListSerializer.build_array(paged_inventions, user_id: current_user.id))
+        resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
       desc "list participants"
@@ -163,6 +163,74 @@ module V1
         user_inventions = invention.user_inventions
         paged_user_inventions = user_inventions.order(id: :desc).page(page).per(size)
         resp_ok("participants" => ParticipantSerializer.build_array(paged_user_inventions))
+      end
+
+      desc "download invention uploaded file"
+      params do
+        requires :invention_id, type: Integer, desc: 'invention_opportunity id'
+      end
+      get :download_uploaded_file do
+        authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return data_not_found(MISSING_INV) if invention.nil?
+        organization = invention.organization
+        # Members should definitely be read only
+        return permission_denied(NOT_GOD_OA_MEMBER_DENIED) unless current_user.god? || current_user.oa?(organization) || current_user.member?(organization)
+        upload_file = invention.upload_file
+        return data_not_found(MISSING_FILE) unless upload_file.present? && upload_file.upload.present?
+        filename = upload_file.upload_file_name
+        content_type upload_file.upload_content_type
+        env['api.format'] = :binary
+        header 'Content-Disposition', "attachment; filename=#{CGI.escape(filename)}"
+        File.open(upload_file.upload.path).read
+      end
+
+      desc "add comment"
+      params do
+        requires :invention_id, type: Integer, desc: "invention_id"
+        requires :content, type: String, desc: "content (500)"
+      end
+      post :add_comment do
+        authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return data_not_found(MISSING_INV) if invention.nil?
+        unless current_user.god? || current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_GOD_INVENTOR_DENIED)
+        end
+        invention.comments.create(user: current_user, content: params[:content])
+        resp_ok("inventions" => InventionSerializer.new(invention, user_id: current_user.id))
+      end
+
+      desc "update comment"
+      params do
+        requires :comment_id, type: Integer, desc: "comment_id"
+        requires :content, type: String, desc: "content (500)"
+      end
+      put :update_comment do
+        authenticate!
+        comment = Comment.find_by(id: params[:comment_id])
+        return data_not_found(MISSING_COMMENT) if comment.nil?
+        unless current_user.god? || current_user.auth?(comment)
+          return permission_denied(NOT_GOD_AUTH_DENIED)
+        end
+        comment.update(content: params[:content])
+        invention = comment.invention
+        resp_ok("inventions" => InventionSerializer.new(invention, user_id: current_user.id))
+      end
+
+      desc "delete comment"
+      params do
+        requires :comment_id, type: Integer, desc: "comment_id"
+      end
+      delete :delete_comment do
+        authenticate!
+        comment = Comment.find_by(id: params[:comment_id])
+        return data_not_found(MISSING_COMMENT) if comment.nil?
+        unless current_user.god? || current_user.auth?(comment)
+          return permission_denied(NOT_GOD_AUTH_DENIED)
+        end
+        comment.destroy
+        resp_ok
       end
 
     end
