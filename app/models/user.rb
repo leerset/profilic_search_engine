@@ -224,11 +224,11 @@ class User < ApplicationRecord
   end
 
   def organization_roles(organization)
-    user_organizations.where(organization: organization).map(&:role)
+    user_organizations.includes(:role).where(organization: organization).map(&:role)
   end
 
   def invention_roles(invention)
-    user_inventions.where(invention: invention).map(&:role)
+    user_inventions.includes(:role).where(invention: invention).map(&:role)
   end
 
   def expired?
