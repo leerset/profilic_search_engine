@@ -27,7 +27,7 @@ module V1
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
           :invention_opportunity_id, :organization_id, :title, :description, :action
         )
-        invention = Invention.create_by(permit_invention_params)
+        invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
         invention.user_inventions.create(user: current_user, role: inventor_role)
         if (co_inventor_ids = params[:co_inventors]).present?
