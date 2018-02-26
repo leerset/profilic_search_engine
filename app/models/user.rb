@@ -137,11 +137,11 @@ class User < ApplicationRecord
   end
 
   def inventor?(invention)
-    invention_roles(invention).find_by(code: 'inventor').present?
+    user_inventions.where(invention: invention).joins(:role).where(roles: {code: 'inventor'}).any?
   end
 
   def co_inventor?(invention)
-    invention_roles(invention).find_by(code: 'co-inventor').present?
+    user_inventions.where(invention: invention).joins(:role).where(roles: {code: 'co-inventor'}).any?
   end
 
   def co_inventors
