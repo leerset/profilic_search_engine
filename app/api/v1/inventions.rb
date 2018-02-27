@@ -8,11 +8,18 @@ module V1
       desc "create invention"
       params do
         requires :invention, type: Hash do
-          requires :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
+          optional :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
           requires :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
+          optional :action_note, type: String, desc: "action note (500)"
+          optional :searches, type: Array do
+            optional :title, type: String, desc: "title"
+            optional :url, type: String, desc: "url"
+            optional :note, type: String, desc: "note"
+            optional :tag, type: String, desc: "tag"
+          end
         end
         optional :co_inventors, type: Array, desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
@@ -22,14 +29,24 @@ module V1
         organization = Organization.find_by(id: params[:invention][:organization_id])
         return data_not_found(MISSING_ORG) if organization.nil?
         return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
-        invention_opportunity = InventionOpportunity.find_by(id: params[:invention][:invention_opportunity_id])
-        return data_not_found(MISSING_IO) if invention_opportunity.nil?
+        if params[:invention][:invention_opportunity_id].present?
+          invention_opportunity = InventionOpportunity.find_by(id: params[:invention][:invention_opportunity_id])
+          return data_not_found(MISSING_IO) if invention_opportunity.nil?
+        end
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
           :invention_opportunity_id, :organization_id, :title, :description, :action
         )
         invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
-        invention.user_inventions.create(user: current_user, role: inventor_role)
+        invention.user_inventions.create!(user: current_user, role: inventor_role)
+        if (searches = params[:invention][:searches]).present?
+          searches.each do |search|
+            permit_search_params = ActionController::Parameters.new(search).permit(
+              :title, :url, :note, :tag
+            )
+            invention.searches.create!(permit_search_params)
+          end
+        end
         if (co_inventor_ids = params[:co_inventors]).present?
           co_inventor_role = Role.find_by(role_type: 'invention', code: 'co-inventor')
           co_inventor_ids.uniq.each do |co_inventor_id|
@@ -230,6 +247,71 @@ module V1
           return permission_denied(NOT_GOD_AUTH_DENIED)
         end
         comment.destroy
+        resp_ok
+      end
+
+      desc "create invention search"
+      params do
+        requires :invention_id, type: Integer, desc: "invention_id"
+        requires :search, type: Hash do
+          optional :title, type: String, desc: "title"
+          optional :url, type: String, desc: "url"
+          optional :note, type: String, desc: "note"
+          optional :tag, type: String, desc: "tag"
+        end
+      end
+      post :create_search do
+        authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return data_not_found(MISSING_INV) if invention.nil?
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_INVENTOR_DENIED)
+        end
+        permit_search_params = ActionController::Parameters.new(params[:search]).permit(
+          :title, :url, :note, :tag
+        )
+        invention.searches.create!(permit_search_params)
+        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
+      end
+
+      desc "update invention search"
+      params do
+        requires :search_id, type: Integer, desc: "search_id"
+        requires :search, type: Hash do
+          optional :title, type: String, desc: "title"
+          optional :url, type: String, desc: "url"
+          optional :note, type: String, desc: "note"
+          optional :tag, type: String, desc: "tag"
+        end
+      end
+      put :update_search do
+        authenticate!
+        search = Search.find_by(id: params[:search_id])
+        return data_not_found(MISSING_SEARCH) if search.nil?
+        invention = search.invention
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_INVENTOR_DENIED)
+        end
+        permit_search_params = ActionController::Parameters.new(params[:search]).permit(
+          :title, :url, :note, :tag
+        )
+        search.update(permit_search_params)
+        resp_ok("inventions" => InventionSerializer.new(invention, user_id: current_user.id))
+      end
+
+      desc "delete invention search"
+      params do
+        requires :search_id, type: Integer, desc: "search_id"
+      end
+      delete :delete_search do
+        authenticate!
+        search = Search.find_by(id: params[:search_id])
+        return data_not_found(MISSING_SEARCH) if search.nil?
+        invention = search.invention
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_INVENTOR_DENIED)
+        end
+        search.destroy
         resp_ok
       end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180226075428) do
+ActiveRecord::Schema.define(version: 20180227031802) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -101,6 +101,15 @@ ActiveRecord::Schema.define(version: 20180226075428) do
     t.index ["upload_file_id"], name: "index_invention_opportunity_upload_files_on_upload_file_id"
   end
 
+  create_table "invention_searches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "invention_id"
+    t.bigint "search_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invention_id"], name: "index_invention_searches_on_invention_id"
+    t.index ["search_id"], name: "index_invention_searches_on_search_id"
+  end
+
   create_table "invention_upload_files", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "invention_id"
     t.bigint "upload_file_id"
@@ -119,6 +128,7 @@ ActiveRecord::Schema.define(version: 20180226075428) do
     t.string "title"
     t.string "description"
     t.string "action"
+    t.string "action_note", limit: 500
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["invention_opportunity_id"], name: "index_inventions_on_invention_opportunity_id"
@@ -173,6 +183,19 @@ ActiveRecord::Schema.define(version: 20180226075428) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_roles_on_name"
+  end
+
+  create_table "searches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "title"
+    t.string "url"
+    t.string "note"
+    t.string "tag"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["note"], name: "index_searches_on_note"
+    t.index ["tag"], name: "index_searches_on_tag"
+    t.index ["title"], name: "index_searches_on_title"
+    t.index ["url"], name: "index_searches_on_url"
   end
 
   create_table "solutions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

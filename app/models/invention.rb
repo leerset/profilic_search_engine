@@ -7,6 +7,8 @@ class Invention < ApplicationRecord
   has_one :upload_file, through: :invention_upload_file
   has_many :invention_comments
   has_many :comments, through: :invention_comments
+  has_many :invention_searches
+  has_many :searches, through: :invention_searches
 
   IN_CONTENT_TYPES = [
     'application/msword',

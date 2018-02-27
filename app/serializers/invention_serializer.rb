@@ -2,7 +2,11 @@ class InventionSerializer < ActiveModel::Serializer
   attributes :id, :title, :description, :created_time, :updated_time,
     :action, :role, :uploaded_filename,
     :inventor, :co_inventors,
-    :organization, :opportunity, :comments
+    :organization, :opportunity, :comments, :searches
+
+  def searches
+    SearchSerializer.build_array(object.searches)
+  end
 
   def comments
     CommentSerializer.build_array(object.comments)
@@ -34,6 +38,7 @@ class InventionSerializer < ActiveModel::Serializer
   end
 
   def opportunity
+    return nil if object.invention_opportunity.nil?
     InventionOpportunitySerializer.new(object.invention_opportunity)
   end
 
