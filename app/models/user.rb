@@ -144,6 +144,10 @@ class User < ApplicationRecord
     user_inventions.where(invention: invention).joins(:role).where(roles: {code: 'co-inventor'}).any?
   end
 
+  def mentor?(invention)
+    user_inventions.where(invention: invention).joins(:role).where(roles: {code: 'mentor'}).any?
+  end
+
   def co_inventors
     array = []
     inventions.uniq.each do |invention|
