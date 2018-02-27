@@ -5,6 +5,7 @@ class Grape::API
   NOT_GOD_OA_DENIED = 'not GOD, not OA, permission denied.'
   NOT_GOD_OA_MEMBER_DENIED = 'not GOD, not OA, not member, permission denied.'
   NOT_INVENTOR_DENIED = 'not INVENTOR, permission denied.'
+  NOT_CO_INVENTOR_DENIED = 'not CO-INVENTOR, permission denied.'
   NOT_GOD_INVENTOR_DENIED = 'not GOD, not INVENTOR, permission denied.'
   NOT_ORG_USR_DENIED = 'not organization user, permission denied.'
   NOT_GOD_AUTH_DENIED = 'not GOD, not Auth, permission denied.'
@@ -25,7 +26,7 @@ class Grape::API
   MISSING_FILE = 'no file found.'
   MISSING_IO = 'no invention opportunity found.'
   MISSING_COMMENT = 'no comment found.'
-
+  MISSING_SEARCH = 'no search found.'
   # data_exist
   EXIST_ROL = 'role name already exist.'
   EXIST_ORG = 'organization name already exist.'

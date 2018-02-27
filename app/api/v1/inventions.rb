@@ -67,8 +67,8 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.god? || current_user.inventor?(invention)
-          return permission_denied(NOT_GOD_INVENTOR_DENIED)
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         ActiveRecord::Base.transaction do
           if params[:invention].present?
@@ -111,8 +111,8 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.god? || current_user.inventor?(invention)
-          return permission_denied(NOT_GOD_INVENTOR_DENIED)
+        unless current_user.inventor?(invention)
+          return permission_denied(NOT_INVENTOR_DENIED)
         end
         invention.destroy
         resp_ok
@@ -126,8 +126,8 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.god? || current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_GOD_INVENTOR_DENIED)
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
@@ -142,13 +142,7 @@ module V1
         page = params[:page].presence || 1
         size = params[:size].presence || 20
         organizations = current_user.managed_organizations
-        inventions = if current_user.god?
-          Invention.all
-        elsif organizations.any?
-          Invention.where(organization: organizations)
-        else
-          current_user.inventions
-        end
+        inventions = current_user.inventions
         paged_inventions = inventions.order(id: :desc).page(page).per(size)
         resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
@@ -177,9 +171,9 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        organization = invention.organization
-        # Members should definitely be read only
-        return permission_denied(NOT_GOD_OA_MEMBER_DENIED) unless current_user.god? || current_user.oa?(organization) || current_user.member?(organization)
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        end
         upload_file = invention.upload_file
         return data_not_found(MISSING_FILE) unless upload_file.present? && upload_file.upload.present?
         filename = upload_file.upload_file_name
@@ -198,8 +192,8 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.god? || current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_GOD_INVENTOR_DENIED)
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         invention.comments.create(user: current_user, content: params[:content])
         resp_ok("inventions" => InventionSerializer.new(invention, user_id: current_user.id))
@@ -214,8 +208,8 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        unless current_user.god? || current_user.auth?(comment)
-          return permission_denied(NOT_GOD_AUTH_DENIED)
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         comment.update(content: params[:content])
         invention = comment.invention
@@ -230,8 +224,8 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        unless current_user.god? || current_user.auth?(comment)
-          return permission_denied(NOT_GOD_AUTH_DENIED)
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         comment.destroy
         resp_ok
@@ -252,7 +246,7 @@ module V1
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_INVENTOR_DENIED)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         permit_search_params = ActionController::Parameters.new(params[:search]).permit(
           :title, :url, :note, :tag
@@ -277,7 +271,7 @@ module V1
         return data_not_found(MISSING_SEARCH) if search.nil?
         invention = search.invention
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_INVENTOR_DENIED)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         permit_search_params = ActionController::Parameters.new(params[:search]).permit(
           :title, :url, :note, :tag
@@ -296,7 +290,7 @@ module V1
         return data_not_found(MISSING_SEARCH) if search.nil?
         invention = search.invention
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_INVENTOR_DENIED)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         search.destroy
         resp_ok
