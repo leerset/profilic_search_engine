@@ -14,14 +14,8 @@ module V1
           optional :description, type: String, desc: "description (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
-          optional :searches, type: Array do
-            optional :title, type: String, desc: "title"
-            optional :url, type: String, desc: "url"
-            optional :note, type: String, desc: "note"
-            optional :tag, type: String, desc: "tag"
-          end
         end
-        optional :co_inventors, type: Array, desc: "co_inventors id array, e.g. [1,2,3]"
+        optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
       end
       post :create do
@@ -34,19 +28,11 @@ module V1
           return data_not_found(MISSING_IO) if invention_opportunity.nil?
         end
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
-          :invention_opportunity_id, :organization_id, :title, :description, :action
+          :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note
         )
         invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
         invention.user_inventions.create!(user: current_user, role: inventor_role)
-        if (searches = params[:invention][:searches]).present?
-          searches.each do |search|
-            permit_search_params = ActionController::Parameters.new(search).permit(
-              :title, :url, :note, :tag
-            )
-            invention.searches.create!(permit_search_params)
-          end
-        end
         if (co_inventor_ids = params[:co_inventors]).present?
           co_inventor_role = Role.find_by(role_type: 'invention', code: 'co-inventor')
           co_inventor_ids.uniq.each do |co_inventor_id|
@@ -72,8 +58,9 @@ module V1
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
+          optional :action_note, type: String, desc: "action note (500)"
         end
-        optional :co_inventors, type: Array, desc: "co_inventors id array, e.g. [1,2,3]"
+        optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
       end
       put :update do
@@ -94,7 +81,7 @@ module V1
               return data_not_found(MISSING_IO) if invention_opportunity.nil?
             end
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
-              :invention_opportunity_id, :organization_id, :title, :description, :action
+              :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note
             )
             invention.update_attributes(permit_invention_params)
           end
