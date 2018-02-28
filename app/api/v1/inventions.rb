@@ -68,8 +68,8 @@ module V1
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
         optional :invention, type: Hash do
-          optional :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
-          optional :organization_id, type: Integer, desc: "organization_id"
+          # optional :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
+          # optional :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
@@ -88,16 +88,17 @@ module V1
         end
         ActiveRecord::Base.transaction do
           if params[:invention].present?
-            if params[:invention][:organization_id].present?
-              organization = Organization.find_by(id: params[:invention][:organization_id])
-              return data_not_found(MISSING_ORG) if organization.nil?
-            end
-            if params[:invention][:invention_opportunity_id].present?
-              invention_opportunity = InventionOpportunity.find_by(id: params[:invention][:invention_opportunity_id])
-              return data_not_found(MISSING_IO) if invention_opportunity.nil?
-            end
+            # if params[:invention][:organization_id].present?
+            #   organization = Organization.find_by(id: params[:invention][:organization_id])
+            #   return data_not_found(MISSING_ORG) if organization.nil?
+            # end
+            # if params[:invention][:invention_opportunity_id].present?
+            #   invention_opportunity = InventionOpportunity.find_by(id: params[:invention][:invention_opportunity_id])
+            #   return data_not_found(MISSING_IO) if invention_opportunity.nil?
+            # end
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
-              :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note, :stage
+              # :invention_opportunity_id, :organization_id,
+              :title, :description, :action, :action_note, :stage
             )
             invention.update_attributes(permit_invention_params)
           end
