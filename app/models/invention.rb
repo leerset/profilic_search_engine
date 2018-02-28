@@ -21,7 +21,7 @@ class Invention < ApplicationRecord
   end
 
   def co_inventors
-    user_inventions.joins(:role).where(roles: {code: 'co-inventor'}).map(&:user).uniq.sort
+    user_inventions.joins(:role).where(roles: {code: 'co_inventor'}).map(&:user).uniq.sort
   end
 
   def mentors

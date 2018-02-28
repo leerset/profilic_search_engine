@@ -141,7 +141,7 @@ class User < ApplicationRecord
   end
 
   def co_inventor?(invention)
-    user_inventions.where(invention: invention).joins(:role).where(roles: {code: 'co-inventor'}).any?
+    user_inventions.where(invention: invention).joins(:role).where(roles: {code: 'co_inventor'}).any?
   end
 
   def mentor?(invention)
@@ -151,7 +151,7 @@ class User < ApplicationRecord
   def co_inventors
     array = []
     inventions.uniq.each do |invention|
-      array += invention.user_invetions.includes(:user).joins(:role).where(roles: {code: ['inventor', 'co-inventor']}).map(&:user).uniq.sort
+      array += invention.user_invetions.includes(:user).joins(:role).where(roles: {code: ['inventor', 'co_inventor']}).map(&:user).uniq.sort
     end
     array.uniq.select{|user| user.id != self.id}
   end

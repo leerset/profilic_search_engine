@@ -49,7 +49,7 @@ module V1
           end
         end
         if (co_inventor_ids = params[:co_inventors]).present?
-          co_inventor_role = Role.find_by(role_type: 'invention', code: 'co-inventor')
+          co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
           co_inventor_ids.uniq.each do |co_inventor_id|
             co_inventor = User.find_by_id(co_inventor_id)
             invention.user_inventions.find_or_create_by(user: co_inventor, role: co_inventor_role) if co_inventor
@@ -102,7 +102,7 @@ module V1
             invention.update_attributes(permit_invention_params)
           end
           if (co_inventor_ids = params[:co_inventors]).present?
-            co_inventor_role = Role.find_by(role_type: 'invention', code: 'co-inventor')
+            co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
             invention.user_invetions.where(role: co_inventor_role).where.not(user_id: [co_inventor_ids]).destroy_all
             co_inventor_ids.uniq.each do |co_inventor_id|
               co_inventor = User.find_by_id(co_inventor_id)
