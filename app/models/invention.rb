@@ -1,6 +1,6 @@
 class Invention < ApplicationRecord
   belongs_to :organization
-  belongs_to :invention_opportunity
+  belongs_to :invention_opportunity, optional: true
   has_many :user_inventions
   has_many :users, through: :user_inventions
   has_one :invention_upload_file
