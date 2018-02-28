@@ -14,7 +14,7 @@ module V1
           optional :description, type: String, desc: "description (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
-          optional :level, type: String, desc: "level, e.g. Full Authoring"
+          optional :stage, type: String, desc: "stage, e.g. Full Authoring"
         end
         optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
@@ -29,7 +29,7 @@ module V1
           return data_not_found(MISSING_IO) if invention_opportunity.nil?
         end
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
-          :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note, :level
+          :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note, :stage
         )
         invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
@@ -60,7 +60,7 @@ module V1
           optional :description, type: String, desc: "description (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
-          optional :level, type: String, desc: "level, e.g. Full Authoring"
+          optional :stage, type: String, desc: "stage, e.g. Full Authoring"
         end
         optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
@@ -83,7 +83,7 @@ module V1
               return data_not_found(MISSING_IO) if invention_opportunity.nil?
             end
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
-              :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note, :level
+              :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note, :stage
             )
             invention.update_attributes(permit_invention_params)
           end
@@ -105,22 +105,22 @@ module V1
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 
-      desc "update invention level"
+      desc "update invention stage"
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
-        optional :level, type: String, desc: "level, e.g. Full Authoring"
+        optional :stage, type: String, desc: "stage, e.g. Full Authoring"
       end
-      put :update_level do
+      put :update_stage do
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        if params[:level].present?
-          invention.update_attributes(level: params[:level])
+        if params[:stage].present?
+          invention.update_attributes(stage: params[:stage])
         else
-          invention.update_attributes(level: nil)
+          invention.update_attributes(stage: nil)
         end
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
