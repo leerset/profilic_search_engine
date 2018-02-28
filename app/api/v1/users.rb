@@ -31,7 +31,7 @@ module V1
       end
       post :resend_magic_link do
         user = User.find_by(email: params[:email])
-        return data_not_found(MISSING_USR) if user.nil?
+        return resp_error(MISSING_USR) if user.nil?
         user.auth.reset_secure_random
         user.update_access_token
         Mailer.magic_link_email(user, 'Successfully Resent Magic Link.').deliver

@@ -15,6 +15,12 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :stage, type: String, desc: "stage, e.g. Full Authoring"
+          optional :searches, type: Array do
+            optional :title, type: String, desc: "title"
+            optional :url, type: String, desc: "url"
+            optional :note, type: String, desc: "note"
+            optional :tag, type: String, desc: "tag"
+          end
         end
         optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
@@ -34,6 +40,14 @@ module V1
         invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
         invention.user_inventions.create!(user: current_user, role: inventor_role)
+        if (searches = params[:invention][:searches]).present?
+          searches.each do |search|
+            permit_search_params = ActionController::Parameters.new(search).permit(
+              :title, :url, :note, :tag
+            )
+            invention.searches.create!(permit_search_params)
+          end
+        end
         if (co_inventor_ids = params[:co_inventors]).present?
           co_inventor_role = Role.find_by(role_type: 'invention', code: 'co-inventor')
           co_inventor_ids.uniq.each do |co_inventor_id|
