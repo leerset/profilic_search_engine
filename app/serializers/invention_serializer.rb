@@ -13,11 +13,11 @@ class InventionSerializer < ActiveModel::Serializer
   end
 
   def inventor
-    UserSerializer.new(object.inventor)
+    UserSimpleSerializer.new(object.inventor)
   end
 
   def co_inventors
-    UserSerializer.build_array(object.co_inventors)
+    UserSimpleSerializer.build_array(object.co_inventors)
   end
 
   def role
