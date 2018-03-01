@@ -25,9 +25,9 @@ class UserEncryptionSerializer < ActiveModel::Serializer
   def user_organization_statuses
     manage_organizations = instance_options[:managed_organizations]
     current_user_organization_statuses = if manage_organizations
-      object.user_organization_statuses.where(organization: manage_organizations)
+      object.user_organization_statuses.includes(:user, :organization).where(organization: manage_organizations)
     else
-      object.user_organization_statuses
+      object.user_organization_statuses.includes(:user, :organization)
     end
     UserOrganizationStatusSerializer.build_array(current_user_organization_statuses)
   end
