@@ -90,15 +90,15 @@ module V1
         optional :status, type: String, desc: "status"
         optional :page, type: Integer, desc: 'curent page index, default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
-        optional :sort_column, type: String, desc: 'sort column default: by id'
-        optional :sort_order, type: String, desc: 'sort order (desc for descending), default: ascending'
+        optional :sort_column, type: String, default: "id", desc: 'sort column default: by id'
+        optional :sort_order, type: String, default: "asc", desc: 'sort order (desc for descending), default: ascending'
       end
       get :list do
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
         sortcolumn = InventionOpportunity.columns_hash[params[:sort_column]] ? params[:sort_column] : "id"
-        sortorder = params[:sort_order] && params[:sort_order].downcase == "desc" ? "desc" : nil
+        sortorder = params[:sort_order] && params[:sort_order].downcase == "desc" ? "desc" : "asc"
         organizations = []
         if params[:organization_id].present?
           organization = Organization.find_by(id: params[:organization_id])

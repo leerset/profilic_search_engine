@@ -174,14 +174,18 @@ module V1
       params do
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
+        optional :sort_column, type: String, default: "updated_at", desc: 'sort column default: by updated_time (updated_at)'
+        optional :sort_order, type: String, default: "desc", desc: 'sort order (asc for ascending), default: descending'
       end
       get :list do
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
+        sortcolumn = Invention.columns_hash[params[:sort_column]] ? params[:sort_column] : "updated_at"
+        sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         organizations = current_user.managed_organizations
         inventions = current_user.inventions
-        paged_inventions = inventions.includes(:users).order(updated_at: :desc).page(page).per(size)
+        paged_inventions = inventions.includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
