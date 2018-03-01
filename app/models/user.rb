@@ -113,11 +113,11 @@ class User < ApplicationRecord
   end
 
   def oa?(organization)
-    organization_roles(organization).detect{|role| role.code == 'organization_administrator'}.present?
+    user_organizations.joins(:role).where(organization: organization, roles: {code: 'organization_administrator'}).any?
   end
 
   def member?(organization)
-    organization_roles(organization).detect{|role| role.code == 'organization_member'}.present?
+    user_organizations.joins(:role).where(organization: organization, roles: {code: 'organization_member'}).any?
   end
 
   def all_oa?(organizations)
@@ -133,7 +133,7 @@ class User < ApplicationRecord
   end
 
   def member_organizations
-    self.user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_member'}).map(&:organization).uniq.sort
+    user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_member'}).map(&:organization).uniq.sort
   end
 
   def inventor?(invention)
