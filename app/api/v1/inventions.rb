@@ -22,7 +22,7 @@ module V1
           optional :note, type: String, desc: "note"
           optional :tag, type: String, desc: "tag"
         end
-        optional :co_inventors, type: Array, desc: "co_inventors id array, e.g. [1,2,3]"
+        optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
       end
       post :create do
@@ -77,7 +77,7 @@ module V1
           optional :action_note, type: String, desc: "action note (500)"
           optional :stage, type: String, desc: "stage, e.g. Full Authoring"
         end
-        optional :co_inventors, type: Array, desc: "co_inventors id array, e.g. [1,2,3]"
+        optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
       end
       put :update do
