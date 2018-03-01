@@ -186,53 +186,40 @@ class User < ApplicationRecord
     inv_roles
   end
 
-  def organization_roles_array
-    org_roles = []
-    organizations.uniq.each do |organization|
-      organization_roles(organization).uniq.each do |role|
-        org_roles << {
-          id: organization.id,
-          name: organization.name,
-          role_id: role.id,
-          role_name: role.name
-        }
-      end
-    end
-    org_roles
-  end
-
   def organization_roles_array_in_organizations(orgs)
     org_roles = []
-    organizations.where(id: orgs.map(&:id)).uniq.each do |organization|
-      organization_roles(organization).uniq.each do |role|
-        org_roles << {
-          id: organization.id,
-          name: organization.name,
-          role_id: role.id,
-          role_name: role.name
-        }
-      end
+    user_organizations.includes(:role, :organization).where(organization: orgs).each do |uo|
+      org_roles << {
+        id: uo.organization.id,
+        name: uo.organization.name,
+        role_id: uo.role.try(:id),
+        role_name: uo.role.try(:name)
+      }
     end
-    org_roles
+    org_roles.uniq
+  end
+
+  def organization_roles_array
+    organization_roles_array_in_organizations(organizations)
   end
 
   def global_roles_array
     glo_roles = []
-    self.roles.uniq.each do |role|
+    roles.each do |role|
       glo_roles << {
         role_id: role.id,
         role_name: role.name
       }
     end
-    glo_roles
+    glo_roles.uniq
   end
 
   def organization_roles(organization)
-    user_organizations.includes(:role).where(organization: organization).map(&:role)
+    user_organizations.includes(:role, :organization).where(organization: organization).map(&:role)
   end
 
   def invention_roles(invention)
-    user_inventions.includes(:role).where(invention: invention).map(&:role)
+    user_inventions.includes(:role, :invention).where(invention: invention).map(&:role)
   end
 
   def expired?
