@@ -22,7 +22,7 @@ module V1
           password: SecureRandom.base58
         )
         Mailer.magic_link_email(user, 'Successfully Signed Up.').deliver
-        resp_ok("user" => UserSerializer.new(user))
+        resp_ok("user" => UserEncryptionSerializer.new(user))
       end
 
       desc "resend magic link by email"
@@ -53,7 +53,7 @@ module V1
           return unauthorized("This link has expired, the new link has been sent to your mailbox, please sign in again")
         end
         user.update_access_token
-        resp_ok("user" => UserSerializer.new(user))
+        resp_ok("user" => UserEncryptionSerializer.new(user))
       end
 
       desc "logout / reset magic link and access token"
@@ -76,7 +76,7 @@ module V1
       end
       get :detail do
         authenticate!
-        resp_ok("user" => UserSerializer.new(current_user))
+        resp_ok("user" => UserEncryptionSerializer.new(current_user))
       end
 
       desc "update user"
@@ -168,7 +168,7 @@ module V1
             end
           end if params[:addresses].present?
         end
-        resp_ok("user" => UserSerializer.new(current_user))
+        resp_ok("user" => UserEncryptionSerializer.new(current_user))
       end
 
     end

@@ -1,6 +1,6 @@
 class InventionSerializer < ActiveModel::Serializer
   attributes :id, :title, :description, :created_time, :updated_time,
-    :action, :action_note, :role, :uploaded_filename,
+    :action, :action_note, :stage, :role, :uploaded_filename,
     :inventor, :co_inventors,
     :organization, :opportunity, :comments, :searches
 

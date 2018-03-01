@@ -35,7 +35,7 @@ module V1
           password: SecureRandom.base58
         )
         Mailer.magic_link_email(user, 'Successfully Signed Up.').deliver
-        resp_ok("user" => UserSerializer.new(user))
+        resp_ok("user" => UserEncryptionSerializer.new(user))
       end
 
       desc "login by magic link / get user access token"
@@ -47,7 +47,7 @@ module V1
         return unauthorized("Expired magic link") if auth.nil?
         user = auth.user
         user.update_access_token
-        resp_ok("user" => UserSerializer.new(user))
+        resp_ok("user" => UserEncryptionSerializer.new(user))
       end
 
       desc "get user"
@@ -57,7 +57,7 @@ module V1
       get :detail do
         user = User.find_by(id: params[:user_id])
         return data_not_found(MISSING_USR) if user.nil?
-        resp_ok("user" => UserSerializer.new(user))
+        resp_ok("user" => UserEncryptionSerializer.new(user))
       end
 
       desc "get magic_link"
@@ -72,7 +72,7 @@ module V1
         return data_not_found(MISSING_USR) if user.nil?
         user.update_access_token
         user.auth.reset_secure_random
-        resp_ok("user" => UserSerializer.new(user))
+        resp_ok("user" => UserEncryptionSerializer.new(user))
       end
 
       desc "update user"
@@ -168,7 +168,7 @@ module V1
             end
           end if params[:addresses].present?
         end
-        resp_ok("user" => UserSerializer.new(user))
+        resp_ok("user" => UserEncryptionSerializer.new(user))
       end
 
     end

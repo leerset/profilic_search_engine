@@ -8,7 +8,7 @@ module V1
       desc "create invention"
       params do
         requires :invention, type: Hash do
-          optional :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
+          optional :invention_opportunity_id, type: String, desc: "invention_opportunity_id"
           requires :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (200)"
@@ -30,8 +30,9 @@ module V1
         organization = Organization.find_by(id: params[:invention][:organization_id])
         return data_not_found(MISSING_ORG) if organization.nil?
         return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
-        if params[:invention][:invention_opportunity_id].present?
-          invention_opportunity = InventionOpportunity.find_by(id: params[:invention][:invention_opportunity_id])
+        opportunity_id = params[:invention][:invention_opportunity_id]
+        if opportunity_id.present? && opportunity_id.to_i != 0
+          invention_opportunity = InventionOpportunity.find_by(id: opportunity_id.to_i)
           return data_not_found(MISSING_IO) if invention_opportunity.nil?
         end
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
@@ -180,7 +181,7 @@ module V1
         size = params[:size].presence || 20
         organizations = current_user.managed_organizations
         inventions = current_user.inventions
-        paged_inventions = inventions.order(id: :desc).page(page).per(size)
+        paged_inventions = inventions.includes(:users).order(updated_at: :desc).page(page).per(size)
         resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
@@ -196,7 +197,7 @@ module V1
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
         user_inventions = invention.user_inventions
-        paged_user_inventions = user_inventions.order(id: :desc).page(page).per(size)
+        paged_user_inventions = user_inventions.order(updated_at: :desc).page(page).per(size)
         resp_ok("participants" => ParticipantSerializer.build_array(paged_user_inventions))
       end
 
@@ -233,7 +234,7 @@ module V1
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         invention.comments.create(user: current_user, content: params[:content])
-        resp_ok("inventions" => InventionSerializer.new(invention, user_id: current_user.id))
+        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 
       desc "update comment"
@@ -250,7 +251,7 @@ module V1
         end
         comment.update(content: params[:content])
         invention = comment.invention
-        resp_ok("inventions" => InventionSerializer.new(invention, user_id: current_user.id))
+        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 
       desc "delete comment"
@@ -314,7 +315,7 @@ module V1
           :title, :url, :note, :tag
         )
         search.update(permit_search_params)
-        resp_ok("inventions" => InventionSerializer.new(invention, user_id: current_user.id))
+        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 
       desc "delete invention search"
