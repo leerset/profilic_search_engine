@@ -3,8 +3,8 @@ class Invention < ApplicationRecord
   belongs_to :invention_opportunity, optional: true
   has_many :user_inventions
   has_many :users, through: :user_inventions
-  has_one :invention_upload_file
-  has_one :upload_file, through: :invention_upload_file
+  has_many :invention_upload_files
+  has_many :upload_files, through: :invention_upload_files
   has_many :invention_comments
   has_many :comments, through: :invention_comments
   has_many :invention_searches

@@ -1,4 +1,5 @@
 class UploadFile < ApplicationRecord
+
   UPLOAD_CONTENT_TYPES = [
     'image/png',
     'image/jpeg',

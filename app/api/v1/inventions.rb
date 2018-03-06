@@ -60,7 +60,7 @@ module V1
           bad_request('upload file type is invalid') unless Invention::IN_CONTENT_TYPES.include?(upload[:type])
           upload_file = UploadFile.create
           upload_file.update_upload(upload)
-          invention.update(upload_file: upload_file)
+          invention.upload_files << upload_file
         end
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
@@ -115,7 +115,7 @@ module V1
             bad_request('upload file type is invalid') unless Invention::IN_CONTENT_TYPES.include?(upload[:type])
             upload_file = UploadFile.create
             upload_file.update_upload(upload)
-            invention.update(upload_file: upload_file)
+            invention.upload_files << upload_file
           end
         end
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
@@ -336,6 +336,138 @@ module V1
         end
         search.destroy
         resp_ok
+      end
+
+#####
+
+      desc "test create invention"
+      params do
+        requires :invention, type: Hash do
+          optional :invention_opportunity_id, type: String, desc: "invention_opportunity_id"
+          requires :organization_id, type: Integer, desc: "organization_id"
+          optional :title, type: String, desc: "title (100)"
+          optional :description, type: String, desc: "description (200)"
+          optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
+          optional :action_note, type: String, desc: "action note (500)"
+          optional :stage, type: String, desc: "stage, e.g. Full Authoring"
+        end
+        optional :searches, type: Array do
+          optional :title, type: String, desc: "title"
+          optional :url, type: String, desc: "url"
+          optional :note, type: String, desc: "note"
+          optional :tag, type: String, desc: "tag"
+        end
+        optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
+        optional :uploads, type: Array[File], desc: "upload files"
+      end
+      post :test_create do
+        authenticate!
+        organization = Organization.find_by(id: params[:invention][:organization_id])
+        return data_not_found(MISSING_ORG) if organization.nil?
+        return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
+        opportunity_id = params[:invention][:invention_opportunity_id]
+        if opportunity_id.present? && opportunity_id.to_i != 0
+          invention_opportunity = InventionOpportunity.find_by(id: opportunity_id.to_i)
+          return data_not_found(MISSING_IO) if invention_opportunity.nil?
+        end
+        if (uploads = params[:uploads]).present?
+          uploads.each do |upload|
+            bad_request('upload file type is invalid') unless Invention::IN_CONTENT_TYPES.include?(upload[:type])
+          end
+        end
+        permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
+          :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note, :stage
+        )
+        invention = Invention.create!(permit_invention_params)
+        inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
+        invention.user_inventions.create!(user: current_user, role: inventor_role)
+        if (searches = params[:searches]).present?
+          searches.each do |search|
+            permit_search_params = ActionController::Parameters.new(search).permit(
+              :title, :url, :note, :tag
+            )
+            invention.searches.create!(permit_search_params)
+          end
+        end
+        if (co_inventor_ids = params[:co_inventors]).present?
+          co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
+          co_inventor_ids.uniq.each do |co_inventor_id|
+            co_inventor = User.find_by_id(co_inventor_id)
+            invention.user_inventions.find_or_create_by(user: co_inventor, role: co_inventor_role) if co_inventor
+          end
+        end
+        if (uploads = params[:uploads]).present?
+          uploads.each do |upload|
+            bad_request('upload file type is invalid') unless Invention::IN_CONTENT_TYPES.include?(upload[:type])
+            upload_file = UploadFile.create
+            upload_file.update_upload(upload)
+            invention.upload_files << upload_file
+          end
+        end
+        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
+      end
+
+      desc "update invention"
+      params do
+        requires :invention_id, type: Integer, desc: "invention_id"
+        optional :invention, type: Hash do
+          # optional :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
+          # optional :organization_id, type: Integer, desc: "organization_id"
+          optional :title, type: String, desc: "title (100)"
+          optional :description, type: String, desc: "description (200)"
+          optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
+          optional :action_note, type: String, desc: "action note (500)"
+          optional :stage, type: String, desc: "stage, e.g. Full Authoring"
+        end
+        optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
+        optional :uploads, type: Array[File], desc: "upload files"
+      end
+      put :test_update do
+        authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return data_not_found(MISSING_INV) if invention.nil?
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        end
+        if (uploads = params[:uploads]).present?
+          uploads.each do |upload|
+            bad_request('upload file type is invalid') unless Invention::IN_CONTENT_TYPES.include?(upload[:type])
+          end
+        end
+        ActiveRecord::Base.transaction do
+          if params[:invention].present?
+            # if params[:invention][:organization_id].present?
+            #   organization = Organization.find_by(id: params[:invention][:organization_id])
+            #   return data_not_found(MISSING_ORG) if organization.nil?
+            # end
+            # if params[:invention][:invention_opportunity_id].present?
+            #   invention_opportunity = InventionOpportunity.find_by(id: params[:invention][:invention_opportunity_id])
+            #   return data_not_found(MISSING_IO) if invention_opportunity.nil?
+            # end
+            permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
+              # :invention_opportunity_id, :organization_id,
+              :title, :description, :action, :action_note, :stage
+            )
+            invention.update_attributes(permit_invention_params)
+          end
+          if (co_inventor_ids = params[:co_inventors]).present?
+            co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
+            invention.user_invetions.where(role: co_inventor_role).where.not(user_id: [co_inventor_ids]).destroy_all
+            co_inventor_ids.uniq.each do |co_inventor_id|
+              co_inventor = User.find_by_id(co_inventor_id)
+              invention.user_inventions.find_or_create_by(user: co_inventor, role: co_inventor_role) if co_inventor
+            end
+          end
+          if (uploads = params[:uploads]).present?
+            uploads.each do |upload|
+              bad_request('upload file type is invalid') unless Invention::IN_CONTENT_TYPES.include?(upload[:type])
+              upload_file = UploadFile.create
+              upload_file.update_upload(upload)
+              invention.upload_files << upload_file
+            end
+          end
+        end
+        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 
     end

@@ -1,6 +1,7 @@
 class InventionSerializer < ActiveModel::Serializer
   attributes :id, :title, :description, :created_time, :updated_time,
     :action, :action_note, :stage, :role, :uploaded_filename,
+    :upload_files,
     :inventor, :co_inventors,
     :organization, :opportunity, :comments, :searches
 
@@ -29,8 +30,11 @@ class InventionSerializer < ActiveModel::Serializer
   end
 
   def uploaded_filename
-    return object.upload_file.upload_file_name if object.upload_file.present?
     nil
+  end
+
+  def upload_files
+    UploadFileSerializer.build_array(object.upload_files)
   end
 
   def organization
