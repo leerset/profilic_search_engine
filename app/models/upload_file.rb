@@ -1,5 +1,8 @@
 class UploadFile < ApplicationRecord
 
+  has_many :invention_upload_files, optional: true, dependent: :destroy
+  has_many :invention_opportunity_upload_files, optional: true, dependent: :destroy
+
   UPLOAD_CONTENT_TYPES = [
     'image/png',
     'image/jpeg',
