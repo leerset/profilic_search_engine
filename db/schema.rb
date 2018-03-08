@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180228013131) do
+ActiveRecord::Schema.define(version: 20180308031010) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -186,6 +186,14 @@ ActiveRecord::Schema.define(version: 20180228013131) do
     t.index ["name"], name: "index_roles_on_name"
   end
 
+  create_table "scratchpads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "invention_id"
+    t.text "html"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invention_id"], name: "index_scratchpads_on_invention_id"
+  end
+
   create_table "searches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "title"
     t.string "url"
@@ -350,4 +358,5 @@ ActiveRecord::Schema.define(version: 20180228013131) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "scratchpads", "inventions"
 end

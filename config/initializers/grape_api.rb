@@ -27,6 +27,7 @@ class Grape::API
   MISSING_IO = 'no invention opportunity found.'
   MISSING_COMMENT = 'no comment found.'
   MISSING_SEARCH = 'no search found.'
+  MISSING_SCRATCHPAD = 'no scratchpad found.'
   # data_exist
   EXIST_ROL = 'role name already exist.'
   EXIST_ORG = 'organization name already exist.'
