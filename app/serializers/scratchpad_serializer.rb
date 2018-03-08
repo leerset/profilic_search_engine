@@ -1,6 +1,10 @@
 class ScratchpadSerializer < ActiveModel::Serializer
   attributes :id, :invention_id, :content, :created_time, :updated_time
 
+  def content
+    object.html
+  end
+
   def created_time
     object.created_at.to_i
   end
