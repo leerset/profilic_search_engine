@@ -17,7 +17,7 @@ module V1
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        invention.scratchpads.create(content: params[:content])
+        invention.scratchpads.create(html: params[:content])
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
@@ -34,7 +34,7 @@ module V1
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        scratchpad.update_attributes(content: params[:content])
+        scratchpad.update_attributes(html: params[:content])
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
