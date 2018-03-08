@@ -14,6 +14,7 @@ module V1
     mount V1::People
     mount V1::InventionOpportunities
     mount V1::UploadFiles
+    mount V1::Scratchpads
 
     add_swagger_documentation(
       api_version: 'API/v1',
