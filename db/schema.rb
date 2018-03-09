@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180308031010) do
+ActiveRecord::Schema.define(version: 20180309020047) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -126,7 +126,7 @@ ActiveRecord::Schema.define(version: 20180308031010) do
     t.bigint "organization_id"
     t.string "name"
     t.string "title"
-    t.string "description"
+    t.text "description"
     t.string "action"
     t.string "stage"
     t.string "action_note", limit: 500
