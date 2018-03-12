@@ -8,7 +8,8 @@ module V1
       desc "create scratchpad"
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
-        requires :content, type: String, desc: "content"
+        optional :draw, type: String, desc: "draw content"
+        optional :significance, type: String, desc: "significance content"
       end
       post :create do
         authenticate!
@@ -17,14 +18,15 @@ module V1
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        invention.scratchpads.create(html: params[:content])
+        invention.scratchpads.create(draw: params[:draw], significance: params[:significance])
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
       desc "update scratchpad"
       params do
         requires :id, type: Integer, desc: "scratchpad id"
-        requires :content, type: String, desc: "content"
+        optional :draw, type: String, desc: "draw content"
+        optional :significance, type: String, desc: "significance content"
       end
       put :update do
         authenticate!
@@ -34,7 +36,7 @@ module V1
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        scratchpad.update_attributes(html: params[:content])
+        scratchpad.update_attributes(draw: params[:draw], significance: params[:significance])
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
