@@ -31,7 +31,7 @@ module V1
       put :update do
         authenticate!
         scratchpad = Scratchpad.find_by(id: params[:id])
-        return data_not_found(MISSING_SCRATCHPAD) if concept.nil?
+        return data_not_found(MISSING_SCRATCHPAD) if scratchpad.nil?
         invention = scratchpad.invention
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
@@ -47,7 +47,7 @@ module V1
       delete :delete do
         authenticate!
         scratchpad = Scratchpad.find_by(id: params[:id])
-        return data_not_found(MISSING_SCRATCHPAD) if concept.nil?
+        return data_not_found(MISSING_SCRATCHPAD) if scratchpad.nil?
         invention = scratchpad.invention
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
