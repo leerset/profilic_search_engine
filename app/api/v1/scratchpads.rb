@@ -52,6 +52,7 @@ module V1
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
         scratchpad.destroy
+        invention.reload
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
