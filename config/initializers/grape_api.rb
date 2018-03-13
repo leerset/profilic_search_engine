@@ -30,6 +30,7 @@ class Grape::API
   MISSING_SCRATCHPAD = 'no scratchpad found.'
   MISSING_CS = 'no container section found.'
   # data_exist
+  EXIST_INV_SCRATCHPAD = 'invention scratchpad already exist.'
   EXIST_ROL = 'role name already exist.'
   EXIST_ORG = 'organization name already exist.'
   EXIST_IO_TITLE = 'invention opportunity title already exist.'

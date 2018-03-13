@@ -11,11 +11,12 @@ module V1
           optional :invention_opportunity_id, type: String, desc: "invention_opportunity_id"
           requires :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
-          optional :description, type: String, desc: "description (200)"
+          optional :description, type: String, desc: "description (65535)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :stage, type: String, desc: "stage, e.g. Full Authoring"
         end
+        optional :scratchpad, type: String, desc: "scratchpad content (65535)"
         optional :searches, type: Array do
           optional :title, type: String, desc: "title"
           optional :url, type: String, desc: "url"
@@ -62,6 +63,7 @@ module V1
           upload_file.update_upload(upload)
           invention.upload_files << upload_file
         end
+        invention.create_scratchpad!(content: params[:scratchpad])
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 
@@ -77,6 +79,7 @@ module V1
           optional :action_note, type: String, desc: "action note (500)"
           optional :stage, type: String, desc: "stage, e.g. Full Authoring"
         end
+        optional :scratchpad, type: String, desc: "scratchpad content (65535)"
         optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :upload, type: File, desc: "upload file"
       end
@@ -102,6 +105,10 @@ module V1
               :title, :description, :action, :action_note, :stage
             )
             invention.update_attributes(permit_invention_params)
+          end
+          if (scratchpad_content = params[:scratchpad]).present?
+            scratchpad = invention.scratchpad || invention.create_scratchpad
+            scratchpad.update(content: scratchpad_content)
           end
           if (co_inventor_ids = params[:co_inventors]).present?
             co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')

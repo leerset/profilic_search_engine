@@ -1,12 +1,8 @@
 class ScratchpadSerializer < ActiveModel::Serializer
-  attributes :id, :invention_id, :draw, :significance, :created_time, :updated_time
+  attributes :id, :invention_id, :content, :created_time, :updated_time
 
-  def draw
-    {content: object.draw}
-  end
-
-  def significance
-    {content: object.significance}
+  def content
+    object.content.to_s
   end
 
   def created_time

@@ -8,25 +8,24 @@ module V1
       desc "create scratchpad"
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
-        optional :draw, type: String, desc: "draw content"
-        optional :significance, type: String, desc: "significance content"
+        optional :content, type: String, desc: "content (65535)"
       end
       post :create do
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
+        return data_not_found(EXIST_INV_SCRATCHPAD) if invention.scratchpad.present?
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        invention.scratchpads.create(draw: params[:draw], significance: params[:significance])
+        invention.create_scratchpad(content: params[:content])
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
       desc "update scratchpad"
       params do
         requires :id, type: Integer, desc: "scratchpad id"
-        optional :draw, type: String, desc: "draw content"
-        optional :significance, type: String, desc: "significance content"
+        optional :content, type: String, desc: "content (65535)"
       end
       put :update do
         authenticate!
@@ -36,7 +35,7 @@ module V1
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        scratchpad.update_attributes(draw: params[:draw], significance: params[:significance])
+        scratchpad.update_attributes(content: params[:content])
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 

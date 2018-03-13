@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180313015847) do
+ActiveRecord::Schema.define(version: 20180313080748) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -198,6 +198,7 @@ ActiveRecord::Schema.define(version: 20180313015847) do
   create_table "scratchpads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "invention_id"
     t.text "html"
+    t.text "content"
     t.text "draw"
     t.text "significance"
     t.datetime "created_at", null: false

@@ -9,7 +9,7 @@ class Invention < ApplicationRecord
   has_many :comments, through: :invention_comments
   has_many :invention_searches
   has_many :searches, through: :invention_searches
-  has_many :scratchpads
+  has_one :scratchpad
   has_many :container_sections
 
   IN_CONTENT_TYPES = [
