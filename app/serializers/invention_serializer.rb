@@ -2,12 +2,16 @@ class InventionSerializer < ActiveModel::Serializer
   attributes :id, :title, :description, :created_time, :updated_time,
     :action, :action_note, :stage, :role, :uploaded_filename,
     :upload_files,
-    :scratchpads,
+    :scratchpads, :container_sections,
     :inventor, :co_inventors,
     :organization, :opportunity, :comments, :searches
 
   def scratchpads
     ScratchpadSerializer.build_array(object.scratchpads)
+  end
+
+  def container_sections
+    ContainerSectionSerializer.build_array(object.container_sections)
   end
 
   def searches

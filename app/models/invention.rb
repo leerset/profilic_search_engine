@@ -10,6 +10,7 @@ class Invention < ApplicationRecord
   has_many :invention_searches
   has_many :searches, through: :invention_searches
   has_many :scratchpads
+  has_many :container_sections
 
   IN_CONTENT_TYPES = [
     'application/msword',
