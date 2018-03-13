@@ -30,8 +30,8 @@ module V1
       end
       put :update do
         authenticate!
-        container_section = container_section.find_by(id: params[:id])
-        return data_not_found(MISSING_container_section) if container_section.nil?
+        container_section = ContainerSection.find_by(id: params[:id])
+        return data_not_found(MISSING_CS) if container_section.nil?
         invention = container_section.invention
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
@@ -46,8 +46,8 @@ module V1
       end
       delete :delete do
         authenticate!
-        container_section = container_section.find_by(id: params[:id])
-        return data_not_found(MISSING_container_section) if container_section.nil?
+        container_section = ContainerSection.find_by(id: params[:id])
+        return data_not_found(MISSING_CS) if container_section.nil?
         invention = container_section.invention
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
