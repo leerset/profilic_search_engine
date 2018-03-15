@@ -47,6 +47,7 @@ class InventionSerializer < ActiveModel::Serializer
   end
 
   def organization
+    return nil if object.organization.nil?
     OrganizationSimpleSerializer.new(object.organization)
   end
 
