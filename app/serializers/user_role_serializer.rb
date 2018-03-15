@@ -2,7 +2,7 @@ class UserRoleSerializer < ActiveModel::Serializer
   attributes :id, :user, :role
 
   def user
-    UserSerializer.new(object.user)
+    UserSimpleSerializer.new(object.user)
   end
 
   def role

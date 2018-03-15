@@ -24,7 +24,7 @@ class InventionOpportunitySerializer < ActiveModel::Serializer
   end
 
   def organization
-    OrganizationSerializer.new(object.organization)
+    OrganizationSimpleSerializer.new(object.organization)
   end
 
 end

@@ -73,7 +73,7 @@ class UserEncryptionSerializer < ActiveModel::Serializer
     else
       object.organizations.uniq
     end
-    OrganizationSerializer.build_array(current_organizations)
+    OrganizationSimpleSerializer.build_array(current_organizations)
   end
 
   def expires_time

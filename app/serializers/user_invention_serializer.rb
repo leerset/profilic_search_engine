@@ -2,7 +2,7 @@ class UserInventionSerializer < ActiveModel::Serializer
   attributes :id, :user, :invention, :role
 
   def user
-    UserSerializer.new(object.user)
+    UserSimpleSerializer.new(object.user)
   end
 
   def invention
