@@ -9,7 +9,7 @@ module V1
       params do
         requires :invention, type: Hash do
           optional :invention_opportunity_id, type: String, desc: "invention_opportunity_id"
-          optional :organization_id, type: Integer, desc: "organization_id"
+          # optional :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (65535)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
@@ -32,11 +32,17 @@ module V1
       end
       post :create do
         authenticate!
-        organization_id = params[:invention][:organization_id].present?
-        if organization_id.present? && organization_id.to_i != 0
-          organization = Organization.find_by(id: organization_id)
-          return data_not_found(MISSING_ORG) if organization.nil?
-          return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
+        if params[:invention][:organization_id].present? 
+          organization_id = params[:invention][:organization_id]
+          if organization_id && organization_id.to_i != 0
+            organization = Organization.find_by(id: organization_id)
+            return data_not_found(MISSING_ORG) if organization.nil?
+            return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
+          else
+            organization_id = nil
+          end
+        else
+          organization_id = nil
         end
         opportunity_id = params[:invention][:invention_opportunity_id]
         if opportunity_id.present? && opportunity_id.to_i != 0
