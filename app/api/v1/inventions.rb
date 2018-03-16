@@ -9,7 +9,7 @@ module V1
       params do
         requires :invention, type: Hash do
           optional :invention_opportunity_id, type: String, desc: "invention_opportunity_id"
-          # optional :organization_id, type: Integer, desc: "organization_id"
+          optional :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (65535)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
@@ -32,25 +32,24 @@ module V1
       end
       post :create do
         authenticate!
-        if params[:invention][:organization_id].present? 
-          organization_id = params[:invention][:organization_id]
-          if organization_id && organization_id.to_i != 0
-            organization = Organization.find_by(id: organization_id)
-            return data_not_found(MISSING_ORG) if organization.nil?
-            return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
-          else
-            organization_id = nil
-          end
+        organization_id = params[:invention][:organization_id]
+        if organization_id && organization_id.to_i != 0
+          organization = Organization.find_by(id: organization_id)
+          return data_not_found(MISSING_ORG) if organization.nil?
+          return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
         else
-          organization_id = nil
+          params[:invention][:organization_id] = nil
         end
         opportunity_id = params[:invention][:invention_opportunity_id]
         if opportunity_id.present? && opportunity_id.to_i != 0
           invention_opportunity = InventionOpportunity.find_by(id: opportunity_id.to_i)
           return data_not_found(MISSING_IO) if invention_opportunity.nil?
+        else
+          params[:invention][:invention_opportunity_id] = nil
         end
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
-          :invention_opportunity_id, :organization_id, :title, :description, :action, :action_note, :phase
+          :invention_opportunity_id, :organization_id,
+          :title, :description, :action, :action_note, :phase
         )
         invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
@@ -84,8 +83,8 @@ module V1
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
         optional :invention, type: Hash do
-          # optional :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
-          # optional :organization_id, type: Integer, desc: "organization_id"
+          optional :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
+          optional :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
@@ -105,16 +104,23 @@ module V1
         end
         ActiveRecord::Base.transaction do
           if params[:invention].present?
-            # if params[:invention][:organization_id].present?
-            #   organization = Organization.find_by(id: params[:invention][:organization_id])
-            #   return data_not_found(MISSING_ORG) if organization.nil?
-            # end
-            # if params[:invention][:invention_opportunity_id].present?
-            #   invention_opportunity = InventionOpportunity.find_by(id: params[:invention][:invention_opportunity_id])
+            organization_id = params[:invention][:organization_id]
+            if organization_id.present? && organization_id.to_i != 0
+              organization = Organization.find_by(id: organization_id)
+              return data_not_found(MISSING_ORG) if organization.nil?
+            else
+              params[:invention][:organization_id] = nil
+            end
+            # invention_opportunity_id = params[:invention][:invention_opportunity_id]
+            # if invention_opportunity_id.present? && invention_opportunity_id.to_i != 0
+            #   invention_opportunity = InventionOpportunity.find_by(id: invention_opportunity_id)
             #   return data_not_found(MISSING_IO) if invention_opportunity.nil?
+            # else
+            #   params[:invention][:invention_opportunity_id] = nil
             # end
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
-              # :invention_opportunity_id, :organization_id,
+              # :invention_opportunity_id,
+              :organization_id,
               :title, :description, :action, :action_note, :phase
             )
             invention.update_attributes(permit_invention_params)
