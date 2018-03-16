@@ -19,7 +19,7 @@ class Invention < ApplicationRecord
   ]
 
   def inventor
-    user_inventions.joins(:role).where(roles: {code: 'inventor'})
+    user_inventions.joins(:role).where(roles: {code: 'inventor'}).first
   end
 
   def co_inventors
