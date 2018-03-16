@@ -138,17 +138,13 @@ module V1
           end
           if (co_inventors = params[:co_inventors]).present?
             co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
-            invention.user_invetions.where(role: co_inventor_role).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
+            invention.user_inventions.where(role: co_inventor_role).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
             co_inventors.each do |co_inventor|
               user = User.find_by_id(co_inventor[:user_id])
               invention.user_inventions.find_or_create_by(user: user).update(
                 role: co_inventor_role,
                 access: co_inventor[:access]
               ) if user
-            end
-            co_inventor_ids.uniq.each do |co_inventor_id|
-              co_inventor = User.find_by_id(co_inventor_id)
-              invention.user_inventions.find_or_create_by(user: co_inventor, role: co_inventor_role) if co_inventor
             end
           end
           if (upload = params[:upload]).present?
