@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180315152432) do
+ActiveRecord::Schema.define(version: 20180316031328) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -279,6 +279,7 @@ ActiveRecord::Schema.define(version: 20180315152432) do
     t.bigint "user_id"
     t.bigint "invention_id"
     t.bigint "role_id"
+    t.string "access"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["invention_id"], name: "index_user_inventions_on_invention_id"

@@ -23,7 +23,11 @@ module V1
           optional :note, type: String, desc: "note"
           optional :tag, type: String, desc: "tag"
         end
-        optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
+        # optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
+        optional :co_inventors, type: Array do
+          optional :user_id, type: Integer, desc: "user_id"
+          optional :access, type: Integer, desc: "access level"
+        end
         optional :upload, type: File, desc: "upload file"
       end
       post :create do
@@ -58,11 +62,14 @@ module V1
             invention.searches.create!(permit_search_params)
           end
         end
-        if (co_inventor_ids = params[:co_inventors]).present?
+        if (co_inventors = params[:co_inventors]).present?
           co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
-          co_inventor_ids.uniq.each do |co_inventor_id|
-            co_inventor = User.find_by_id(co_inventor_id)
-            invention.user_inventions.find_or_create_by(user: co_inventor, role: co_inventor_role) if co_inventor
+          co_inventors.each do |co_inventor|
+            user = User.find_by_id(co_inventor[:user_id])
+            invention.user_inventions.find_or_create_by(user: user).update(
+              role: co_inventor_role,
+              access: co_inventor[:access]
+            ) if user
           end
         end
         if (upload = params[:upload]).present?
@@ -88,7 +95,11 @@ module V1
           optional :phase, type: String, desc: "phase, e.g. Full Authoring"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
-        optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
+        # optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
+        optional :co_inventors, type: Array do
+          optional :user_id, type: Integer, desc: "user_id"
+          optional :access, type: Integer, desc: "access level"
+        end
         optional :upload, type: File, desc: "upload file"
       end
       put :update do
@@ -107,15 +118,15 @@ module V1
             else
               params[:invention][:organization_id] = nil
             end
-            # invention_opportunity_id = params[:invention][:invention_opportunity_id]
-            # if invention_opportunity_id.present? && invention_opportunity_id.to_i != 0
-            #   invention_opportunity = InventionOpportunity.find_by(id: invention_opportunity_id)
-            #   return data_not_found(MISSING_IO) if invention_opportunity.nil?
-            # else
-            #   params[:invention][:invention_opportunity_id] = nil
-            # end
+            invention_opportunity_id = params[:invention][:invention_opportunity_id]
+            if invention_opportunity_id.present? && invention_opportunity_id.to_i != 0
+              invention_opportunity = InventionOpportunity.find_by(id: invention_opportunity_id)
+              return data_not_found(MISSING_IO) if invention_opportunity.nil?
+            else
+              params[:invention][:invention_opportunity_id] = nil
+            end
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
-              # :invention_opportunity_id,
+              :invention_opportunity_id,
               :organization_id,
               :title, :description, :action, :action_note, :phase
             )
@@ -125,9 +136,16 @@ module V1
             scratchpad = invention.scratchpad || invention.create_scratchpad
             scratchpad.update(content: scratchpad_content)
           end
-          if (co_inventor_ids = params[:co_inventors]).present?
+          if (co_inventors = params[:co_inventors]).present?
             co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
-            invention.user_invetions.where(role: co_inventor_role).where.not(user_id: [co_inventor_ids]).destroy_all
+            invention.user_invetions.where(role: co_inventor_role).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
+            co_inventors.each do |co_inventor|
+              user = User.find_by_id(co_inventor[:user_id])
+              invention.user_inventions.find_or_create_by(user: user).update(
+                role: co_inventor_role,
+                access: co_inventor[:access]
+              ) if user
+            end
             co_inventor_ids.uniq.each do |co_inventor_id|
               co_inventor = User.find_by_id(co_inventor_id)
               invention.user_inventions.find_or_create_by(user: co_inventor, role: co_inventor_role) if co_inventor
