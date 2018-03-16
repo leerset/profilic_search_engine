@@ -24,10 +24,6 @@ module V1
           optional :tag, type: String, desc: "tag"
         end
         optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
-        optional :co_inventors, type: Array do
-          optional :user_id, type: Integer, desc: "user_id"
-          optional :access_level, type: Integer, desc: "access_level"
-        end
         optional :upload, type: File, desc: "upload file"
       end
       post :create do
