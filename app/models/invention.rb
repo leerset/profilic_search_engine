@@ -19,19 +19,19 @@ class Invention < ApplicationRecord
   ]
 
   def inventor
-    user_inventions.joins(:role).where(roles: {code: 'inventor'}).first
+    user_inventions.select {|ui| ui.role.code == "inventor"}.first
   end
 
   def co_inventors
-    user_inventions.joins(:role).where(roles: {code: 'co_inventor'})
+    user_inventions.select {|ui| ui.role.code == "co_inventor"}
   end
 
   def mentors
-    user_inventions.joins(:role).where(roles: {code: 'mentor'})
+    user_inventions.select {|ui| ui.role.code == "mentor"}
   end
 
   def user_role(user_id)
-    user_inventions.includes(:role).where(user_id: user_id).first.try(:role).try(:name)
+    user_inventions.select {|ui| ui.user_id == user_id}.first.try(:role).try(:name)
   end
 
 end

@@ -5,6 +5,20 @@ class InventionSerializer < ActiveModel::Serializer
     :upload_files, :container_sections,
     :organization, :opportunity, :comments, :searches
 
+  def self.eager_load_relation(relation)
+    relation.includes(
+      :scratchpad, 
+      :upload_files,
+      :comments,
+      :organization,
+      :searches,
+      :container_sections,
+      :invention_opportunity,
+      [invention_opportunity: :upload_file],
+      [user_inventions: :role]
+    )
+  end
+
   def scratchpad
     scratchpad = object.scratchpad || object.create_scratchpad
     ScratchpadSerializer.new(scratchpad)
