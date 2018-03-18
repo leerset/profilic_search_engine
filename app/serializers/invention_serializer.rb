@@ -5,8 +5,8 @@ class InventionSerializer < ActiveModel::Serializer
     :upload_files, :container_sections,
     :organization, :opportunity, :comments, :searches
 
-  def self.eager_load_relation(relation)
-    relation.includes(
+  def self.eager_load_array(array)
+    array.includes(
       :scratchpad, 
       :upload_files,
       :comments,

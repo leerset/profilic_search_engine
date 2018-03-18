@@ -18,7 +18,7 @@ class Organization < ApplicationRecord
   end
 
   def business_address
-    addresses.find_by(address_type: 'business')
+    addresses.select {|a| a.address_type == 'business'}[0]
   end
 
   def administrators

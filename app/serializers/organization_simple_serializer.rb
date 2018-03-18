@@ -1,6 +1,12 @@
 class OrganizationSimpleSerializer < ActiveModel::Serializer
   attributes :id, :name, :business_address, :created_time, :updated_time
 
+  def self.eager_load_array(array)
+    array.includes(
+      :addresses
+    )
+  end
+
   def business_address
     AddressSerializer.new(object.business_address) if object.business_address
   end

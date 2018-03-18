@@ -113,7 +113,7 @@ class User < ApplicationRecord
   end
 
   def oa?(organization)
-    user_organizations.joins(:role).where(organization: organization, roles: {code: 'organization_administrator'}).any?
+    user_organizations.select {|uo| uo.organization_id = organization.id && uo.role.code == 'organization_administrator'}.any?
   end
 
   def member?(organization)
@@ -158,8 +158,9 @@ class User < ApplicationRecord
 
   def invention_roles_array
     inv_roles = []
-    inventions.uniq.each do |invention|
-      invention_roles(invention).uniq.each do |role|
+    uis = user_inventions.includes(:role, :invention)
+    uis.map(&:invention).uniq.each do |invention|
+      invention_roles(uis, invention).uniq.each do |role|
         inv_roles << {
           id: invention.id,
           name: invention.name,
@@ -173,8 +174,9 @@ class User < ApplicationRecord
 
   def invention_roles_array_in_organizations(orgs)
     inv_roles = []
+    uis = user_inventions.includes(:role, :invention)
     inventions.includes(:organization).where.not(organization: orgs).uniq.each do |invention|
-      invention_roles(invention).uniq.each do |role|
+      invention_roles(uis, invention).uniq.each do |role|
         inv_roles << {
           id: invention.id,
           name: invention.name,
@@ -218,8 +220,8 @@ class User < ApplicationRecord
     user_organizations.includes(:role, :organization).where(organization: organization).map(&:role)
   end
 
-  def invention_roles(invention)
-    user_inventions.includes(:role, :invention).where(invention: invention).map(&:role)
+  def invention_roles(user_invention_array, invention)
+    user_invention_array.select {|ui| ui.invention_id = invention.id}.map(&:role)
   end
 
   def expired?
