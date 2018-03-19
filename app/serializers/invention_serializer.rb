@@ -15,6 +15,7 @@ class InventionSerializer < ActiveModel::Serializer
       :container_sections,
       :invention_opportunity,
       [invention_opportunity: :upload_file],
+      [invention_opportunity: {organization: :addresses}],
       [user_inventions: :role]
     )
   end

@@ -2,6 +2,12 @@ class InventionOpportunitySerializer < ActiveModel::Serializer
   attributes :id, :title, :short_description, :closing_date, :closing_time,
     :created_time, :status, :uploaded_filename, :organization
 
+  def self.eager_load_array(array)
+    array.includes(
+      [organization: :addresses]
+    )
+  end
+
   def short_description
     object.short_description
   end
