@@ -1,16 +1,16 @@
 class Invention < ApplicationRecord
   belongs_to :organization, optional: true
   belongs_to :invention_opportunity, optional: true
-  has_many :user_inventions
+  has_many :user_inventions, dependent: :destroy
   has_many :users, through: :user_inventions
-  has_many :invention_upload_files
+  has_many :invention_upload_files, dependent: :destroy
   has_many :upload_files, through: :invention_upload_files
-  has_many :invention_comments
+  has_many :invention_comments, dependent: :destroy
   has_many :comments, through: :invention_comments
-  has_many :invention_searches
+  has_many :invention_searches, dependent: :destroy
   has_many :searches, through: :invention_searches
-  has_one :scratchpad
-  has_many :container_sections
+  has_one :scratchpad, dependent: :destroy
+  has_many :container_sections, dependent: :destroy
 
   IN_CONTENT_TYPES = [
     'application/msword',

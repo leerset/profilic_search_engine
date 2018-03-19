@@ -174,8 +174,8 @@ class User < ApplicationRecord
 
   def invention_roles_array_in_organizations(orgs)
     inv_roles = []
-    uis = user_inventions.includes(:role, :invention)
-    inventions.includes(:organization).where.not(organization: orgs).uniq.each do |invention|
+    uis = user_inventions.includes(:role, invention: :organization).where.not(inventions: {organization: orgs})
+    uis.map(&:invention).uniq.each do |invention|
       invention_roles(uis, invention).uniq.each do |role|
         inv_roles << {
           id: invention.id,
