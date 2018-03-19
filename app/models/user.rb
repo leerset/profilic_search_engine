@@ -37,6 +37,8 @@ class User < ApplicationRecord
   validates_attachment_content_type :resume,
     :content_type => RESUME_CONTENT_TYPES
 
+  @@PROLIFIC_ORGANIZATION_ID = 1
+
   def update_resume(resume_file)
     # resume_file[:filename]
     # resume_file[:type]
@@ -53,9 +55,7 @@ class User < ApplicationRecord
   end
 
   def prolific_status
-    prolific = Organization.find_by(code: 'prolific')
-    return nil if prolific.nil?
-    self.user_organization_statuses.find_by(organization_id: prolific.id).try(:status)
+    self.user_organization_statuses.select {|uos| uos.organization_id == @@PROLIFIC_ORGANIZATION_ID}[0].try(:status)
   end
 
   def join_prolific_organization

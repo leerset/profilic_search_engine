@@ -9,7 +9,7 @@ class InventionSerializer < ActiveModel::Serializer
     array.includes(
       :scratchpad, 
       :upload_files,
-      :comments,
+      [comments: :user],
       :organization,
       :searches,
       :container_sections,
