@@ -8,6 +8,32 @@ module V1
       desc "get the corresponding possible opportunities in organization"
       params do
         requires :organization_id, type: Integer, desc: 'organization id'
+        optional :opportunity_status, default: 'Active', type: String, desc: 'opportunities status: Active, Inactive'
+        optional :inventor_status, default: 'Active', type: String, desc: 'inventors status: Active, Inactive'
+      end
+      get :opportunities_and_inventors do
+        authenticate!
+        organization = Organization.find_by(id: params[:organization_id])
+        return data_not_found(MISSING_ORG) if organization.nil?
+        invention_opportunities = if (opportunity_status = params[:opportunity_status]).present?
+          organization.invention_opportunities.where(status: opportunity_status).order(created_at: :desc)
+        else
+          organization.invention_opportunities.order(status: :asc, created_at: :desc)
+        end
+        uos = if (inventor_status = params[:inventor_status]).present?
+          organization.user_organization_statuses.includes(:user).where(status: inventor_status).order(created_at: :desc)
+        else
+          organization.user_organization_statuses.includes(:user).order(status: :asc, created_at: :desc)
+        end
+        resp_ok(
+          "inventors" => UserSerializer.build_array(uos.map(&:user).uniq),
+          "invention_opportunities" => InventionOpportunitySerializer.build_array(invention_opportunities)
+        )
+      end
+
+      desc "get the corresponding possible opportunities in organization"
+      params do
+        requires :organization_id, type: Integer, desc: 'organization id'
         optional :status, default: 'Active', type: String, desc: 'opportunities status: Active, Inactive'
       end
       get :opportunities do
