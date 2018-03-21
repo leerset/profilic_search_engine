@@ -15,6 +15,7 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, desc: "phase, e.g. Full Authoring"
+          optional :comment_status, default: 'anyone-organization', type: String, desc: "comment_permission generic string value: `anyone-organization`, `only-inventors`, `nobody`"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
         optional :searches, type: Array do
@@ -49,7 +50,8 @@ module V1
         end
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
           :invention_opportunity_id, :organization_id,
-          :title, :description, :action, :action_note, :phase
+          :title, :description, :action, :action_note, :phase,
+          :comment_status
         )
         invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
@@ -93,6 +95,8 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, desc: "phase, e.g. Full Authoring"
+          optional :comment_status, default: 'anyone-organization', type: String, desc: "comment_permission generic string value: `anyone-organization`, `only-inventors`, `nobody`"
+          optional :archived, type: Boolean, desc: "archived"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
         # optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
@@ -128,7 +132,8 @@ module V1
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
               :invention_opportunity_id,
               :organization_id,
-              :title, :description, :action, :action_note, :phase
+              :title, :description, :action, :action_note, :phase,
+              :comment_status, :archived
             )
             invention.update_attributes(permit_invention_params)
           end
@@ -208,6 +213,7 @@ module V1
 
       desc "list inventions"
       params do
+        optional :archived, type: Boolean, desc: 'archived， if true, show both '
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
         optional :sort_column, type: String, default: "updated_at", desc: 'sort column default: by updated_time (updated_at)'
@@ -270,8 +276,17 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        case invention.comment_status
+        when 'anyone-organization'
+          unless invention.organization && current_user.organization_member(invention.organization)
+            return permission_denied(NOT_ORG_USR_DENIED)
+          end
+        when 'only-inventors'
+          unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+            return permission_denied(NOT_CO_INVENTOR_DENIED)
+          end
+        else # 'nobody'
+          return permission_denied('Prohibit comments')
         end
         invention.comments.create(user: current_user, content: params[:content])
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
