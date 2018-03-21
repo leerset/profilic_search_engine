@@ -1,10 +1,14 @@
 class PeopleSerializer < ActiveModel::Serializer
   attributes :id, :email, :password, :access_token, :expires_time, :magic_link, :is_expired, :status,
-    :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
+    :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
     :home_address, :work_address, :organizations,
     :resume, :resume_filepath,
     :global_roles, :organization_roles, :invention_roles,
     :user_organization_statuses
+
+  def fullname
+    [object.firstname, object.lastname].compact.join(' ')
+  end
 
   def user_organization_statuses
     UserOrganizationStatusSerializer.build_array(object.user_organization_statuses)

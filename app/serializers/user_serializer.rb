@@ -1,11 +1,15 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :email, :status,
-    :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
+    :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
     :drafts_amount, :inventions_amount,
     :home_address, :work_address, :organizations,
     :resume, :resume_filepath,
     :global_roles, :organization_roles, :invention_roles,
     :user_organization_statuses
+
+  def fullname
+    [object.firstname, object.lastname].compact.join(' ')
+  end
 
   def email
     if (manage_organizations = instance_options[:managed_organizations]).present?

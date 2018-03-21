@@ -1,8 +1,12 @@
 class PeopleCommonSerializer < ActiveModel::Serializer
   attributes :id, :email, :password, :access_token, :expires_time, :magic_link, :is_expired, :status,
-    :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
+    :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
     :home_address, :work_address,
     :resume, :resume_filepath
+
+  def fullname
+    [object.firstname, object.lastname].compact.join(' ')
+  end
 
   def is_expired
     object.expired?
