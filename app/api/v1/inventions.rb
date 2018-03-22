@@ -14,7 +14,7 @@ module V1
           optional :description, type: String, desc: "description (65535)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
-          optional :phase, type: String, desc: "phase, e.g. Full Authoring"
+          optional :phase, type: String, default: "phase-1", desc: "phase, e.g. Full Authoring"
           optional :comment_status, default: 'anyone-organization', type: String, desc: "comment_permission generic string value: `anyone-organization`, `only-inventors`, `nobody`"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
