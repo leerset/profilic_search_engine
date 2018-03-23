@@ -44,7 +44,7 @@ class User < ApplicationRecord
   end
 
   def visible_inventions
-    [inventions & organization_inventions].uniq
+    (inventions & organization_inventions).uniq
   end
 
   def update_resume(resume_file)
