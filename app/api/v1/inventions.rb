@@ -15,7 +15,7 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, default: "phase-1", desc: "phase, e.g. Full Authoring"
-          optional :comment_status, default: 'anyone-organization', type: String, desc: "comment_permission generic string value: `anyone-organization`, `only-inventors`, `nobody`"
+          optional :comment_status, default: 'only-organization', type: String, desc: "comment_permission generic string value: `only-organization`, `only-collaborators`"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
         optional :searches, type: Array do
@@ -95,7 +95,7 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, desc: "phase, e.g. Full Authoring"
-          optional :comment_status, default: 'all-organization', type: String, desc: "comment_permission generic string value: `all-organization`, `all-collaborators`"
+          optional :comment_status, default: 'only-organization', type: String, desc: "comment_status generic string value: `only-organization`, `only-collaborators`"
           optional :archived, type: Boolean, desc: "archived"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
