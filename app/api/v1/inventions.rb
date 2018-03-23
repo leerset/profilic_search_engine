@@ -95,7 +95,7 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, desc: "phase, e.g. Full Authoring"
-          optional :comment_status, default: 'anyone-organization', type: String, desc: "comment_permission generic string value: `anyone-organization`, `only-inventors`, `nobody`"
+          optional :comment_status, default: 'all-organization', type: String, desc: "comment_permission generic string value: `all-organization`, `all-collaborators`"
           optional :archived, type: Boolean, desc: "archived"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
@@ -205,10 +205,13 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        unless current_user.visible_inventions.include?(invention)
+          return permission_denied("No permission to read")
         end
-        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
+        is_editable = current_user.inventor?(invention) || current_user.co_inventor?(invention)
+        resp_ok(
+          "invention" => InventionSerializer.new(invention, user_id: current_user.id),
+          "is_editable" => is_editable )
       end
 
       desc "list inventions"
@@ -226,7 +229,7 @@ module V1
         sortcolumn = Invention.columns_hash[params[:sort_column]] ? params[:sort_column] : "updated_at"
         sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         # organizations = current_user.managed_organizations
-        inventions = current_user.inventions
+        inventions = current_user.visible_inventions
         paged_inventions = inventions.includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
@@ -277,16 +280,16 @@ module V1
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
         case invention.comment_status
-        when 'anyone-organization'
-          unless invention.organization && current_user.organization_member(invention.organization)
-            return permission_denied(NOT_ORG_USR_DENIED)
+        when 'only-organization'
+          unless current_user.organization_inventions.include?(invention) || current_user.inventions.include?(invention)
+            return permission_denied('No permission to add comments')
           end
-        when 'only-inventors'
-          unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-            return permission_denied(NOT_CO_INVENTOR_DENIED)
+        when 'only-collaborators'
+          unless current_user.inventions.include?(invention)
+            return permission_denied('No permission to add comments')
           end
         else # 'nobody'
-          return permission_denied('Prohibit comments')
+          return permission_denied('No permission to add comments')
         end
         invention.comments.create(user: current_user, content: params[:content])
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
@@ -301,8 +304,17 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        case invention.comment_status
+        when 'only-organization'
+          unless current_user.organization_inventions.include?(invention) || current_user.inventions.include?(invention)
+            return permission_denied('No permission to update comments')
+          end
+        when 'only-collaborators'
+          unless current_user.inventions.include?(invention)
+            return permission_denied('No permission to update comments')
+          end
+        else # 'nobody'
+          return permission_denied('No permission to update comments')
         end
         comment.update(content: params[:content])
         invention = comment.invention
@@ -317,8 +329,8 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        unless current_user.inventor?(invention)
+          return permission_denied('No permission to delete comments')
         end
         comment.destroy
         resp_ok

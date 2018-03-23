@@ -12,6 +12,12 @@ class Invention < ApplicationRecord
   has_one :scratchpad, dependent: :destroy
   has_many :container_sections, dependent: :destroy
 
+  enum comment_status: [
+    'only-organization',
+    'only-collaborators',
+    'nobody'
+  ]
+
   IN_CONTENT_TYPES = [
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
