@@ -226,11 +226,12 @@ module V1
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
+        archived = params[:archived].presence || false
         sortcolumn = Invention.columns_hash[params[:sort_column]] ? params[:sort_column] : "updated_at"
         sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         # organizations = current_user.managed_organizations
         inventions = current_user.visible_inventions
-        paged_inventions = inventions.includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
+        paged_inventions = inventions.where(id: inventions.map(&:id)).where(archived: archived).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
