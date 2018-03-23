@@ -15,7 +15,7 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, default: "phase-1", desc: "phase, e.g. Full Authoring"
-          optional :comment_status, default: 'only-organization', type: String, desc: "comment_permission generic string value: `only-organization`, `only-collaborators`"
+          optional :comment_status, default: 'only-organization', type: String, desc: "comment_status generic string value: `only-organization`, `only-collaborators`"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
         optional :searches, type: Array do
@@ -141,7 +141,7 @@ module V1
             scratchpad = invention.scratchpad || invention.create_scratchpad
             scratchpad.update(content: scratchpad_content)
           end
-          if (co_inventors = params[:co_inventors]).present?
+          unless (co_inventors = params[:co_inventors]).nil?
             co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
             invention.user_inventions.where(role: co_inventor_role).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
             co_inventors.each do |co_inventor|
