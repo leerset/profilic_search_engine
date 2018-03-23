@@ -231,7 +231,7 @@ module V1
         sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         # organizations = current_user.managed_organizations
         inventions = current_user.visible_inventions
-        paged_inventions = inventions.where(id: inventions.map(&:id)).where(archived: archived).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
+        paged_inventions = Invention.where(id: inventions.map(&:id)).where(archived: archived).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
@@ -246,8 +246,7 @@ module V1
         size = params[:size].presence || 20
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        user_inventions = invention.user_inventions
-        paged_user_inventions = user_inventions.order(updated_at: :desc).page(page).per(size)
+        paged_user_inventions = invention.user_inventions.order(updated_at: :desc).page(page).per(size)
         resp_ok("participants" => ParticipantSerializer.build_array(paged_user_inventions))
       end
 
