@@ -40,11 +40,11 @@ class User < ApplicationRecord
   @@PROLIFIC_ORGANIZATION_ID = 1
 
   def organization_inventions
-    Invention.where(organization: member_organizations).where(comment_status: 'only-organization')
+    Invention.where(organization: member_organizations).where(bulk_read_access: 'anyone-organization')
   end
 
   def visible_inventions
-    (inventions & organization_inventions).uniq
+    (inventions | organization_inventions).uniq
   end
 
   def update_resume(resume_file)

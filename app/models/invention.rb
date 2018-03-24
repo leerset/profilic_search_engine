@@ -12,11 +12,10 @@ class Invention < ApplicationRecord
   has_one :scratchpad, dependent: :destroy
   has_many :container_sections, dependent: :destroy
 
-  enum comment_status: [
-    'only-organization',
-    'only-collaborators',
-    'nobody'
-  ]
+  # enum bulk_read_access: [
+  #   'anyone-organization',
+  #   'only-inventors'
+  # ]
 
   IN_CONTENT_TYPES = [
     'application/msword',

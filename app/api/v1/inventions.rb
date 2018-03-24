@@ -15,7 +15,7 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, default: "phase-1", desc: "phase, e.g. Full Authoring"
-          optional :comment_status, default: 'only-organization', type: String, desc: "comment_status generic string value: `only-organization`, `only-collaborators`"
+          optional :bulk_read_access, default: 'only-inventors', type: String, desc: "bulk_read_access generic string value: `anyone-organization`, `only-inventors`"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
         optional :searches, type: Array do
@@ -51,7 +51,7 @@ module V1
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
           :invention_opportunity_id, :organization_id,
           :title, :description, :action, :action_note, :phase,
-          :comment_status
+          :bulk_read_access
         )
         invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
@@ -95,7 +95,7 @@ module V1
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, desc: "phase, e.g. Full Authoring"
-          optional :comment_status, default: 'only-organization', type: String, desc: "comment_status generic string value: `only-organization`, `only-collaborators`"
+          optional :bulk_read_access, default: 'only-inventors', type: String, desc: "bulk_read_access generic string value: `anyone-organization`, `only-inventors`"
           optional :archived, type: Boolean, desc: "archived"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
@@ -133,7 +133,7 @@ module V1
               :invention_opportunity_id,
               :organization_id,
               :title, :description, :action, :action_note, :phase,
-              :comment_status, :archived
+              :bulk_read_access, :archived
             )
             invention.update_attributes(permit_invention_params)
           end
@@ -231,7 +231,11 @@ module V1
         sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         # organizations = current_user.managed_organizations
         inventions = current_user.visible_inventions
-        paged_inventions = Invention.where(id: inventions.map(&:id)).where(archived: archived).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
+        paged_inventions = if archived
+          Invention.where(id: inventions.map(&:id)).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
+        else
+          Invention.where(id: inventions.map(&:id)).where(archived: false).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
+        end
         resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
@@ -279,7 +283,7 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        case invention.comment_status
+        case invention.bulk_read_access
         when 'only-organization'
           unless current_user.organization_inventions.include?(invention) || current_user.inventions.include?(invention)
             return permission_denied('No permission to add comments')
@@ -304,7 +308,7 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        case invention.comment_status
+        case invention.bulk_read_access
         when 'only-organization'
           unless current_user.organization_inventions.include?(invention) || current_user.inventions.include?(invention)
             return permission_denied('No permission to update comments')
