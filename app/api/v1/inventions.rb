@@ -110,8 +110,8 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        unless current_user.edit_access?(invention)
+          return permission_denied('Not permission to edit')
         end
         ActiveRecord::Base.transaction do
           if params[:invention].present?
@@ -205,10 +205,10 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.visible_inventions.include?(invention)
+        unless current_user.read_access?(invention)
           return permission_denied("No permission to read")
         end
-        is_editable = current_user.inventor?(invention) || current_user.co_inventor?(invention)
+        is_editable = current_user.edit_access?(invention)
         resp_ok(
           "invention" => InventionSerializer.new(invention, user_id: current_user.id),
           "is_editable" => is_editable )
@@ -283,16 +283,7 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        case invention.bulk_read_access
-        when 'only-organization'
-          unless current_user.organization_inventions.include?(invention) || current_user.inventions.include?(invention)
-            return permission_denied('No permission to add comments')
-          end
-        when 'only-collaborators'
-          unless current_user.inventions.include?(invention)
-            return permission_denied('No permission to add comments')
-          end
-        else # 'nobody'
+        unless app_user.read_access?(invention)
           return permission_denied('No permission to add comments')
         end
         invention.comments.create(user: current_user, content: params[:content])
@@ -308,21 +299,11 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        case invention.bulk_read_access
-        when 'only-organization'
-          unless current_user.organization_inventions.include?(invention) || current_user.inventions.include?(invention)
-            return permission_denied('No permission to update comments')
-          end
-        when 'only-collaborators'
-          unless current_user.inventions.include?(invention)
-            return permission_denied('No permission to update comments')
-          end
-        else # 'nobody'
+        unless app_user.auth?(comment)
           return permission_denied('No permission to update comments')
         end
         comment.update(content: params[:content])
-        invention = comment.invention
-        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
+        resp_ok("comment" => CommentSerializer.new(comment))
       end
 
       desc "delete comment"
@@ -333,7 +314,7 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        unless current_user.inventor?(invention)
+        unless app_user.auth?(comment)
           return permission_denied('No permission to delete comments')
         end
         comment.destroy

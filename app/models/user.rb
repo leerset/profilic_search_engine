@@ -40,7 +40,22 @@ class User < ApplicationRecord
   @@PROLIFIC_ORGANIZATION_ID = 1
 
   def organization_inventions
-    Invention.where(organization: member_organizations).where(bulk_read_access: 'anyone-organization')
+    Invention.where(organization: member_organizations, bulk_read_access: 'anyone-organization')
+  end
+
+  def read_access?(invention)
+    case invention.bulk_read_access
+    when 'anyone-organization'
+      user_inventions.where(invention: invention).any? || member?(invention.organization)
+    when 'only-inventors'
+      user_inventions.where(invention: invention).any?
+    else
+      edit_access?(invention)
+    end
+  end
+
+  def edit_access?(invention)
+    inventor?(invention) || user_inventions.where(invention: invention, access: [1,2]).any?
   end
 
   def visible_inventions
