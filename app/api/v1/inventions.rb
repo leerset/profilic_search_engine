@@ -236,7 +236,7 @@ module V1
         else
           Invention.where(id: inventions.map(&:id)).where(archived: false).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
         end
-        resp_ok("inventions" => InventionSerializer.build_array(paged_inventions, user_id: current_user.id))
+        resp_ok("inventions" => InventionListSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
       desc "list participants"
