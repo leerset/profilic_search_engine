@@ -10,6 +10,10 @@ module V1
         requires :invention_id, type: Integer, desc: "invention_id"
         optional :draw, type: String, desc: "draw content"
         optional :significance, type: String, desc: "significance content"
+        optional :landscape, type: String, desc: "landscape content"
+        optional :problem_summary, type: String, desc: "problem_summary content"
+        optional :gap, type: String, desc: "gap content"
+        optional :problem_significance, type: String, desc: "problem_significance content"
       end
       post :create do
         authenticate!
@@ -18,7 +22,10 @@ module V1
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        invention.container_sections.create(draw: params[:draw], significance: params[:significance])
+        permit_params = ActionController::Parameters.new(params).permit(
+          :draw, :significance, :landscape, :problem_summary, :gap, :problem_significance
+        )
+        invention.create_container_section(permit_params)
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
@@ -27,6 +34,10 @@ module V1
         requires :id, type: Integer, desc: "container_section id"
         optional :draw, type: String, desc: "draw content"
         optional :significance, type: String, desc: "significance content"
+        optional :landscape, type: String, desc: "landscape content"
+        optional :problem_summary, type: String, desc: "problem_summary content"
+        optional :gap, type: String, desc: "gap content"
+        optional :problem_significance, type: String, desc: "problem_significance content"
       end
       put :update do
         authenticate!
@@ -36,7 +47,10 @@ module V1
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
         end
-        container_section.update_attributes(draw: params[:draw], significance: params[:significance])
+        permit_params = ActionController::Parameters.new(params).permit(
+          :draw, :significance, :landscape, :problem_summary, :gap, :problem_significance
+        )
+        container_section.update_attributes(permit_params)
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 

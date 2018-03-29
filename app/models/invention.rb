@@ -10,7 +10,7 @@ class Invention < ApplicationRecord
   has_many :invention_searches, dependent: :destroy
   has_many :searches, through: :invention_searches
   has_one :scratchpad, dependent: :destroy
-  has_many :container_sections, dependent: :destroy
+  has_one :container_section, dependent: :destroy
 
   # enum bulk_read_access: [
   #   'anyone-organization',

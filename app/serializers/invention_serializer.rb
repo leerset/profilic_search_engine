@@ -3,7 +3,7 @@ class InventionSerializer < ActiveModel::Serializer
     :action, :action_note, :phase, :role, :uploaded_filename, :scratchpad,
     :bulk_read_access, :archived,
     :inventor, :co_inventors,
-    :upload_files, :container_sections,
+    :upload_files, :container_section,
     :organization, :opportunity, :comments, :searches
 
   def self.eager_load_array(array)
@@ -13,7 +13,7 @@ class InventionSerializer < ActiveModel::Serializer
       [comments: :user],
       :organization,
       :searches,
-      :container_sections,
+      :container_section,
       :invention_opportunity,
       [invention_opportunity: :upload_file],
       [invention_opportunity: {organization: :addresses}],
@@ -26,8 +26,10 @@ class InventionSerializer < ActiveModel::Serializer
     ScratchpadSerializer.new(scratchpad)
   end
 
-  def container_sections
-    ContainerSectionSerializer.build_array(object.container_sections)
+  def container_section
+    container_section = object.container_section
+    return ContainerSectionSerializer.new(container_section) if container_section.present?
+    nil
   end
 
   def searches
