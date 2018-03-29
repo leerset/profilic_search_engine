@@ -283,7 +283,7 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless app_user.read_access?(invention)
+        unless current_user.read_access?(invention)
           return permission_denied('No permission to add comments')
         end
         invention.comments.create(user: current_user, content: params[:content])
@@ -299,7 +299,7 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        unless app_user.auth?(comment)
+        unless current_user.auth?(comment)
           return permission_denied('No permission to update comments')
         end
         comment.update(content: params[:content])
@@ -314,7 +314,7 @@ module V1
         authenticate!
         comment = Comment.find_by(id: params[:comment_id])
         return data_not_found(MISSING_COMMENT) if comment.nil?
-        unless app_user.auth?(comment)
+        unless current_user.auth?(comment)
           return permission_denied('No permission to delete comments')
         end
         comment.destroy
