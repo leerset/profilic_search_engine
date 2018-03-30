@@ -217,6 +217,10 @@ module V1
       desc "list inventions"
       params do
         optional :archived, type: Boolean, desc: 'archived， if true, show both '
+        optional :title, type: String, desc: 'invention title/opportunity title'
+        optional :organization_id, type: Integer, desc: "organization_id"
+        optional :user_role, type: String, desc: 'The logged in users role in relation to the invention'
+        optional :phase, type: String, desc: 'phase'
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
         optional :sort_column, type: String, default: "updated_at", desc: 'sort column default: by updated_time (updated_at)'
@@ -224,18 +228,40 @@ module V1
       end
       get :list do
         authenticate!
+        organization_id = params[:organization_id]
+        if organization_id.present? && organization_id.to_i != 0
+          organization = Organization.find_by(id: organization_id)
+          return data_not_found(MISSING_ORG) if organization.nil?
+        end
         page = params[:page].presence || 1
         size = params[:size].presence || 20
+        includes = []
+        user_role = params[:user_role]
+        includes << :user_inventions if params[:user_role].present?
+        inventions = current_user.visible_inventions.includes()
         archived = params[:archived].presence || false
+        inventions = inventions.select{|inv| inv.archived} if archived
+        phase = params[:phase]
+        inventions = inventions.select{|inv| inv.phase == phase} if phase.present?
+        if user_role.present?
+          inventions = inventions.select{|inv| inv.user_inventions.map{|ui| ui.role.code == user_role}.any?}
+        end
+        title = params[:title]
+        if title.present?
+          title = title.downcase
+          inventions = inventions.select{|inv|
+            inv.title.to_s.downcase.index(title) ||
+            inv.invention_opportunity.present? && inv.invention_opportunity.title.to_s.downcase.index(title)
+          }
+        end
+        if organization_id.present?
+          inventions = inventions.select{|inv| inv.organization_id == organization_id}
+        end
         sortcolumn = Invention.columns_hash[params[:sort_column]] ? params[:sort_column] : "updated_at"
         sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         # organizations = current_user.managed_organizations
-        inventions = current_user.visible_inventions
-        paged_inventions = if archived
-          Invention.where(id: inventions.map(&:id)).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
-        else
-          Invention.where(id: inventions.map(&:id)).where(archived: false).includes(:users).order("#{sortcolumn} #{sortorder}").page(page).per(size)
-        end
+        paged_inventions = Invention.includes(:users).where(id: inventions.map(&:id))
+          .order("inventions.#{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("inventions" => InventionListSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
