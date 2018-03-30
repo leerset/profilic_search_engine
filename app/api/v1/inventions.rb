@@ -237,8 +237,11 @@ module V1
         size = params[:size].presence || 20
         includes = []
         user_role = params[:user_role]
-        includes << :user_inventions if params[:user_role].present?
-        inventions = current_user.visible_inventions.includes()
+        title = params[:title]
+        includes << {user_inventions: :role} if user_role.present?
+        includes << :organization if organization_id.present?
+        includes << :invention_opportunity if title.present?
+        inventions = current_user.visible_inventions(includes)
         archived = params[:archived].presence || false
         inventions = inventions.select{|inv| inv.archived} if archived
         phase = params[:phase]
@@ -246,7 +249,6 @@ module V1
         if user_role.present?
           inventions = inventions.select{|inv| inv.user_inventions.map{|ui| ui.role.code == user_role}.any?}
         end
-        title = params[:title]
         if title.present?
           title = title.downcase
           inventions = inventions.select{|inv|
