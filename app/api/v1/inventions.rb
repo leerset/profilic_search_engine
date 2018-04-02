@@ -247,7 +247,7 @@ module V1
         phase = params[:phase]
         inventions = inventions.select{|inv| inv.phase == phase} if phase.present?
         if user_role.present?
-          inventions = inventions.select{|inv| inv.user_inventions.map{|ui| ui.role.code == user_role}.any?}
+          inventions = inventions.select{|inv| inv.user_inventions.map{|ui| ui.user == current_user && ui.role.code == user_role}.any?}
         end
         if title.present?
           title = title.downcase
