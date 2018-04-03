@@ -71,7 +71,7 @@ module V1
       get :list do
         authenticate!
         # return resp_error(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa_organizations.any?
-        organizations = current_user.managed_organizations
+        organizations = current_user.member_organizations
         resp_ok("organizations" => OrganizationSerializer.build_array(organizations))
       end
 
