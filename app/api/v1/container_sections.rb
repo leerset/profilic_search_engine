@@ -64,8 +64,8 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        unless current_user.read_access?(invention)
+          return permission_denied('No permission to add comments')
         end
         container_section = invention.container_section || invention.create_container_section
         case params[:section_name]
