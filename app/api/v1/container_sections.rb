@@ -60,7 +60,7 @@ module V1
         requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance"
         requires :content, type: String, desc: "section comment content"
       end
-      put :add_comment do
+      post :add_comment do
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
