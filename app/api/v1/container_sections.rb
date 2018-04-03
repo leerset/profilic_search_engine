@@ -49,7 +49,8 @@ module V1
         permit_params = ActionController::Parameters.new(params).permit(
           :draw, :significance, :landscape, :problem_summary, :gap, :problem_significance
         )
-        invention.container_section.update_attributes(permit_params)
+        container_section = invention.container_section || invention.create_container_section
+        container_section.update_attributes(permit_params)
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
