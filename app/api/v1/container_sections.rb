@@ -70,7 +70,7 @@ module V1
         container_section = invention.container_section || invention.create_container_section
         case params[:section_name]
         when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance'
-          container_section.call("#{params[:section_name]}_comments").create(user: current_user, content: params[:content])
+          container_section.send("#{params[:section_name]}_comments").create(user: current_user, content: params[:content])
         else
           return permission_denied("unknown section name")
         end
