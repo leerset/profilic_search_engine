@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180324044458) do
+ActiveRecord::Schema.define(version: 20180403003016) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -67,12 +67,27 @@ ActiveRecord::Schema.define(version: 20180324044458) do
     t.index ["user_id"], name: "index_concepts_on_user_id"
   end
 
+  create_table "container_section_comments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "container_section_id"
+    t.bigint "comment_id"
+    t.string "section_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["comment_id"], name: "index_container_section_comments_on_comment_id"
+    t.index ["container_section_id"], name: "index_container_section_comments_on_container_section_id"
+    t.index ["section_name"], name: "index_container_section_comments_on_section_name"
+  end
+
   create_table "container_sections", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.bigint "invention_id"
     t.text "draw"
     t.text "significance"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "landscape"
+    t.text "problem_summary"
+    t.text "gap"
+    t.text "problem_significance"
     t.index ["invention_id"], name: "index_container_sections_on_invention_id"
   end
 

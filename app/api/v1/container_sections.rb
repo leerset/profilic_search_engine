@@ -54,6 +54,29 @@ module V1
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
+      desc "add container_section comment"
+      params do
+        requires :invention_id, type: Integer, desc: "invention_id"
+        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance"
+        requires :content, type: String, desc: "section comment content"
+      end
+      put :add_comment do
+        authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return data_not_found(MISSING_INV) if invention.nil?
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        end
+        container_section = invention.container_section || invention.create_container_section
+        case params[:section_name]
+        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance'
+          container_section.call("#{params[:section_name]}_comments").create(user: current_user, content: params[:content])
+        else
+          return permission_denied("unknown section name")
+        end
+        resp_ok("invention" => InventionSerializer.new(invention))
+      end
+
       # desc "delete container_section"
       # params do
       #   requires :id, type: Integer, desc: "container_section id"
