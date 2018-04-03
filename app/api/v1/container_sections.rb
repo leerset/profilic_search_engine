@@ -38,6 +38,7 @@ module V1
         optional :problem_summary, type: String, desc: "problem_summary content"
         optional :gap, type: String, desc: "gap content"
         optional :problem_significance, type: String, desc: "problem_significance content"
+        optional :summary, type: String, desc: "invention description"
       end
       put :update do
         authenticate!
@@ -45,6 +46,9 @@ module V1
         return data_not_found(MISSING_INV) if invention.nil?
         unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
           return permission_denied(NOT_CO_INVENTOR_DENIED)
+        end
+        if (summary = params[:summary]).present?
+          invention.update(description: summary)
         end
         permit_params = ActionController::Parameters.new(params).permit(
           :draw, :significance, :landscape, :problem_summary, :gap, :problem_significance
