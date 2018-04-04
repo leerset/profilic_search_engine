@@ -58,6 +58,30 @@ module V1
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
+      desc "update container_section completion"
+      params do
+        requires :invention_id, type: Integer, desc: "invention_id"
+        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance"
+        requires :completion, type: Boolean, desc: "section completion"
+      end
+      put :update_completion do
+        authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return data_not_found(MISSING_INV) if invention.nil?
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        end
+        container_section = invention.container_section || invention.create_container_section
+        section_name = params[:section_name]
+        case section_name
+        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance'
+          container_section.update("#{section_name}_completion" => params[:completion])
+        else
+          return permission_denied("unknown section name")
+        end
+        resp_ok("invention" => InventionSerializer.new(invention))
+      end
+
       desc "add container_section comment"
       params do
         requires :invention_id, type: Integer, desc: "invention_id"

@@ -5,6 +5,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
 
   def draw
     {
+      completion: object.draw_completion,
       content: object.draw || "",
       comments: CommentSerializer.build_array(object.draw_comments)
     }
@@ -12,6 +13,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
 
   def significance
     {
+      completion: object.significance_completion,
       content: object.significance || "",
       comments: CommentSerializer.build_array(object.significance_comments)
     }
@@ -19,6 +21,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
 
   def landscape
     {
+      completion: object.landscape_completion,
       content: object.landscape || "",
       comments: CommentSerializer.build_array(object.landscape_comments)
     }
@@ -26,6 +29,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
 
   def problem_summary
     {
+      completion: object.problem_summary_completion,
       content: object.problem_summary || "",
       comments: CommentSerializer.build_array(object.problem_summary_comments)
     }
@@ -33,6 +37,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
 
   def gap
     {
+      completion: object.gap_completion,
       content: object.gap || "",
       comments: CommentSerializer.build_array(object.gap_comments)
     }
@@ -40,6 +45,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
 
   def problem_significance
     {
+      completion: object.problem_significance_completion,
       content: object.problem_significance || "",
       comments: CommentSerializer.build_array(object.problem_significance_comments)
     }
