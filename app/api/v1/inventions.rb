@@ -71,7 +71,7 @@ module V1
             invention.user_inventions.find_or_create_by(user: user).update(
               role: co_inventor_role,
               access: co_inventor[:access]
-            ) if user
+            ) if user && !user.inventor?(invention)
           end
         end
         if (upload = params[:upload]).present?
@@ -149,7 +149,7 @@ module V1
               invention.user_inventions.find_or_create_by(user: user).update(
                 role: co_inventor_role,
                 access: co_inventor[:access]
-              ) if user
+              ) if user && !user.inventor?(invention)
             end
           end
           if (upload = params[:upload]).present?
@@ -262,8 +262,7 @@ module V1
         sortcolumn = Invention.columns_hash[params[:sort_column]] ? params[:sort_column] : "updated_at"
         sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         # organizations = current_user.managed_organizations
-        paged_inventions = Invention.includes(:users).where(id: inventions.map(&:id))
-          .order("inventions.#{sortcolumn} #{sortorder}").page(page).per(size)
+        paged_inventions = Invention.includes(:users).where(id: inventions.map(&:id)).order("inventions.#{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("inventions" => InventionListSerializer.build_array(paged_inventions, user_id: current_user.id))
       end
 
