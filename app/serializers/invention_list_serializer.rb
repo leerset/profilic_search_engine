@@ -1,5 +1,5 @@
 class InventionListSerializer < ActiveModel::Serializer
-  attributes :id, :title, :description, :created_time, :updated_time,
+  attributes :id, :title, :description, :keywords, :created_time, :updated_time,
     :phase, :role, :bulk_read_access, :archived,
     :inventor, :organization, :opportunity, :comments_count
 

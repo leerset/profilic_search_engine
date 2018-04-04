@@ -12,6 +12,7 @@ module V1
           optional :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (65535)"
+          optional :keywords, type: String, desc: "keywords (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, default: "phase-1", desc: "phase, e.g. Full Authoring"
@@ -50,7 +51,7 @@ module V1
         end
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
           :invention_opportunity_id, :organization_id,
-          :title, :description, :action, :action_note, :phase,
+          :title, :description, :keywords, :action, :action_note, :phase,
           :bulk_read_access
         )
         invention = Invention.create!(permit_invention_params)
@@ -92,6 +93,7 @@ module V1
           optional :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (200)"
+          optional :keywords, type: String, desc: "keywords (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, desc: "phase, e.g. Full Authoring"
@@ -132,7 +134,7 @@ module V1
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
               :invention_opportunity_id,
               :organization_id,
-              :title, :description, :action, :action_note, :phase,
+              :title, :description, :keywords, :action, :action_note, :phase,
               :bulk_read_access, :archived
             )
             invention.update_attributes(permit_invention_params)
