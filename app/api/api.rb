@@ -21,14 +21,18 @@ class API < Grape::API
       unauthorized unless current_user
     end
 
+    def check_user_status(user)
+      unauthorized('Suspended prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'suspended'
+      unauthorized('Deleted prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'deleted'
+    end
+
     def current_user
       # return User.first if request.headers["Host"] == 'localhost:3000'
       return nil unless request.headers['Authorization'].present?
       user = User.includes(:user_organization_statuses).where(access_token: request.headers['Authorization']).first
       # error!(unauthorized('You have not signed in for a long time, please login again.'), 401) if user && user.expired?
+      check_user_status(user)
       unauthorized('You have not signed in for a long time, please login again.') if user && user.expired?
-      unauthorized('Suspended prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'suspended'
-      unauthorized('Deleted prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'deleted'
       return user
     end
 

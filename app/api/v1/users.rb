@@ -46,6 +46,7 @@ module V1
         auth = Auth.find_by_secure_random(params[:magic_link])
         return unauthorized("Expired magic link") if auth.nil?
         user = auth.user
+        check_user_status(user)
         if user.expired?
           user.auth.reset_secure_random
           user.update_access_token
