@@ -29,7 +29,7 @@ class User < ApplicationRecord
   has_many :user_organization_statuses
 
   before_create :generate_access_token
-  after_create :create_auth, :join_prolific_organization
+  after_create :create_auth #, :join_prolific_organization
 
   has_attached_file :resume,
     path: ':rails_root/upload/users/:id/resume/:filename',
@@ -83,7 +83,7 @@ class User < ApplicationRecord
   end
 
   def join_prolific_organization
-    prolific = Organization.find_by(code: 'prolific')
+    prolific = Organization.find_by(id: @@PROLIFIC_ORGANIZATION_ID)
     return false if prolific.nil?
     join_organization(prolific)
   end
