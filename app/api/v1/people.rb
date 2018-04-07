@@ -70,7 +70,7 @@ module V1
         user = User.find_by(id: params[:user_id])
         return data_not_found(MISSING_USR) if user.nil?
         orgs = (user.organizations & current_user.managed_organizations)
-        return permission_denied(NOT_GOD_OA_DENIED) if orgs.empty?
+        return permission_denied(NOT_GOD_OA_DENIED) unless orgs.any? || current_user.god?
         ActiveRecord::Base.transaction do
           if params[:user].present?
             permit_user_params = ActionController::Parameters.new(params[:user]).permit(
