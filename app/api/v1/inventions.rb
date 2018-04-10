@@ -82,6 +82,10 @@ module V1
           invention.upload_files << upload_file
         end
         invention.create_scratchpad!(content: params[:scratchpad])
+        if (description = params[:invention][:description]).present?
+          container_section = invention.container_section || invention.create_container_section
+          container_section.update_attributes(summary: description)
+        end
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 
@@ -138,6 +142,10 @@ module V1
               :bulk_read_access, :archived
             )
             invention.update_attributes(permit_invention_params)
+            if (description = params[:invention][:description]).present?
+              container_section = invention.container_section || invention.create_container_section
+              container_section.update_attributes(summary: description)
+            end
           end
           if (scratchpad_content = params[:scratchpad]).present?
             scratchpad = invention.scratchpad || invention.create_scratchpad

@@ -1,7 +1,16 @@
 class ContainerSectionSerializer < ActiveModel::Serializer
   attributes :id, :invention_id, :draw, :significance,
     :landscape, :problem_summary, :gap, :problem_significance,
+    :summary,
     :created_time, :updated_time
+
+  def summary
+    {
+      completion: object.summary_completion,
+      content: object.summary || "",
+      comments: CommentSerializer.build_array(object.summary_comments)
+    }
+  end
 
   def draw
     {

@@ -51,7 +51,7 @@ module V1
           invention.update(description: summary)
         end
         permit_params = ActionController::Parameters.new(params).permit(
-          :draw, :significance, :landscape, :problem_summary, :gap, :problem_significance
+          :draw, :significance, :landscape, :problem_summary, :gap, :problem_significance, :summary
         )
         container_section = invention.container_section || invention.create_container_section
         container_section.update_attributes(permit_params)
@@ -74,7 +74,7 @@ module V1
         container_section = invention.container_section || invention.create_container_section
         section_name = params[:section_name]
         case section_name
-        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance'
+        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance', 'summary'
           container_section.update("#{section_name}_completion" => params[:completion])
         else
           return permission_denied("unknown section name")
@@ -97,7 +97,7 @@ module V1
         end
         container_section = invention.container_section || invention.create_container_section
         case params[:section_name]
-        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance'
+        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance', 'summary'
           container_section.send("#{params[:section_name]}_comments").create(user: current_user, content: params[:content])
         else
           return permission_denied("unknown section name")

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180404231937) do
+ActiveRecord::Schema.define(version: 20180410013023) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -94,6 +94,8 @@ ActiveRecord::Schema.define(version: 20180404231937) do
     t.boolean "problem_summary_completion", default: false
     t.boolean "gap_completion", default: false
     t.boolean "problem_significance_completion", default: false
+    t.text "summary"
+    t.boolean "summary_completion", default: false
     t.index ["invention_id"], name: "index_container_sections_on_invention_id"
   end
 
