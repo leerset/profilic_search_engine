@@ -23,14 +23,14 @@ module V1
         authenticate!
         user = User.find_by(id: params[:user_id])
         return data_not_found(MISSING_USR) if user.nil?
+        orgs = (current_user.managed_organizations & user.organizations)
+        return permission_denied(NOT_GOD_OA_DENIED) if !current_user.god? && orgs.empty?
         if current_user.god?
-          resp_ok(
-            'user' => PeopleSerializer.new(current_user)
-          )
+          resp_ok("user" => UserSerializer.new(user))
+        elsif current_user.managed_organizations.any?
+          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
         else
-          resp_ok(
-            'user' => PeopleCommonSerializer.new(current_user)
-          )
+          return permission_denied(NOT_GOD_OA_DENIED)
         end
       end
 
