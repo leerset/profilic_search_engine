@@ -112,20 +112,22 @@ module V1
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
-        organizations = if params[:organization_id]
-          Organization.where(id: params[:organization_id])
+        if current_user.god?
+          user = User.all
         else
-          Organization.all
-        end
-        unless current_user.god?
+          organizations = if params[:organization_id]
+            Organization.where(id: params[:organization_id])
+          else
+            Organization.all
+          end
           organizations = (organizations & current_user.member_organizations)
+          uoss = if params[:status]
+            UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
+          else
+            UserOrganizationStatus.where(organization_id: organizations.map(&:id))
+          end
+          users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
         end
-        uoss = if params[:status]
-          UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
-        else
-          UserOrganizationStatus.where(organization_id: organizations.map(&:id))
-        end
-        users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
         if params[:name].present?
           name = params[:name].strip
           nameparts = name.gsub(/\s/,'%')
@@ -147,20 +149,22 @@ module V1
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
-        organizations = if params[:organization_id]
-          Organization.where(id: params[:organization_id])
+        if current_user.god?
+          user = User.all
         else
-          Organization.all
-        end
-        unless current_user.god?
+          organizations = if params[:organization_id]
+            Organization.where(id: params[:organization_id])
+          else
+            Organization.all
+          end
           organizations = (organizations & current_user.member_organizations)
+          uoss = if params[:status]
+            UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
+          else
+            UserOrganizationStatus.where(organization_id: organizations.map(&:id))
+          end
+          users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
         end
-        uoss = if params[:status]
-          UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
-        else
-          UserOrganizationStatus.where(organization_id: organizations.map(&:id))
-        end
-        users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
         if params[:name].present?
           name = params[:name].strip
           nameparts = name.gsub(/\s/,'%')
