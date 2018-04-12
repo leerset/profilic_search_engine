@@ -7,13 +7,6 @@ class UserEncryptionSerializer < ActiveModel::Serializer
     :global_roles, :organization_roles, :invention_roles,
     :user_organization_statuses
 
-  def email
-    if (manage_organizations = instance_options[:managed_organizations]).present?
-      return object.email if (object.organizations & manage_organizations).any?
-    end
-    return nil
-  end
-
   def drafts_amount
     0
   end
@@ -23,13 +16,7 @@ class UserEncryptionSerializer < ActiveModel::Serializer
   end
 
   def user_organization_statuses
-
-    manage_organizations = instance_options[:managed_organizations]
-    current_user_organization_statuses = if manage_organizations
-      object.user_organization_statuses.includes(:user, :organization).where(organization: manage_organizations)
-    else
-      object.user_organization_statuses.includes(:user, :organization)
-    end
+    current_user_organization_statuses = object.user_organization_statuses.includes(:user, :organization)
     UserOrganizationStatusSerializer.build_array(current_user_organization_statuses)
   end
 
@@ -38,21 +25,11 @@ class UserEncryptionSerializer < ActiveModel::Serializer
   end
 
   def organization_roles
-    manage_organizations = instance_options[:managed_organizations]
-    if manage_organizations
-      object.organization_roles_array_in_organizations(manage_organizations)
-    else
-      object.organization_roles_array
-    end
+    object.organization_roles_array
   end
 
   def invention_roles
-    manage_organizations = instance_options[:managed_organizations]
-    if manage_organizations
-      object.invention_roles_array_in_organizations(manage_organizations)
-    else
-      object.invention_roles_array
-    end
+    object.invention_roles_array
   end
 
   def is_expired
@@ -68,12 +45,7 @@ class UserEncryptionSerializer < ActiveModel::Serializer
   end
 
   def organizations
-    manage_organizations = instance_options[:managed_organizations]
-    current_organizations = if manage_organizations
-      object.organizations.where(id: manage_organizations.map(&:id)).distinct
-    else
-      object.organizations.distinct
-    end
+    current_organizations = object.organizations.distinct
     OrganizationSimpleSerializer.build_array(current_organizations)
   end
 
