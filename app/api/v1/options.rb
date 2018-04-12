@@ -117,8 +117,8 @@ module V1
         else
           Organization.all
         end
-        if !current_user.god? && current_user.managed_organizations.any?
-          organizations = (organizations & current_user.managed_organizations)
+        unless current_user.god?
+          organizations = (organizations & current_user.member_organizations)
         end
         uoss = if params[:status]
           UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
@@ -132,13 +132,7 @@ module V1
           users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email) OR CONCAT(firstname,' ', lastname) LIKE ?", name, name, name, nameparts)
         end
         users = users.order(id: :desc).page(page).per(size)
-        if current_user.god?
-          resp_ok("users" => UserSerializer.build_array(users))
-        elsif current_user.managed_organizations.any?
-          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
-        else
-          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: []))
-        end
+        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
       end
 
       desc "get Users List Filtering"
@@ -158,8 +152,8 @@ module V1
         else
           Organization.all
         end
-        if !current_user.god? && current_user.managed_organizations.any?
-          organizations = (organizations & current_user.managed_organizations)
+        unless current_user.god?
+          organizations = (organizations & current_user.member_organizations)
         end
         uoss = if params[:status]
           UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
@@ -173,13 +167,7 @@ module V1
           users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email) OR CONCAT(firstname,' ', lastname) LIKE ?", name, name, name, nameparts)
         end
         users = users.order(id: :desc).page(page).per(size)
-        if current_user.god?
-          resp_ok("users" => UserSerializer.build_array(users))
-        elsif current_user.managed_organizations.any?
-          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
-        else
-          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: []))
-        end
+        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
       end
 
       desc "get user"
@@ -190,14 +178,11 @@ module V1
         authenticate!
         user = User.find_by(id: params[:user_id])
         return data_not_found(MISSING_USR) if user.nil?
-        orgs = (current_user.managed_organizations & user.organizations)
-        return permission_denied(NOT_GOD_OA_DENIED) if !current_user.god? && orgs.empty?
-        if current_user.god?
-          resp_ok("user" => UserSerializer.new(user))
-        elsif current_user.managed_organizations.any?
+        orgs = (current_user.member_organizations & user.organizations)
+        if current_user.god? || orgs.any?
           resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
         else
-          return permission_denied(NOT_GOD_OA_DENIED)
+          return permission_denied(NOT_GOD_OA_MEMBER_DENIED)
         end
       end
 
