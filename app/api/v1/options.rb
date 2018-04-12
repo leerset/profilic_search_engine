@@ -179,7 +179,9 @@ module V1
         user = User.find_by(id: params[:user_id])
         return data_not_found(MISSING_USR) if user.nil?
         orgs = (current_user.member_organizations & user.organizations)
-        if current_user.god? || orgs.any?
+        if user == current_user || current_user.god?
+          resp_ok("user" => UserEncryptionSerializer.new(user))
+        elsif orgs.any?
           resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
         else
           return permission_denied(NOT_GOD_OA_MEMBER_DENIED)
