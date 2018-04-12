@@ -1,8 +1,16 @@
 class ContainerSectionSerializer < ActiveModel::Serializer
   attributes :id, :invention_id, :draw, :significance,
     :landscape, :problem_summary, :gap, :problem_significance,
-    :summary,
+    :summary, :c_construction,
     :created_time, :updated_time
+
+  def c_construction
+    {
+      completion: object.c_construction_completion,
+      comments: CommentSerializer.build_array(object.c_construction_comments)
+      components: CConstructionSerializer.build_array(object.c_constructions)
+    }
+  end
 
   def summary
     {

@@ -3,6 +3,7 @@ class ContainerSection < ApplicationRecord
 
   has_many :container_section_comments, dependent: :destroy
   has_many :comments, through: :container_section_comments
+  has_many :c_constructions
 
   has_many :summary_container_section_comments,
     -> { where(section_name: 'summary') }, class_name: 'ContainerSectionComment'
@@ -31,5 +32,9 @@ class ContainerSection < ApplicationRecord
   has_many :problem_significance_container_section_comments,
     -> { where(section_name: 'problem_significance') }, class_name: 'ContainerSectionComment'
   has_many :problem_significance_comments, through: :problem_significance_container_section_comments, source: :comment
+
+  has_many :c_construction_container_section_comments,
+    -> { where(section_name: 'c_construction') }, class_name: 'ContainerSectionComment'
+  has_many :c_construction_comments, through: :c_construction_container_section_comments, source: :comment
 
 end

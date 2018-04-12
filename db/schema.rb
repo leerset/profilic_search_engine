@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180410013023) do
+ActiveRecord::Schema.define(version: 20180412081601) do
 
   create_table "addresses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "address_type"
@@ -37,6 +37,20 @@ ActiveRecord::Schema.define(version: 20180410013023) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_auths_on_user_id"
+  end
+
+  create_table "c_constructions", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.bigint "container_section_id"
+    t.string "c_type"
+    t.text "ideal_example"
+    t.text "properties"
+    t.text "how_made"
+    t.text "innovative_aspects"
+    t.text "why_hasnt_done_before"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["c_type"], name: "index_c_constructions_on_c_type"
+    t.index ["container_section_id"], name: "index_c_constructions_on_container_section_id"
   end
 
   create_table "citizenships", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -96,6 +110,7 @@ ActiveRecord::Schema.define(version: 20180410013023) do
     t.boolean "problem_significance_completion", default: false
     t.text "summary"
     t.boolean "summary_completion", default: false
+    t.boolean "c_construction_completion", default: false
     t.index ["invention_id"], name: "index_container_sections_on_invention_id"
   end
 

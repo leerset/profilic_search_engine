@@ -39,6 +39,14 @@ module V1
         optional :gap, type: String, desc: "gap content"
         optional :problem_significance, type: String, desc: "problem_significance content"
         optional :summary, type: String, desc: "invention description"
+        optional :c_constructions, type: Array do
+          optional :c_type, type: String, desc: "c_construction type"
+          optional :ideal_example, type: String, desc: "c_construction ideal_example"
+          optional :properties, type: String, desc: "c_construction properties"
+          optional :how_made, type: String, desc: "c_construction how_made"
+          optional :innovative_aspects, type: String, desc: "c_construction innovative_aspects"
+          optional :why_hasnt_done_before, type: String, desc: "c_construction why_hasnt_done_before"
+        end
       end
       put :update do
         authenticate!
@@ -55,13 +63,24 @@ module V1
         )
         container_section = invention.container_section || invention.create_container_section
         container_section.update_attributes(permit_params)
+        c_constructions = params[:c_constructions]
+        if c_constructions.present?
+          c_constructions.each do |cc|
+            c_type = cc[:c_type]
+            c_construction = container_section.c_constructions.find_or_create_by(c_type: c_type)
+            c_permit_params = ActionController::Parameters.new(cc).permit(
+              :ideal_example, :properties, :how_made, :innovative_aspects, :why_hasnt_done_before
+            )
+            c_construction.update_attributes(c_permit_params)
+          end
+        end
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
       desc "update container_section completion"
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
-        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance"
+        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary c_construction"
         requires :completion, type: Boolean, desc: "section completion"
       end
       put :update_completion do
@@ -74,7 +93,7 @@ module V1
         container_section = invention.container_section || invention.create_container_section
         section_name = params[:section_name]
         case section_name
-        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance', 'summary'
+        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance', 'summary', 'c_construction'
           container_section.update("#{section_name}_completion" => params[:completion])
         else
           return permission_denied("unknown section name")
