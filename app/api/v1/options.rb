@@ -113,7 +113,7 @@ module V1
         page = params[:page].presence || 1
         size = params[:size].presence || 20
         if current_user.god?
-          user = User.all
+          users = User.all
         else
           organizations = if params[:organization_id]
             Organization.where(id: params[:organization_id])
@@ -150,7 +150,7 @@ module V1
         page = params[:page].presence || 1
         size = params[:size].presence || 20
         if current_user.god?
-          user = User.all
+          users = User.all
         else
           organizations = if params[:organization_id]
             Organization.where(id: params[:organization_id])
