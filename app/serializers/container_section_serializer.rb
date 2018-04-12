@@ -7,7 +7,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
   def c_construction
     {
       completion: object.c_construction_completion,
-      comments: CommentSerializer.build_array(object.c_construction_comments)
+      comments: CommentSerializer.build_array(object.c_construction_comments),
       components: CConstructionSerializer.build_array(object.c_constructions)
     }
   end
