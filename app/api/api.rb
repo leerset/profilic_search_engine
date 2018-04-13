@@ -22,8 +22,8 @@ class API < Grape::API
     end
 
     def check_user_status(user)
-      unauthorized('Suspended prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'suspended'
-      unauthorized('Deleted prolific status, should not be allowed to sign in.') if user && user.prolific_status && user.prolific_status.downcase == 'deleted'
+      unauthorized('Suspended status, should not be allowed to sign in.') if user && user.status && user.status.downcase == 'suspended'
+      unauthorized('Deleted status, should not be allowed to sign in.') if user && user.status && user.status.downcase == 'deleted'
     end
 
     def current_user
