@@ -19,5 +19,5 @@ staging:
 production:
   <<: *default
   server_env: production
-  host: https://prolific-production.firebaseapp.com
+  host: https://lific.pro
   mail_sender: postmaster@mail.lific.pro

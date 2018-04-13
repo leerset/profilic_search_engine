@@ -16,11 +16,11 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              'smtp.gmail.com',
+    address:              'smtp.mailgun.org',
     port:                 587,
-    domain:               "gmail.com",
-    user_name:            'jianyi.immed@gmail.com',
-    password:             'leer903376',
+    domain:               "mail.lific.pro",
+    user_name:            'postmaster@mail.lific.pro',
+    password:             '81016b462e3ee05735cc4a4e62563e0f-833f99c3-70b6d470',
     authentication:       :login,
     enable_starttls_auto: true  }
 
@@ -107,4 +107,5 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
 end
