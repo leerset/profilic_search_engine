@@ -2,13 +2,7 @@ class Mailer < ApplicationMailer
   # Rails.application.routes.default_url_options[:host] = Settings.host
   # Rails.application.routes.default_url_options[:host] = "http://dev.soloman.org.cn"
   Rails.application.routes.default_url_options[:host] = 'http://dedi2.cijef.com.hk'
-  # default from: 'jianyi.prolific@gmail.com'
-  default from: 'jianyi.immed@gmail.com'
-  # default from: 'jianyi@hydrap.com'
-  # default cc: 'jianyi@hydrap.com'
-  # default cc: 'jianyi.prolific@gmail.com'
-  # layout 'mailer/order_email'
-  # layout 'mailer/welcome_email'
+  default from: Settings.mail_sender
 
   def add_prefix_and_suffix_to_subject(subject)
     # [Settings.mail_prefix, subject, Settings.mail_suffix].compact.join(" ")

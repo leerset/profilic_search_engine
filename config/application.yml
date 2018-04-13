@@ -5,6 +5,7 @@ default: &default
 development:
   <<: *default
   server_env: development
+  mail_sender: development@prolific.com
   host: https://prolific-development.firebaseapp.com
 
 test:
@@ -19,3 +20,4 @@ production:
   <<: *default
   server_env: production
   host: https://prolific-production.firebaseapp.com
+  mail_sender: postmaster@mail.lific.pro

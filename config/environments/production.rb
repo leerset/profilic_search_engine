@@ -14,7 +14,6 @@ Rails.application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
 
-
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address:              'smtp.gmail.com',
@@ -24,7 +23,6 @@ Rails.application.configure do
     password:             'leer903376',
     authentication:       :login,
     enable_starttls_auto: true  }
-
 
   config.action_mailer.perform_deliveries = true
   # Don't care if the mailer can't send.
