@@ -37,7 +37,7 @@ class User < ApplicationRecord
   validates_attachment_content_type :resume,
     :content_type => RESUME_CONTENT_TYPES
 
-  @@PROLIFIC_ORGANIZATION_ID = 1
+  # @@PROLIFIC_ORGANIZATION_ID = 1
 
   def organization_inventions
     Invention.where(organization: member_organizations, bulk_read_access: 'anyone-organization')
@@ -78,15 +78,15 @@ class User < ApplicationRecord
     self.build_auth(secure_random: Auth.generate_secure_random).save!
   end
 
-  def prolific_status
-    self.user_organization_statuses.select {|uos| uos.organization_id == @@PROLIFIC_ORGANIZATION_ID}[0].try(:status)
-  end
+  # def prolific_status
+  #   # self.user_organization_statuses.select {|uos| uos.organization_id == @@PROLIFIC_ORGANIZATION_ID}[0].try(:status)
+  # end
 
-  def join_prolific_organization
-    prolific = Organization.find_by(id: @@PROLIFIC_ORGANIZATION_ID)
-    return false if prolific.nil?
-    join_organization(prolific)
-  end
+  # def join_prolific_organization
+  #   prolific = Organization.find_by(id: @@PROLIFIC_ORGANIZATION_ID)
+  #   return false if prolific.nil?
+  #   join_organization(prolific)
+  # end
 
   def join_organization(organization)
     organization_member_role = Role.find_by(code: 'organization_member')
