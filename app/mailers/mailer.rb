@@ -37,6 +37,7 @@ class Mailer < ApplicationMailer
   end
 
   def magic_link_email(user, status)
+    @host = Settings.host
     @user = user
     @status = status
     @magic_link = user.magic_link

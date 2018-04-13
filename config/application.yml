@@ -1,0 +1,21 @@
+default: &default
+  server_env: 'local'
+  host: http://localhost:8080
+
+development:
+  <<: *default
+  server_env: development
+  host: https://prolific-development.firebaseapp.com
+
+test:
+  <<: *default
+  host: https://prolific-development.firebaseapp.com
+
+staging:
+  <<: *default
+  host: https://prolific-development.firebaseapp.com
+
+production:
+  <<: *default
+  server_env: production
+  host: https://prolific-production.firebaseapp.com
