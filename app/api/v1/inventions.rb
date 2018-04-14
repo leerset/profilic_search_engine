@@ -192,6 +192,22 @@ module V1
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 
+      desc "update invention archived"
+      params do
+        requires :invention_id, type: Integer, desc: "invention_id"
+        requires :archived, type: Boolean, desc: "archived, e.g. true or false"
+      end
+      put :update_archived do
+        authenticate!
+        invention = Invention.find_by(id: params[:invention_id])
+        return data_not_found(MISSING_INV) if invention.nil?
+        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        end
+        invention.update_attributes(archived: params[:archived])
+        resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
+      end
+
       desc "delete invention"
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
