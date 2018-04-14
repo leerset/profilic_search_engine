@@ -201,8 +201,8 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        unless current_user.inventor?(invention)
+          return permission_denied(NOT_INVENTOR_DENIED)
         end
         invention.update_attributes(archived: params[:archived])
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
@@ -269,7 +269,7 @@ module V1
         includes << :invention_opportunity if title.present?
         inventions = current_user.visible_inventions(includes)
         archived = params[:archived].presence || false
-        inventions = inventions.select{|inv| inv.archived} if archived
+        inventions = inventions.select{|inv| inv.archived == archived} if archived
         phase = params[:phase]
         inventions = inventions.select{|inv| inv.phase == phase} if phase.present?
         if user_role.present?
