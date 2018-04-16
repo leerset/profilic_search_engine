@@ -40,6 +40,8 @@ module V1
         optional :problem_significance, type: String, desc: "problem_significance content"
         optional :summary, type: String, desc: "invention description"
         optional :c_constructions, type: Array do
+          optional :id, type: String, desc: "c_construction id"
+          optional :delete, type: Boolean, desc: "c_construction delete"
           optional :c_type, type: String, desc: "c_construction type"
           optional :ideal_example, type: String, desc: "c_construction ideal_example"
           optional :properties, type: String, desc: "c_construction properties"
@@ -63,15 +65,20 @@ module V1
         )
         container_section = invention.container_section || invention.create_container_section
         container_section.update_attributes(permit_params)
-        c_constructions = params[:c_constructions]
-        if c_constructions.present?
-          c_constructions.each do |cc|
-            c_type = cc[:c_type]
-            c_construction = container_section.c_constructions.find_or_create_by(c_type: c_type)
-            c_permit_params = ActionController::Parameters.new(cc).permit(
-              :ideal_example, :properties, :how_made, :innovative_aspects, :why_hasnt_done_before
-            )
-            c_construction.update_attributes(c_permit_params)
+        c_constructions = params[:c_constructions].presence || []
+        c_constructions.each do |cc|
+          c_permit_params = ActionController::Parameters.new(cc).permit(
+            :ideal_example, :properties, :how_made, :innovative_aspects, :why_hasnt_done_before
+          )
+          c_construction = CConstruction.find_by_id(cc[:id])
+          if c_construction.present?
+            if cc[:delete].present? && cc[:delete] == true
+              c_construction.destroy
+            else
+              c_construction.update_attributes(c_permit_params)
+            end
+          else
+            CConstruction.create(c_permit_params)
           end
         end
         resp_ok("invention" => InventionSerializer.new(invention))
