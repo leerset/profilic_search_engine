@@ -11,7 +11,7 @@ class CConstructionSerializer < ActiveModel::Serializer
         content: object.ideal_example
       },
       properties: {
-        content: object.ideal_example
+        content: object.properties
       },
       how_made: {
         content: object.how_made
