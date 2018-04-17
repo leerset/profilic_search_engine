@@ -134,7 +134,7 @@ module V1
           users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email) OR CONCAT(firstname,' ', lastname) LIKE ?", name, name, name, nameparts)
         end
         users = users.order(id: :desc).page(page).per(size)
-        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
+        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
       end
 
       desc "get Users List Filtering"
@@ -171,7 +171,7 @@ module V1
           users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email) OR CONCAT(firstname,' ', lastname) LIKE ?", name, name, name, nameparts)
         end
         users = users.order(id: :desc).page(page).per(size)
-        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
+        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
       end
 
       desc "get user"
@@ -186,7 +186,7 @@ module V1
         if user == current_user || current_user.god?
           resp_ok("user" => UserEncryptionSerializer.new(user))
         elsif orgs.any?
-          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
+          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.member_organizations))
         else
           return permission_denied(NOT_GOD_OA_MEMBER_DENIED)
         end

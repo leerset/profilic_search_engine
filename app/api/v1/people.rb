@@ -28,7 +28,7 @@ module V1
         if current_user.god?
           resp_ok("user" => UserSerializer.new(user))
         elsif current_user.managed_organizations.any?
-          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
+          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.member_organizations))
         else
           return permission_denied(NOT_GOD_OA_DENIED)
         end
