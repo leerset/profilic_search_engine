@@ -78,7 +78,7 @@ module V1
               c_construction.update_attributes(c_permit_params)
             end
           else
-            CConstruction.create(c_permit_params)
+            container_section.c_constructions.create(c_permit_params)
           end
         end
         resp_ok("invention" => InventionSerializer.new(invention))
