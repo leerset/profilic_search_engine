@@ -68,7 +68,7 @@ module V1
         c_constructions = params[:c_constructions].presence || []
         c_constructions.each do |cc|
           c_permit_params = ActionController::Parameters.new(cc).permit(
-            :ideal_example, :properties, :how_made, :innovative_aspects, :why_hasnt_done_before
+            :c_type, :ideal_example, :properties, :how_made, :innovative_aspects, :why_hasnt_done_before
           )
           c_construction = CConstruction.find_by_id(cc[:id])
           if c_construction.present?
