@@ -1,5 +1,5 @@
 class CConstructionSerializer < ActiveModel::Serializer
-  attributes :id, :type, :items, :created_time, :updated_time
+  attributes :id, :type, :completion, :items, :created_time, :updated_time
 
   def type
     object.c_type

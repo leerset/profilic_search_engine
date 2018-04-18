@@ -43,6 +43,7 @@ module V1
           optional :id, type: String, desc: "c_construction id"
           optional :delete, type: Boolean, desc: "c_construction delete"
           optional :c_type, type: String, desc: "c_construction type"
+          optional :completion, type: Boolean, desc: "c_construction completion"
           optional :ideal_example, type: String, desc: "c_construction ideal_example"
           optional :properties, type: String, desc: "c_construction properties"
           optional :how_made, type: String, desc: "c_construction how_made"
@@ -68,7 +69,7 @@ module V1
         c_constructions = params[:c_constructions].presence || []
         c_constructions.each do |cc|
           c_permit_params = ActionController::Parameters.new(cc).permit(
-            :c_type, :ideal_example, :properties, :how_made, :innovative_aspects, :why_hasnt_done_before
+            :c_type, :completion, :ideal_example, :properties, :how_made, :innovative_aspects, :why_hasnt_done_before
           )
           c_construction = CConstruction.find_by_id(cc[:id])
           if c_construction.present?
