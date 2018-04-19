@@ -114,63 +114,22 @@ module V1
         authenticate!
         page = params[:page].presence || 1
         size = params[:size].presence || 20
-        if current_user.god?
-          users = User.all
+        status = params[:status]
+        organizations = if params[:organization_id]
+          Organization.where(id: params[:organization_id]) & current_user.member_organizations
         else
-          organizations = if params[:organization_id]
-            Organization.where(id: params[:organization_id])
-          else
-            Organization.all
-          end
-          organizations = (organizations & current_user.member_organizations)
-          uoss = if params[:status]
-            UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
-          else
-            UserOrganizationStatus.where(organization_id: organizations.map(&:id))
-          end
-          users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
+          current_user.member_organizations
         end
-        if params[:name].present?
-          name = params[:name].strip
-          nameparts = name.gsub(/\s/,'%')
-          users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email) OR CONCAT(firstname,' ', lastname) LIKE ?", name, name, name, nameparts)
-        end
-        sortcolumn = User.columns_hash[params[:sort_column]] ? params[:sort_column] : "updated_at"
-        sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
-        # organizations = current_user.managed_organizations
-        users = users.order("users.#{sortcolumn} #{sortorder}").page(page).per(size)
-        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
-      end
-
-      desc "get Users List Filtering"
-      params do
-        optional 'name', type: String, desc: "name"
-        optional 'organization_id', type: Integer, desc: "organization_id, null for all"
-        optional 'status', type: String, desc: "status, null for all"
-        optional :page, type: Integer, desc: 'curent page index，default: 1'
-        optional :size, type: Integer, desc: 'records count in each page, default: 20'
-        optional :sort_column, type: String, default: "updated_at", desc: 'sort column default: by updated_time (updated_at)'
-        optional :sort_order, type: String, default: "desc", desc: 'sort order (asc for ascending), default: descending'
-      end
-      get :filter_users do
-        authenticate!
-        page = params[:page].presence || 1
-        size = params[:size].presence || 20
-        if current_user.god?
-          users = User.all
+        user_organization_status = params[:user_organization_status]
+        uoss = if user_organization_status
+          UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: user_organization_status)
         else
-          organizations = if params[:organization_id]
-            Organization.where(id: params[:organization_id])
-          else
-            Organization.all
-          end
-          organizations = (organizations & current_user.member_organizations)
-          uoss = if params[:status]
-            UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: params[:status])
-          else
-            UserOrganizationStatus.where(organization_id: organizations.map(&:id))
-          end
-          users = User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
+          UserOrganizationStatus.where(organization_id: organizations.map(&:id))
+        end
+        users = if status
+          User.includes(:user_organization_statuses).where(status: status).where(user_organization_statuses: {id: uoss.map(&:id)})
+        else
+          User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
         end
         if params[:name].present?
           name = params[:name].strip
