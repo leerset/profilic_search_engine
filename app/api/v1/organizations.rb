@@ -21,9 +21,9 @@ module V1
           organization.invention_opportunities.order(status: :asc, created_at: :desc)
         end
         uos = if (inventor_status = params[:inventor_status]).present?
-          organization.user_organization_statuses.includes(:user).where(status: inventor_status).order(created_at: :desc)
+          organization.user_organization_statuses.includes(:user).where.not(user: current_user).where(status: inventor_status).order(created_at: :desc)
         else
-          organization.user_organization_statuses.includes(:user).order(status: :asc, created_at: :desc)
+          organization.user_organization_statuses.includes(:user).where.not(user: current_user).order(status: :asc, created_at: :desc)
         end
         resp_ok(
           "inventors" => UserSerializer.build_array(uos.map(&:user).uniq),
