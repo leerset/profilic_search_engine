@@ -1,5 +1,6 @@
 class UserSimpleSerializer < ActiveModel::Serializer
-  attributes :id, :email, :status, :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone
+  attributes :id, :email, :status, :created_time, :updated_time,
+    :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone
 
   def fullname
     [object.firstname, object.lastname].compact.join(' ')
@@ -10,6 +11,14 @@ class UserSimpleSerializer < ActiveModel::Serializer
       return object.email if (object.organizations & manage_organizations).any?
     end
     return nil
+  end
+
+  def created_time
+    object.created_at.to_i
+  end
+
+  def updated_time
+    object.updated_at.to_i
   end
 
 end

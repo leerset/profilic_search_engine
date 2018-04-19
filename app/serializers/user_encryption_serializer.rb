@@ -1,5 +1,6 @@
 class UserEncryptionSerializer < ActiveModel::Serializer
   attributes :id, :email, :password, :access_token, :expires_time, :magic_link, :is_expired, :status,
+    :created_time, :updated_time,
     :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
     :drafts_amount, :inventions_amount,
     :home_address, :work_address, :organizations,
@@ -51,6 +52,14 @@ class UserEncryptionSerializer < ActiveModel::Serializer
 
   def expires_time
     object.expires_at.to_i
+  end
+
+  def created_time
+    object.created_at.to_i
+  end
+
+  def updated_time
+    object.updated_at.to_i
   end
 
 end

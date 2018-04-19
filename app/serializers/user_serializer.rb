@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :id, :email, :status,
+  attributes :id, :email, :status, :created_time, :updated_time,
     :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
     :drafts_amount, :inventions_amount,
     :home_address, :work_address, :organizations,
@@ -82,6 +82,14 @@ class UserSerializer < ActiveModel::Serializer
 
   def expires_time
     object.expires_at.to_i
+  end
+
+  def created_time
+    object.created_at.to_i
+  end
+
+  def updated_time
+    object.updated_at.to_i
   end
 
 end

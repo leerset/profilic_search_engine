@@ -107,6 +107,8 @@ module V1
         optional 'status', type: String, desc: "status, null for all"
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
+        optional :sort_column, type: String, default: "updated_at", desc: 'sort column default: by updated_time (updated_at)'
+        optional :sort_order, type: String, default: "desc", desc: 'sort order (asc for ascending), default: descending'
       end
       get :users do
         authenticate!
@@ -133,7 +135,10 @@ module V1
           nameparts = name.gsub(/\s/,'%')
           users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email) OR CONCAT(firstname,' ', lastname) LIKE ?", name, name, name, nameparts)
         end
-        users = users.order(id: :desc).page(page).per(size)
+        sortcolumn = User.columns_hash[params[:sort_column]] ? params[:sort_column] : "updated_at"
+        sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
+        # organizations = current_user.managed_organizations
+        users = users.order("users.#{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
       end
 
@@ -144,6 +149,8 @@ module V1
         optional 'status', type: String, desc: "status, null for all"
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
+        optional :sort_column, type: String, default: "updated_at", desc: 'sort column default: by updated_time (updated_at)'
+        optional :sort_order, type: String, default: "desc", desc: 'sort order (asc for ascending), default: descending'
       end
       get :filter_users do
         authenticate!
@@ -170,7 +177,10 @@ module V1
           nameparts = name.gsub(/\s/,'%')
           users = users.where("LOCATE(?, firstname) OR LOCATE(?, lastname) OR LOCATE(?, email) OR CONCAT(firstname,' ', lastname) LIKE ?", name, name, name, nameparts)
         end
-        users = users.order(id: :desc).page(page).per(size)
+        sortcolumn = User.columns_hash[params[:sort_column]] ? params[:sort_column] : "updated_at"
+        sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
+        # organizations = current_user.managed_organizations
+        users = users.order("users.#{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
       end
 
