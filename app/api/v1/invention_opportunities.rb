@@ -115,6 +115,7 @@ module V1
         else
           InventionOpportunity.where(organization: organizations)
         end
+        invention_opportunities = invention_opportunities.where.not(status: 'Inactive') unless current_user.god?
         paged_invention_opportunities = invention_opportunities.order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("invention_opportunities" => InventionOpportunitySerializer.build_array(paged_invention_opportunities))
       end
