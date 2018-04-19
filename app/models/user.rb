@@ -152,12 +152,16 @@ class User < ApplicationRecord
     if self.god?
       Organization.all
     else
-      self.user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_administrator'}).map(&:organization).uniq.sort
+      user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_administrator'}).map(&:organization).uniq.sort
     end
   end
 
   def member_organizations
-    user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_member'}).map(&:organization).uniq.sort
+    if self.god?
+      Organization.all
+    else
+      user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_member'}).map(&:organization).uniq.sort
+    end
   end
 
   def inventor?(invention)
