@@ -99,23 +99,20 @@ module V1
         size = params[:size].presence || 20
         sortcolumn = InventionOpportunity.columns_hash[params[:sort_column]] ? params[:sort_column] : "id"
         sortorder = params[:sort_order] && params[:sort_order].downcase == "desc" ? "desc" : "asc"
-        organizations = []
         if params[:organization_id].present?
-          organization = Organization.find_by(id: params[:organization_id])
-          return data_not_found(MISSING_ORG) if organization.nil?
-          organizations << organization
-        end
-        if organizations.any?
-          organizations &= (current_user.managed_organizations | current_user.member_organizations)
+          organizations = Organization.where(id: params[:organization_id])
+          return data_not_found(MISSING_ORG) if organizations.empty?
+          organizations &= current_user.member_organizations
         else
-          organizations = (current_user.managed_organizations | current_user.member_organizations)
+          organizations = current_user.member_organizations
         end
-        invention_opportunities = if params[:status]
+        invention_opportunities = if params[:status].present?
           InventionOpportunity.where(organization: organizations, status: params[:status])
         else
           InventionOpportunity.where(organization: organizations)
         end
-        invention_opportunities = invention_opportunities.where.not(status: 'Inactive') unless current_user.god?
+        # only members cannot see Inactive opportunities
+        invention_opportunities = invention_opportunities.where.not(organization: current_user.only_member_organizations, status: 'Inactive')
         paged_invention_opportunities = invention_opportunities.order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
         resp_ok("invention_opportunities" => InventionOpportunitySerializer.build_array(paged_invention_opportunities))
       end
@@ -142,7 +139,7 @@ module V1
         authenticate!
         invention_opportunity = InventionOpportunity.find_by(id: params[:invention_opportunity_id])
         return data_not_found(MISSING_IO) if invention_opportunity.nil?
-        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || invention_opportunity.organization.present? && current_user.oa?(invention_opportunity.organization)
         invention_opportunity.destroy!
         resp_ok(message: 'invention opportunity deleted')
       end
@@ -157,23 +154,7 @@ module V1
         return data_not_found(MISSING_IO) if invention_opportunity.nil?
         organization = invention_opportunity.organization
         # Members should definitely be read only
-        return permission_denied(NOT_GOD_OA_MEMBER_DENIED) unless current_user.god? || current_user.oa?(organization) || current_user.member?(organization)
-        upload_file = invention_opportunity.upload_file
-        return data_not_found(MISSING_FILE) unless upload_file.present? && upload_file.upload.present?
-        filename = upload_file.upload_file_name
-        content_type upload_file.upload_content_type
-        env['api.format'] = :binary
-        header 'Content-Disposition', "attachment; filename=#{CGI.escape(filename)}"
-        File.open(upload_file.upload.path).read
-      end
-
-      desc "test download invention opportunity uploaded file"
-      params do
-        requires :invention_opportunity_id, type: Integer, desc: 'invention_opportunity id'
-      end
-      get :download_test do
-        invention_opportunity = InventionOpportunity.find_by(id: params[:invention_opportunity_id])
-        return data_not_found(MISSING_IO) if invention_opportunity.nil?
+        return permission_denied(NOT_GOD_OA_MEMBER_DENIED) unless current_user.god? || organization.present? && current_user.member?(organization)
         upload_file = invention_opportunity.upload_file
         return data_not_found(MISSING_FILE) unless upload_file.present? && upload_file.upload.present?
         filename = upload_file.upload_file_name
