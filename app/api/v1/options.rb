@@ -151,7 +151,7 @@ module V1
         sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         # organizations = current_user.managed_organizations
         users = users.order("users.#{sortcolumn} #{sortorder}").page(page).per(size)
-        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
+        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
       end
 
       desc "get user"
