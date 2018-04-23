@@ -157,11 +157,11 @@ class User < ApplicationRecord
   end
 
   def member_organizations
-    if self.god?
-      Organization.all
-    else
-      user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_member'}).map(&:organization).uniq.sort
-    end
+    user_organizations.includes(:organization).joins(:role).where(roles: {code: 'organization_member'}).map(&:organization).uniq.sort
+  end
+
+  def only_member_organizations
+    member_organizations - managed_organizations
   end
 
   def inventor?(invention)
