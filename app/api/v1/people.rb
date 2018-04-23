@@ -73,8 +73,9 @@ module V1
         return permission_denied(NOT_GOD_OA_DENIED) unless orgs.any? || current_user.god?
         ActiveRecord::Base.transaction do
           if params[:user].present?
-            permit_user_params = ActionController::Parameters.new(params[:user]).permit(
-              :firstname, :lastname, :email, :time_zone, :citizenship, :status)
+            permit_attributes = [:firstname, :lastname, :email, :time_zone, :citizenship]
+            permit_attributes << :status if current_user.god?
+            permit_user_params = ActionController::Parameters.new(params[:user]).permit(permit_attributes)
             user.update(permit_user_params)
           end
           if params[:home_address].present?
@@ -90,6 +91,20 @@ module V1
             user.update_work_address(permit_address_params)
           end
         end
+        resp_ok('user' => PeopleSerializer.new(user))
+      end
+
+      desc 'update people global status'
+      params do
+        requires 'user_id', type: Integer, desc: "user id"
+        requires 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "global status"
+      end
+      put :update_global_status do
+        authenticate!
+        user = User.find_by(id: params[:user_id])
+        return data_not_found(MISSING_USR) if user.nil?
+        return permission_denied(NOT_GOD_DENIED) unless current_user.god?
+        user.update(status: params[:status])
         resp_ok('user' => PeopleSerializer.new(user))
       end
 
