@@ -99,21 +99,25 @@ module V1
         size = params[:size].presence || 20
         sortcolumn = InventionOpportunity.columns_hash[params[:sort_column]] ? params[:sort_column] : "id"
         sortorder = params[:sort_order] && params[:sort_order].downcase == "desc" ? "desc" : "asc"
-        if params[:organization_id].present?
-          organizations = Organization.where(id: params[:organization_id])
-          return data_not_found(MISSING_ORG) if organizations.empty?
-          organizations &= current_user.member_organizations
+        organization_id = params[:organization_id]
+        status = params[:status]
+        organizations = if organization_id.present?
+          organization = Organization.where(id: organization_id)
+          return data_not_found(MISSING_ORG) if organization.nil?
+          [organization] & current_user.member_organizations
         else
-          organizations = current_user.member_organizations
-        end
-        invention_opportunities = if params[:status].present?
-          InventionOpportunity.where(organization: organizations, status: params[:status])
-        else
-          InventionOpportunity.where(organization: organizations)
+          current_user.member_organizations
         end
         # only members cannot see Inactive opportunities
-        invention_opportunities = invention_opportunities.where.not(organization: current_user.only_member_organizations, status: 'Inactive')
-        paged_invention_opportunities = invention_opportunities.order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
+        paged_invention_opportunities = if status.present?
+          InventionOpportunity.where(organization: organizations, status: status).
+            where.not(organization: current_user.only_member_organizations, status: 'Inactive').
+            order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
+        else
+          InventionOpportunity.where(organization: organizations).
+            where.not(organization: current_user.only_member_organizations, status: 'Inactive').
+            order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
+        end
         resp_ok("invention_opportunities" => InventionOpportunitySerializer.build_array(paged_invention_opportunities))
       end
 
