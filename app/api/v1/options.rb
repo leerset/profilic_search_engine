@@ -104,7 +104,7 @@ module V1
       params do
         optional 'name', type: String, desc: "name"
         optional 'organization_id', type: Integer, desc: "organization_id, null for all"
-        optional 'status', type: String, desc: "status, null for all"
+        optional 'status', type: String, desc: "user global status, null for all"
         optional :page, type: Integer, desc: 'curent page index，default: 1'
         optional :size, type: Integer, desc: 'records count in each page, default: 20'
         optional :sort_column, type: String, default: "updated_at", desc: 'sort column default: by updated_time (updated_at)'
@@ -115,22 +115,33 @@ module V1
         page = params[:page].presence || 1
         size = params[:size].presence || 20
         status = params[:status]
-        organizations = if params[:organization_id]
-          Organization.where(id: params[:organization_id]) & current_user.member_organizations
+        organization_id = params[:organization_id]
+        users = if organization_id.present?
+          organization = Organization.find_by(id: organization_id)
+          return data_not_found(MISSING_ORG) if organization.nil?
+          if current_user.god?
+            User.includes(:user_organization_statuses).
+              where(user_organization_statuses: {organization: organization})
+          else
+            statuses = current_user.oa?(organization) ? ['active', 'inactive'] : ['active']
+            User.where(status: statuses).includes(:user_organization_statuses).
+              where(user_organization_statuses: {organization: organization, status: statuses})
+          end
         else
-          current_user.member_organizations
+          if current_user.god?
+            User.all
+          else
+            managed_organizations = current_user.managed_organizations
+            only_member_organizations = current_user.only_member_organizations
+            users = User.where(status: ['active', 'inactive']).includes(:user_organization_statuses).
+              where(user_organization_statuses: {organization_id: managed_organizations.map(&:id), status: ['active', 'inactive']}).
+              or(
+                User.where(status: ['active']).includes(:user_organization_statuses).
+                  where(user_organization_statuses: {organization_id: only_member_organizations.map(&:id), status: ['active']})
+              )
+          end
         end
-        user_organization_status = params[:user_organization_status]
-        uoss = if user_organization_status
-          UserOrganizationStatus.where(organization_id: organizations.map(&:id)).where(status: user_organization_status)
-        else
-          UserOrganizationStatus.where(organization_id: organizations.map(&:id))
-        end
-        users = if status
-          User.includes(:user_organization_statuses).where(status: status).where(user_organization_statuses: {id: uoss.map(&:id)})
-        else
-          User.includes(:user_organization_statuses).where(user_organization_statuses: {id: uoss.map(&:id)})
-        end
+        users = users.where(status: status) if status.present?
         if params[:name].present?
           name = params[:name].strip
           nameparts = name.gsub(/\s/,'%')
@@ -140,7 +151,7 @@ module V1
         sortorder = params[:sort_order] && params[:sort_order].downcase == "asc" ? "asc" : "desc"
         # organizations = current_user.managed_organizations
         users = users.order("users.#{sortcolumn} #{sortorder}").page(page).per(size)
-        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
+        resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.managed_organizations))
       end
 
       desc "get user"
@@ -155,7 +166,7 @@ module V1
         if user == current_user || current_user.god?
           resp_ok("user" => UserEncryptionSerializer.new(user))
         elsif orgs.any?
-          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.member_organizations))
+          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
         else
           return permission_denied(NOT_GOD_OA_MEMBER_DENIED)
         end
