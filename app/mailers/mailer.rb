@@ -35,6 +35,7 @@ class Mailer < ApplicationMailer
     @user = user
     @status = status
     @magic_link = user.magic_link
+    @datetime = user.expires_at.strftime('%Y-%m-%d %H:%M')
     @subject = add_prefix_and_suffix_to_subject("Prolific Magic Link")
     mail(to: user.email, subject: @subject)
   end
