@@ -44,15 +44,10 @@ module V1
       end
       post :login do
         auth = Auth.find_by_secure_random(params[:magic_link])
-        return unauthorized("Expired magic link") if auth.nil?
+        return unauthorized("Invalid magic link") if auth.nil?
         user = auth.user
         check_user_status(user)
-        if user.expired?
-          user.auth.reset_secure_random
-          user.update_access_token
-          Mailer.magic_link_email(user, 'Successfully Resent Magic Link.').deliver
-          return unauthorized("This link has expired, the new link has been sent to your mailbox, please sign in again")
-        end
+        return unauthorized("Expired") if user.expired?
         user.update_access_token
         resp_ok("user" => UserEncryptionSerializer.new(user))
       end
@@ -63,9 +58,8 @@ module V1
       post :logout do
         authenticate!
         ActiveRecord::Base.transaction do
-          user = current_user
-          user.auth.reset_secure_random
-          user.update_access_token
+          # user.auth.reset_secure_random
+          current_user.update_access_token
           # Remove "Sign Out" e-mail
           # Mailer.magic_link_email(user, 'Successfully Logout.').deliver
           return resp_ok(message: "logout sccessful.")
