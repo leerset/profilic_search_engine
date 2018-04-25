@@ -7,10 +7,10 @@ module V1
     mount V1::Options
     mount V1::Organizations
     mount V1::Users
-    mount V1::Test
+    # mount V1::Test
     mount V1::Inventions
     mount V1::UserRoles
-    mount V1::TestRoles
+    # mount V1::TestRoles
     mount V1::People
     mount V1::InventionOpportunities
     mount V1::UploadFiles
