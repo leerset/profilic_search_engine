@@ -69,10 +69,14 @@ module V1
           co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
           co_inventors.each do |co_inventor|
             user = User.find_by_id(co_inventor[:user_id])
-            invention.user_inventions.find_or_create_by(user: user).update(
-              role: co_inventor_role,
-              access: co_inventor[:access]
-            ) if user && !user.inventor?(invention)
+            if user && !user.inventor?(invention)
+              old_ui = invention.user_inventions.find_by(user: user)
+              invention.user_inventions.find_or_create_by(user: user).update(
+                role: co_inventor_role,
+                access: co_inventor[:access]
+              )
+              Mailer.add_invention_notification_email(user, invention, 'Add Invention Notification.').deliver if old_ui.nil?
+            end
           end
         end
         if (upload = params[:upload]).present?
@@ -156,10 +160,14 @@ module V1
             invention.user_inventions.where(role: co_inventor_role).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
             co_inventors.each do |co_inventor|
               user = User.find_by_id(co_inventor[:user_id])
-              invention.user_inventions.find_or_create_by(user: user).update(
-                role: co_inventor_role,
-                access: co_inventor[:access]
-              ) if user && !user.inventor?(invention)
+              if user && !user.inventor?(invention)
+                old_ui = invention.user_inventions.find_by(user: user)
+                invention.user_inventions.find_or_create_by(user: user).update(
+                  role: co_inventor_role,
+                  access: co_inventor[:access]
+                )
+                Mailer.add_invention_notification_email(user, invention, 'Add Invention Notification.').deliver if old_ui.nil?
+              end
             end
           end
           if (upload = params[:upload]).present?
