@@ -1,7 +1,13 @@
 class ContainerSectionSerializer < ActiveModel::Serializer
   attributes :id, :invention_id, :draw, :significance,
     :landscape, :problem_summary, :gap, :problem_significance,
-    :summary, :c_construction,
+    :summary,
+    :construction_howused,
+    :construction_prototype,
+    :comparativeadvantages_innovativeaspects,
+    :comparativeadvantages_advantagessummary,
+    :comparativeadvantages_relevantbackground,
+    :c_construction,
     :created_time, :updated_time
 
   def c_construction
