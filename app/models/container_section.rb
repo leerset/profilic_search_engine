@@ -33,8 +33,41 @@ class ContainerSection < ApplicationRecord
     -> { where(section_name: 'problem_significance') }, class_name: 'ContainerSectionComment'
   has_many :problem_significance_comments, through: :problem_significance_container_section_comments, source: :comment
 
+  has_many :construction_howused_container_section_comments,
+    -> { where(section_name: 'construction_howused') }, class_name: 'ContainerSectionComment'
+  has_many :construction_howused_comments, through: :construction_howused_container_section_comments, source: :comment
+
+  has_many :construction_prototype_container_section_comments,
+    -> { where(section_name: 'construction_prototype') }, class_name: 'ContainerSectionComment'
+  has_many :construction_prototype_comments, through: :construction_prototype_container_section_comments, source: :comment
+
+  has_many :comparativeadvantages_innovativeaspects_container_section_comments,
+    -> { where(section_name: 'comparativeadvantages_innovativeaspects') }, class_name: 'ContainerSectionComment'
+  has_many :comparativeadvantages_innovativeaspects_comments, through: :comparativeadvantages_innovativeaspects_container_section_comments, source: :comment
+
+  has_many :comparativeadvantages_advantagessummary_container_section_comments,
+    -> { where(section_name: 'comparativeadvantages_advantagessummary') }, class_name: 'ContainerSectionComment'
+  has_many :comparativeadvantages_advantagessummary_comments, through: :comparativeadvantages_advantagessummary_container_section_comments, source: :comment
+
+  has_many :comparativeadvantages_relevantbackground_container_section_comments,
+    -> { where(section_name: 'comparativeadvantages_relevantbackground') }, class_name: 'ContainerSectionComment'
+  has_many :comparativeadvantages_relevantbackground_comments, through: :comparativeadvantages_relevantbackground_container_section_comments, source: :comment
+
+  SECTION_NAMES = [
+    'summary', 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance',
+    'construction_howused',
+    'construction_prototype',
+    'comparativeadvantages_innovativeaspects',
+    'comparativeadvantages_advantagessummary',
+    'comparativeadvantages_relevantbackground',
+  ]
+
   has_many :c_construction_container_section_comments,
     -> { where(section_name: 'c_construction') }, class_name: 'ContainerSectionComment'
   has_many :c_construction_comments, through: :c_construction_container_section_comments, source: :comment
+
+  COMPONENT_NAMES = [
+    'c_construction',
+  ]
 
 end

@@ -38,7 +38,12 @@ module V1
         optional :problem_summary, type: String, desc: "problem_summary content"
         optional :gap, type: String, desc: "gap content"
         optional :problem_significance, type: String, desc: "problem_significance content"
-        optional :summary, type: String, desc: "invention description"
+        optional :summary, type: String, desc: "summary content"
+        optional :construction_howused, type: String, desc: "construction_howused content"
+        optional :construction_prototype, type: String, desc: "construction_prototype content"
+        optional :comparativeadvantages_innovativeaspects, type: String, desc: "comparativeadvantages_innovativeaspects content"
+        optional :comparativeadvantages_advantagessummary, type: String, desc: "comparativeadvantages_advantagessummary content"
+        optional :comparativeadvantages_relevantbackground, type: String, desc: "comparativeadvantages_relevantbackground content"
         optional :c_constructions, type: Array do
           optional :id, type: String, desc: "c_construction id"
           optional :delete, type: Boolean, desc: "c_construction delete"
@@ -62,7 +67,7 @@ module V1
           invention.update(description: summary)
         end
         permit_params = ActionController::Parameters.new(params).permit(
-          :draw, :significance, :landscape, :problem_summary, :gap, :problem_significance, :summary
+          ContainerSection::SECTION_NAMES.map(&:to_sym)
         )
         container_section = invention.container_section || invention.create_container_section
         container_section.update_attributes(permit_params)
@@ -106,7 +111,9 @@ module V1
           end
           container_section = invention.container_section || invention.create_container_section
           case section_name
-          when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance', 'summary', 'c_construction'
+          when ContainerSection::SECTION_NAMES
+            container_section.update("#{section_name}_completion" => params[:completion])
+          when ContainerSection::COMPONENT_NAMES
             container_section.update("#{section_name}_completion" => params[:completion])
           else
             return permission_denied("unknown section name")
@@ -144,7 +151,9 @@ module V1
         end
         container_section = invention.container_section || invention.create_container_section
         case params[:section_name]
-        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance', 'summary'
+        when ContainerSection::SECTION_NAMES
+          container_section.send("#{params[:section_name]}_comments").create(user: current_user, content: params[:content])
+        when ContainerSection::COMPONENT_NAMES
           container_section.send("#{params[:section_name]}_comments").create(user: current_user, content: params[:content])
         else
           return permission_denied("unknown section name")
