@@ -87,24 +87,44 @@ module V1
 
       desc "update container_section completion"
       params do
-        requires :invention_id, type: Integer, desc: "invention_id"
-        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary c_construction"
+        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary / c_construction"
+        optional :invention_id, type: Integer, desc: "invention_id"
+        optional :component_id, type: Integer, desc: "component id"
+        exactly_one_of :invention_id, :component_id
         requires :completion, type: Boolean, desc: "section completion"
       end
       put :update_completion do
         authenticate!
-        invention = Invention.find_by(id: params[:invention_id])
-        return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
-        end
-        container_section = invention.container_section || invention.create_container_section
         section_name = params[:section_name]
-        case section_name
-        when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance', 'summary', 'c_construction'
-          container_section.update("#{section_name}_completion" => params[:completion])
+        invention_id = params[:invention_id]
+        component_id = params[:component_id]
+        if invention_id.present?
+          invention = Invention.find_by(id: invention_id)
+          return data_not_found(MISSING_INV) if invention.nil?
+          unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+            return permission_denied(NOT_CO_INVENTOR_DENIED)
+          end
+          container_section = invention.container_section || invention.create_container_section
+          case section_name
+          when 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance', 'summary', 'c_construction'
+            container_section.update("#{section_name}_completion" => params[:completion])
+          else
+            return permission_denied("unknown section name")
+          end
         else
-          return permission_denied("unknown section name")
+          case section_name
+          when 'c_construction'
+            component = section_name.camelcase.constantize.find_by(id: component_id)
+            return data_not_found(MISSING_COMPONENT) if component.nil?
+            invention = component.container_section.invention
+            return data_not_found(MISSING_INV) if invention.nil?
+            unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
+              return permission_denied(NOT_CO_INVENTOR_DENIED)
+            end
+            component.update(completion: params[:completion])
+          else
+            return permission_denied("unknown section name")
+          end
         end
         resp_ok("invention" => InventionSerializer.new(invention))
       end
