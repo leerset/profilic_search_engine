@@ -68,6 +68,46 @@ class ContainerSectionSerializer < ActiveModel::Serializer
     }
   end
 
+  def construction_howused
+    {
+      completion: object.construction_howused_completion,
+      content: object.construction_howused || "",
+      comments: CommentSerializer.build_array(object.construction_howused_comments)
+    }
+  end
+
+  def construction_prototype
+    {
+      completion: object.construction_prototype_completion,
+      content: object.construction_prototype || "",
+      comments: CommentSerializer.build_array(object.construction_prototype_comments)
+    }
+  end
+
+  def comparativeadvantages_innovativeaspects
+    {
+      completion: object.comparativeadvantages_innovativeaspects_completion,
+      content: object.comparativeadvantages_innovativeaspects || "",
+      comments: CommentSerializer.build_array(object.comparativeadvantages_innovativeaspects_comments)
+    }
+  end
+
+  def comparativeadvantages_advantagessummary
+    {
+      completion: object.comparativeadvantages_advantagessummary_completion,
+      content: object.comparativeadvantages_advantagessummary || "",
+      comments: CommentSerializer.build_array(object.comparativeadvantages_advantagessummary_comments)
+    }
+  end
+
+  def comparativeadvantages_relevantbackground
+    {
+      completion: object.comparativeadvantages_relevantbackground_completion,
+      content: object.comparativeadvantages_relevantbackground || "",
+      comments: CommentSerializer.build_array(object.comparativeadvantages_relevantbackground_comments)
+    }
+  end
+
   def created_time
     object.created_at.to_i
   end
