@@ -110,7 +110,6 @@ module V1
             return permission_denied(NOT_CO_INVENTOR_DENIED)
           end
           container_section = invention.container_section || invention.create_container_section
-          binding.pry
           case section_name
           when *ContainerSection::SECTION_NAMES
             container_section.update("#{section_name}_completion" => params[:completion])
