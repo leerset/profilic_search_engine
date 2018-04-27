@@ -110,10 +110,11 @@ module V1
             return permission_denied(NOT_CO_INVENTOR_DENIED)
           end
           container_section = invention.container_section || invention.create_container_section
+          binding.pry
           case section_name
-          when ContainerSection::SECTION_NAMES
+          when *ContainerSection::SECTION_NAMES
             container_section.update("#{section_name}_completion" => params[:completion])
-          when ContainerSection::COMPONENT_NAMES
+          when *ContainerSection::COMPONENT_NAMES
             container_section.update("#{section_name}_completion" => params[:completion])
           else
             return permission_denied("unknown section name")
@@ -151,9 +152,9 @@ module V1
         end
         container_section = invention.container_section || invention.create_container_section
         case params[:section_name]
-        when ContainerSection::SECTION_NAMES
+        when *ContainerSection::SECTION_NAMES
           container_section.send("#{params[:section_name]}_comments").create(user: current_user, content: params[:content])
-        when ContainerSection::COMPONENT_NAMES
+        when *ContainerSection::COMPONENT_NAMES
           container_section.send("#{params[:section_name]}_comments").create(user: current_user, content: params[:content])
         else
           return permission_denied("unknown section name")
