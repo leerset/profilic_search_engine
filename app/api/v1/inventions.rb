@@ -277,6 +277,7 @@ module V1
         includes << :invention_opportunity if title.present?
         inventions = current_user.visible_inventions(includes)
         archived = params[:archived].to_s == 'true' ? true : false
+        inventions = inventions.select{|inv| inv.archived == false || inv.owner?(current_user.id)}
         inventions = inventions.select{|inv| inv.archived == false} unless archived
         phase = params[:phase]
         inventions = inventions.select{|inv| inv.phase == phase} if phase.present?
