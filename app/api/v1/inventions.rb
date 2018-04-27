@@ -250,7 +250,7 @@ module V1
 
       desc "list inventions"
       params do
-        optional :archived, type: Boolean, desc: 'archived, if true show archived only, if false show both'
+        optional :archived, type: Boolean, default: false, desc: 'archived, if default(false) hide archived, if true show both'
         optional :title, type: String, desc: 'invention title/opportunity title'
         optional :organization_id, type: Integer, desc: "organization_id"
         optional :user_role, type: String, desc: 'The logged in users role in relation to the invention'
@@ -277,7 +277,7 @@ module V1
         includes << :invention_opportunity if title.present?
         inventions = current_user.visible_inventions(includes)
         archived = params[:archived].to_s == 'true' ? true : false
-        inventions = inventions.select{|inv| inv.archived} if archived
+        inventions = inventions.select{|inv| inv.archived == false} unless archived
         phase = params[:phase]
         inventions = inventions.select{|inv| inv.phase == phase} if phase.present?
         if user_role.present?

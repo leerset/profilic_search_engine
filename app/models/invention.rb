@@ -23,6 +23,10 @@ class Invention < ApplicationRecord
     'application/pdf'
   ]
 
+  def owner?(user_id)
+    user_inventions.select {|ui| ui.user_id == user_id && ui.role.code == "inventor"}.any?
+  end
+
   def inventor
     user_inventions.select {|ui| ui.role.code == "inventor"}.first
   end

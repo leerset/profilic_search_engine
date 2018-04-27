@@ -1,7 +1,8 @@
 class InventionListSerializer < ActiveModel::Serializer
   attributes :id, :title, :description, :keywords, :created_time, :updated_time,
-    :phase, :role, :bulk_read_access, :archived,
+    :phase, :role, :bulk_read_access,
     :inventor, :organization, :opportunity, :comments_count
+  attribute :archived, if: :owner?
 
   def self.eager_load_array(array)
     array.includes(
@@ -12,6 +13,10 @@ class InventionListSerializer < ActiveModel::Serializer
       [invention_opportunity: {organization: :addresses}],
       [user_inventions: :role]
     )
+  end
+
+  def owner?
+    (user_id = instance_options[:user_id]).present? && object.owner?(user_id)
   end
 
   def comments_count
