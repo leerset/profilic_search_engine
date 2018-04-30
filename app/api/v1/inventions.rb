@@ -43,7 +43,10 @@ module V1
           params[:invention][:organization_id] = nil
         end
         opportunity_id = params[:invention][:invention_opportunity_id]
-        if opportunity_id.present? && opportunity_id.to_i != 0
+        if opportunity_id.present? && opportunity_id.downcase == 'other'
+          invention_opportunity = InventionOpportunity::OTHER
+          params[:invention][:invention_opportunity_id] = invention_opportunity.id
+        elsif opportunity_id.present? && opportunity_id.to_i != 0
           invention_opportunity = InventionOpportunity.find_by(id: opportunity_id.to_i)
           return data_not_found(MISSING_IO) if invention_opportunity.nil?
         else
