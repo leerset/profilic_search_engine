@@ -100,7 +100,7 @@ module V1
       params do
         requires :invention_id, type: Integer, desc: "invention_id"
         optional :invention, type: Hash do
-          optional :invention_opportunity_id, type: Integer, desc: "invention_opportunity_id"
+          optional :invention_opportunity_id, type: String, desc: "invention_opportunity_id"
           optional :organization_id, type: Integer, desc: "organization_id"
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (200)"
@@ -136,12 +136,16 @@ module V1
               params[:invention][:organization_id] = nil
             end
             invention_opportunity_id = params[:invention][:invention_opportunity_id]
-            if invention_opportunity_id.present? && invention_opportunity_id.to_i != 0
-              invention_opportunity = InventionOpportunity.find_by(id: invention_opportunity_id)
+            if invention_opportunity_id.present? && invention_opportunity_id.downcase == 'other'
+              invention_opportunity = InventionOpportunity::OTHER
+              params[:invention][:invention_opportunity_id] = invention_opportunity.id
+            elsif invention_opportunity_id.present? && invention_opportunity_id.to_i != 0
+              invention_opportunity = InventionOpportunity.find_by(id: invention_opportunity_id.to_i)
               return data_not_found(MISSING_IO) if invention_opportunity.nil?
             else
               params[:invention][:invention_opportunity_id] = nil
             end
+
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
               :invention_opportunity_id,
               :organization_id,
