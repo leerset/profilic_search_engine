@@ -41,9 +41,17 @@ module V1
         optional :summary, type: String, desc: "summary content"
         optional :construction_howused, type: String, desc: "construction_howused content"
         optional :construction_prototype, type: String, desc: "construction_prototype content"
+
         optional :comparativeadvantages_innovativeaspects, type: String, desc: "comparativeadvantages_innovativeaspects content"
         optional :comparativeadvantages_advantagessummary, type: String, desc: "comparativeadvantages_advantagessummary content"
         optional :comparativeadvantages_relevantbackground, type: String, desc: "comparativeadvantages_relevantbackground content"
+
+        optional :economics_need, type: String, desc: "economics_need content"
+        optional :economics_enduser, type: String, desc: "economics_enduser content"
+        optional :economics_keyresources, type: String, desc: "economics_keyresources content"
+        optional :economics_capitalexpenditure, type: String, desc: "economics_capitalexpenditure content"
+        optional :references, type: String, desc: "references content"
+
         optional :c_constructions, type: Array do
           optional :id, type: String, desc: "c_construction id"
           optional :delete, type: Boolean, desc: "c_construction delete"
