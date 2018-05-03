@@ -54,7 +54,13 @@ class ContainerSection < ApplicationRecord
   has_many :comparativeadvantages_relevantbackground_comments, through: :comparativeadvantages_relevantbackground_container_section_comments, source: :comment
 
   SECTION_NAMES = [
-    'summary', 'draw', 'significance', 'landscape', 'problem_summary', 'gap', 'problem_significance',
+    'summary',
+    'draw',
+    'significance',
+    'landscape',
+    'problem_summary',
+    'gap',
+    'problem_significance',
     'construction_howused',
     'construction_prototype',
     'comparativeadvantages_innovativeaspects',
@@ -66,8 +72,13 @@ class ContainerSection < ApplicationRecord
     -> { where(section_name: 'c_construction') }, class_name: 'ContainerSectionComment'
   has_many :c_construction_comments, through: :c_construction_container_section_comments, source: :comment
 
+  has_many :c_comparative_advantage_container_section_comments,
+    -> { where(section_name: 'c_comparative_advantage') }, class_name: 'ContainerSectionComment'
+  has_many :c_comparative_advantage_comments, through: :c_comparative_advantage_container_section_comments, source: :comment
+
   COMPONENT_NAMES = [
     'c_construction',
+    'c_comparative_advantage',
   ]
 
 end
