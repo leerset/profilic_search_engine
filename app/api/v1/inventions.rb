@@ -163,14 +163,15 @@ module V1
             scratchpad.update(content: scratchpad_content)
           end
           unless (co_inventors = params[:co_inventors]).nil?
-            co_inventor_role = Role.find_by(role_type: 'invention', code: 'co_inventor')
-            invention.user_inventions.where(role: co_inventor_role).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
+            invention.user_inventions.where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
             co_inventors.each do |co_inventor|
               user = User.find_by_id(co_inventor[:user_id])
+              role_code = Role::ACCESS_ROLE_MAPPING[co_inventor[:access]] || 'co_inventor'
+              user_inventor_role = Role.find_by(role_type: 'invention', code: role_code)
               if user && !user.inventor?(invention)
                 old_ui = invention.user_inventions.find_by(user: user)
                 invention.user_inventions.find_or_create_by(user: user).update(
-                  role: co_inventor_role,
+                  role: user_inventor_role,
                   access: co_inventor[:access]
                 )
                 Mailer.add_invention_notification_email(user, invention, 'Add Invention Notification.').deliver if old_ui.nil?
