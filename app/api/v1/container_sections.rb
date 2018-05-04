@@ -139,8 +139,8 @@ module V1
         if invention_id.present?
           invention = Invention.find_by(id: invention_id)
           return data_not_found(MISSING_INV) if invention.nil?
-          unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-            return permission_denied(NOT_CO_INVENTOR_DENIED)
+          unless current_user.edit_access?(invention)
+            return permission_denied('Not permission to edit')
           end
           container_section = invention.container_section || invention.create_container_section
           case section_name
@@ -158,8 +158,8 @@ module V1
             return data_not_found(MISSING_COMPONENT) if component.nil?
             invention = component.container_section.invention
             return data_not_found(MISSING_INV) if invention.nil?
-            unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-              return permission_denied(NOT_CO_INVENTOR_DENIED)
+            unless current_user.edit_access?(invention)
+              return permission_denied('Not permission to edit')
             end
             component.update(completion: params[:completion])
           else
