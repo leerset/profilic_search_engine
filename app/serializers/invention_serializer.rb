@@ -28,8 +28,8 @@ class InventionSerializer < ActiveModel::Serializer
 
   def container_section
     container_section = object.container_section
-    return ContainerSectionSerializer.new(container_section) if container_section.present?
-    nil
+    return nil if container_section.nil?
+    return ContainerSectionSerializer.new(container_section)
   end
 
   def searches
@@ -41,6 +41,7 @@ class InventionSerializer < ActiveModel::Serializer
   end
 
   def inventor
+    return nil if object.inventor.nil?
     UserInventionSerializer.new(object.inventor)
   end
 
