@@ -15,6 +15,12 @@ class User < ApplicationRecord
 
   has_many :user_addresses
   has_many :addresses, through: :user_addresses
+  has_many :home_addresses, -> {
+    where(address_type: 'home')
+  }, through: :user_addresses, source: :address
+  has_many :work_addresses, -> {
+    where(address_type: 'work')
+  }, through: :user_addresses, source: :address
 
   has_many :user_citizenships
   has_many :citizenships, through: :user_citizenships
@@ -97,11 +103,11 @@ class User < ApplicationRecord
   end
 
   def home_address
-    addresses.find_by(address_type: 'home')
+    home_addresses.first
   end
 
   def work_address
-    addresses.find_by(address_type: 'work')
+    work_addresses.first
   end
 
   def magic_link
@@ -176,10 +182,15 @@ class User < ApplicationRecord
     user_inventions.where(invention: invention).joins(:role).where(roles: {code: 'mentor'}).any?
   end
 
+  def commenter?(invention)
+    user_inventions.where(invention: invention).joins(:role).where(roles: {code: 'commenter'}).any?
+  end
+
+  # collaborators
   def co_inventors
     array = []
     inventions.uniq.each do |invention|
-      array += invention.user_invetions.includes(:user).joins(:role).where(roles: {code: ['inventor', 'co_inventor']}).map(&:user).uniq.sort
+      array += invention.user_invetions.includes(:user).joins(:role).where(roles: {code: ['inventor', 'co_inventor', 'mentor', 'commenter']}).map(&:user).uniq.sort
     end
     array.uniq.select{|user| user.id != self.id}
   end
@@ -202,7 +213,7 @@ class User < ApplicationRecord
 
   def invention_roles_array_in_organizations(orgs)
     inv_roles = []
-    uis = user_inventions.includes(:role, invention: :organization).where.not(inventions: {organization: orgs})
+    uis = user_inventions.includes(:role, invention: :organization).where(inventions: {organization: orgs})
     uis.map(&:invention).uniq.each do |invention|
       invention_roles(uis, invention).uniq.each do |role|
         inv_roles << {
@@ -249,7 +260,11 @@ class User < ApplicationRecord
   end
 
   def invention_roles(user_invention_array, invention)
-    user_invention_array.select {|ui| ui.invention_id = invention.id}.map(&:role)
+    user_invention_array.select {|ui| ui.invention_id == invention.id}.map(&:role)
+  end
+
+  def renewal
+    set_expiration
   end
 
   def expired?
