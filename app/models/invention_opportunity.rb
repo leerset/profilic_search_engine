@@ -1,6 +1,6 @@
 class InventionOpportunity < ApplicationRecord
   belongs_to :organization, optional: true
-  has_one :invention_opportunity_upload_file
+  has_one :invention_opportunity_upload_file, dependent: :destroy
   has_one :upload_file, through: :invention_opportunity_upload_file
 
   OTHER = self.find_by_id(-1) || self.create(

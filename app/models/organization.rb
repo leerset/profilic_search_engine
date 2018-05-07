@@ -1,15 +1,15 @@
 class Organization < ApplicationRecord
-  has_many :user_organizations
+  has_many :user_organizations, dependent: :destroy
   has_many :users, through: :user_organizations
   has_many :inventions
 
-  has_many :organization_addresses
+  has_many :organization_addresses, dependent: :destroy
   has_many :addresses, through: :organization_addresses
   has_many :business_addresses, -> {
     where(address_type: 'business')
   }, through: :organization_addresses, source: :address
 
-  has_many :user_organization_statuses
+  has_many :user_organization_statuses, dependent: :destroy
   has_many :invention_opportunities
 
   def inventors
