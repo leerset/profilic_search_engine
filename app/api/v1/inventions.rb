@@ -119,7 +119,7 @@ module V1
           optional :user_id, type: Integer, desc: "user_id"
           optional :access, type: Integer, desc: "access level"
         end
-        optional :upload, type: File, desc: "upload file"
+        optional :upload, type: File, desc: "upload file" 
       end
       put :update do
         authenticate!
@@ -165,7 +165,10 @@ module V1
             scratchpad.update(content: scratchpad_content)
           end
           unless (co_inventors = params[:co_inventors]).nil?
-            invention.user_inventions.where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
+            co_inventor_role_id = Role.find_by_code("co-inventor").id rescue nil
+            if co_inventor_role_id
+              invention.user_inventions.where(role_id: co_inventor_role_id).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
+            end
             co_inventors.each do |co_inventor|
               user = User.find_by_id(co_inventor[:user_id])
               role_code = Role::ACCESS_ROLE_MAPPING[co_inventor[:access]] || 'co_inventor'
