@@ -165,9 +165,9 @@ module V1
             scratchpad.update(content: scratchpad_content)
           end
           unless (co_inventors = params[:co_inventors]).nil?
-            co_inventor_role_id = Role.find_by_code("co-inventor").id rescue nil
-            if co_inventor_role_id
-              invention.user_inventions.where(role_id: co_inventor_role_id).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
+            inventor_role_id = Role.find_by_code("inventor").id rescue nil
+            if inventor_role_id
+              invention.user_inventions.where.not(role_id: inventor_role_id).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
             end
             co_inventors.each do |co_inventor|
               user = User.find_by_id(co_inventor[:user_id])
