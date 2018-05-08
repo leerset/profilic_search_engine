@@ -102,7 +102,7 @@ module V1
         organization_id = params[:organization_id]
         status = params[:status]
         organizations = if organization_id.present?
-          organization = Organization.where(id: organization_id)
+          organization = Organization.find_by_id(organization_id)
           return data_not_found(MISSING_ORG) if organization.nil?
           [organization] & current_user.member_organizations
         else
