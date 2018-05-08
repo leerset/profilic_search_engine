@@ -24,6 +24,7 @@ class InventionListSerializer < ActiveModel::Serializer
   end
 
   def inventor
+    return nil if object.inventor.nil?
     UserInventionSerializer.new(object.inventor)
   end
 
