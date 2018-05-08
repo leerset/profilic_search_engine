@@ -109,14 +109,17 @@ module V1
           current_user.member_organizations
         end
         # only members cannot see Inactive opportunities
-        paged_invention_opportunities = if status.present?
-          InventionOpportunity.where(organization: organizations, status: status).
+        conditions = if status.present?
+          {organization: organizations, status: status}
+        else
+          {organization: organizations}
+        end
+        paged_invention_opportunities = if current_user.only_member_organizations.any?
+          InventionOpportunity.where(conditions).
             where.not([" organization_id IN (?) AND status = ? ", current_user.only_member_organizations.map(&:id), 'Inactive']).
             order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
         else
-          InventionOpportunity.where(organization: organizations).
-            where.not([" organization_id IN (?) AND status = ? ", current_user.only_member_organizations.map(&:id), 'Inactive']).
-            order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
+          InventionOpportunity.where(conditions).order("status, #{sortcolumn} #{sortorder}").page(page).per(size)
         end
         resp_ok("invention_opportunities" => InventionOpportunitySerializer.build_array(paged_invention_opportunities))
       end
