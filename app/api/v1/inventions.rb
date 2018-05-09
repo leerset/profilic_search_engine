@@ -72,9 +72,9 @@ module V1
           invention.user_inventions.where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
           co_inventors.each do |co_inventor|
             user = User.find_by_id(co_inventor[:user_id])
-            role_code = Role::ACCESS_ROLE_MAPPING[co_inventor[:access]] || 'co_inventor'
+            role_code = Role::ACCESS_ROLE_MAPPING[co_inventor[:access].to_i] || 'co_inventor'
             user_inventor_role = Role.find_by(role_type: 'invention', code: role_code)
-            if user && !user.inventor?(invention)
+            if user && user_inventor_role && !user.inventor?(invention)
               old_ui = invention.user_inventions.find_by(user: user)
               invention.user_inventions.find_or_create_by(user: user).update(
                 role: user_inventor_role,
@@ -119,7 +119,7 @@ module V1
           optional :user_id, type: Integer, desc: "user_id"
           optional :access, type: Integer, desc: "access level"
         end
-        optional :upload, type: File, desc: "upload file" 
+        optional :upload, type: File, desc: "upload file"
       end
       put :update do
         authenticate!
@@ -171,9 +171,9 @@ module V1
             end
             co_inventors.each do |co_inventor|
               user = User.find_by_id(co_inventor[:user_id])
-              role_code = Role::ACCESS_ROLE_MAPPING[co_inventor[:access]] || 'co_inventor'
+              role_code = Role::ACCESS_ROLE_MAPPING[co_inventor[:access].to_i] || 'co_inventor'
               user_inventor_role = Role.find_by(role_type: 'invention', code: role_code)
-              if user && !user.inventor?(invention)
+              if user && user_inventor_role && !user.inventor?(invention)
                 old_ui = invention.user_inventions.find_by(user: user)
                 invention.user_inventions.find_or_create_by(user: user).update(
                   role: user_inventor_role,
