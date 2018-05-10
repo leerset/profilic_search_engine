@@ -273,7 +273,7 @@ class User < ApplicationRecord
   end
 
   def set_expiration
-    self.expires_at = DateTime.now + 1    # 1 day
+    self.expires_at = DateTime.now + 30    # 30 day
   end
 
   def authenticate?(password)
