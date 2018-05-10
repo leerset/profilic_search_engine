@@ -32,7 +32,7 @@ class Invention < ApplicationRecord
   end
 
   def co_inventors
-    user_inventions.select {|ui| ui.role.code == "co_inventor"}
+    user_inventions.select {|ui| ui.role.code == "co-inventor"}
   end
 
   def mentors
