@@ -143,7 +143,7 @@ class User < ApplicationRecord
   end
 
   def oa?(organization)
-    user_organizations.select {|uo| uo.organization_id = organization.id && uo.role.code == 'organization_administrator'}.any?
+    user_organizations.select {|uo| uo.organization_id == organization.id && uo.role.code == 'organization_administrator'}.any?
   end
 
   def member?(organization)
