@@ -120,8 +120,13 @@ module V1
           organization = Organization.find_by(id: organization_id)
           return data_not_found(MISSING_ORG) if organization.nil?
           if current_user.god?
-            User.includes(:user_organization_statuses).
-              where(user_organization_statuses: {organization: organization})
+            if status.present? && status.downcase == 'delete'
+              User.where(status: ['delete']).includes(:user_organization_statuses).
+                where(user_organization_statuses: {organization: organization})
+            else
+              User.where(status: ['active', 'suspended']).includes(:user_organization_statuses).
+                where(user_organization_statuses: {organization: organization})
+            end
           else
             statuses = current_user.oa?(organization) ? ['active', 'suspended'] : ['active']
             User.where(status: statuses).includes(:user_organization_statuses).
@@ -129,7 +134,11 @@ module V1
           end
         else
           if current_user.god?
-            User.all
+            if status.present? && status.downcase == 'delete'
+              User.where(status: ['delete'])
+            else
+              User.where(status: ['active', 'suspended'])
+            end
           else
             managed_organizations = current_user.managed_organizations
             only_member_organizations = current_user.only_member_organizations
