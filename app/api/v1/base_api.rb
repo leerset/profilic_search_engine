@@ -14,6 +14,7 @@ module V1
     mount V1::People
     mount V1::InventionOpportunities
     mount V1::UploadFiles
+    mount V1::DownloadFiles
     mount V1::Scratchpads
     mount V1::ContainerSections
 
