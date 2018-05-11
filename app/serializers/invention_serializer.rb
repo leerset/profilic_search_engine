@@ -2,7 +2,7 @@ class InventionSerializer < ActiveModel::Serializer
   attributes :id, :title, :description, :keywords, :created_time, :updated_time,
     :action, :action_note, :phase, :role, :uploaded_filename, :scratchpad,
     :bulk_read_access, :archived,
-    :inventor, :co_inventors,
+    :inventor, :co_inventors, :collaborators,
     :upload_files, :container_section,
     :organization, :opportunity, :comments, :searches
 
@@ -43,6 +43,10 @@ class InventionSerializer < ActiveModel::Serializer
   def inventor
     return nil if object.inventor.nil?
     UserInventionSerializer.new(object.inventor)
+  end
+
+  def collaborators
+    UserInventionSerializer.build_array(object.collaborators)
   end
 
   def co_inventors
