@@ -169,7 +169,6 @@ module V1
             co_inventors.each do |co_inventor|
               user = User.find_by_id(co_inventor[:user_id])
               remove = co_inventor[:remove]
-              binding.pry
               if user && !user.inventor?(invention) && remove.present? && remove.to_s.downcase == 'true'
                 invention.user_inventions.where(user: user).destroy_all
                 next
