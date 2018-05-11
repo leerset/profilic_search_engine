@@ -118,6 +118,7 @@ module V1
         optional :co_inventors, type: Array do
           optional :user_id, type: Integer, desc: "user_id"
           optional :access, type: Integer, desc: "access level"
+          optional :remove, type: Boolean, desc: "remove boolean"
         end
         optional :upload, type: File, desc: "upload file"
       end
@@ -165,12 +166,14 @@ module V1
             scratchpad.update(content: scratchpad_content)
           end
           unless (co_inventors = params[:co_inventors]).nil?
-            inventor_role_id = Role.find_by_code("inventor").id rescue nil
-            if inventor_role_id
-              invention.user_inventions.where.not(role_id: inventor_role_id).where.not(user_id: co_inventors.map{|a| a[:user_id]}).destroy_all
-            end
             co_inventors.each do |co_inventor|
               user = User.find_by_id(co_inventor[:user_id])
+              remove = co_inventor[:remove]
+              binding.pry
+              if user && !user.inventor?(invention) && remove.present? && remove.to_s.downcase == 'true'
+                invention.user_inventions.where(user: user).destroy_all
+                next
+              end
               role_code = Role::ACCESS_ROLE_MAPPING[co_inventor[:access].to_i] || 'co_inventor'
               user_inventor_role = Role.find_by(role_type: 'invention', code: role_code)
               if user && user_inventor_role && !user.inventor?(invention)
