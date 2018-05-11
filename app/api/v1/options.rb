@@ -123,7 +123,7 @@ module V1
             User.includes(:user_organization_statuses).
               where(user_organization_statuses: {organization: organization})
           else
-            statuses = current_user.oa?(organization) ? ['active', 'inactive'] : ['active']
+            statuses = current_user.oa?(organization) ? ['active', 'suspended'] : ['active']
             User.where(status: statuses).includes(:user_organization_statuses).
               where(user_organization_statuses: {organization: organization, status: statuses})
           end
@@ -133,8 +133,8 @@ module V1
           else
             managed_organizations = current_user.managed_organizations
             only_member_organizations = current_user.only_member_organizations
-            users = User.where(status: ['active', 'inactive']).includes(:user_organization_statuses).
-              where(user_organization_statuses: {organization_id: managed_organizations.map(&:id), status: ['active', 'inactive']}).
+            users = User.where(status: ['active', 'suspended']).includes(:user_organization_statuses).
+              where(user_organization_statuses: {organization_id: managed_organizations.map(&:id), status: ['active', 'suspended']}).
               or(
                 User.where(status: ['active']).includes(:user_organization_statuses).
                   where(user_organization_statuses: {organization_id: only_member_organizations.map(&:id), status: ['active']})
