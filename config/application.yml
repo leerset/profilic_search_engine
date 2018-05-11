@@ -1,6 +1,7 @@
 default: &default
   server_env: 'local'
   host: http://localhost:8080
+  backend_host: https://dedi2.cijef.com.hk
 
 development:
   <<: *default

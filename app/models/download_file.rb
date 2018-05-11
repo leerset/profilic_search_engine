@@ -21,4 +21,9 @@ class DownloadFile < ApplicationRecord
     self.save!
   end
 
+  def download_url
+    return nil if self.download.nil?
+    Settings.backend_host + self.download.url
+  end
+
 end
