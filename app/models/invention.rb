@@ -31,6 +31,10 @@ class Invention < ApplicationRecord
     user_inventions.select {|ui| ui.role.code == "inventor"}.first
   end
 
+  def collaborators
+    user_inventions.select {|ui| ['co-inventor', 'mentor', 'commenter'].include?(ui.role.code)}
+  end
+
   def co_inventors
     user_inventions.select {|ui| ui.role.code == "co-inventor"}
   end

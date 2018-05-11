@@ -46,7 +46,7 @@ class InventionSerializer < ActiveModel::Serializer
   end
 
   def co_inventors
-    UserInventionSerializer.build_array(object.co_inventors)
+    UserInventionSerializer.build_array(object.collaborators)
   end
 
   def role
