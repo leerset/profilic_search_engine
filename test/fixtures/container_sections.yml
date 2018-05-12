@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  invention: one
+  draw: MyText
+  significance: MyText
+
+two:
+  invention: two
+  draw: MyText
+  significance: MyText

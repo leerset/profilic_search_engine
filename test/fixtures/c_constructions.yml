@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  container_section: one
+  c_type: MyString
+  ideal_example: MyText
+  properties: MyText
+  how_made: MyText
+  innovative_aspects: MyText
+  why_hasnt_done_before: MyText
+
+two:
+  container_section: two
+  c_type: MyString
+  ideal_example: MyText
+  properties: MyText
+  how_made: MyText
+  innovative_aspects: MyText
+  why_hasnt_done_before: MyText

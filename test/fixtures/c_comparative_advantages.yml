@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  container_section: one
+  c_type: MyString
+  competing_howworks: MyText
+  shortcomings: MyText
+  howovercomes_shortcomings: MyText
+
+two:
+  container_section: two
+  c_type: MyString
+  competing_howworks: MyText
+  shortcomings: MyText
+  howovercomes_shortcomings: MyText
