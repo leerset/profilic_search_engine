@@ -43,7 +43,7 @@ module V1
           optional 'email', type: String, desc: 'email'
           optional 'time_zone', type: String, desc: 'time_zone'
           optional 'citizenship', type: String, desc: 'citizenship'
-          optional 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "global status"
+          optional 'status', type: String, values: ['Active', 'Inactive', 'Suspend', 'Delete'], desc: "global status"
         end
         optional 'home_address', type: Hash do
           optional 'street1', type: String, desc: 'street1'
@@ -97,7 +97,7 @@ module V1
       desc 'update people global status'
       params do
         requires 'user_id', type: Integer, desc: "user id"
-        requires 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "global status"
+        requires 'status', type: String, values: ['Active', 'Inactive', 'Suspend', 'Delete'], desc: "global status"
       end
       put :update_global_status do
         authenticate!
@@ -116,7 +116,7 @@ module V1
           optional 'email', type: String, desc: 'email'
           optional 'time_zone', type: String, desc: 'time_zone'
           optional 'citizenship', type: String, desc: 'citizenship'
-          # optional 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "global status"
+          # optional 'status', type: String, values: ['Active', 'Inactive', 'Suspend', 'Delete'], desc: "global status"
         end
         optional 'home_address', type: Hash do
           optional 'street1', type: String, desc: 'street1'
@@ -183,7 +183,7 @@ module V1
       params do
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'organization_id', type: Integer, desc: "organization id"
-        requires 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Delete'], desc: "status"
+        requires 'status', type: String, values: ['Active', 'Inactive', 'Suspend', 'Delete'], desc: "status"
         optional 'title', type: String, desc: "title"
         optional 'phone', type: String, desc: "phone"
       end

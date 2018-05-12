@@ -22,7 +22,7 @@ class API < Grape::API
     end
 
     def check_user_status(user)
-      unauthorized('Suspended status, should not be allowed to sign in.') if user && user.status && user.status.downcase == 'suspended'
+      unauthorized('Suspend status, should not be allowed to sign in.') if user && user.status && user.status.downcase == 'suspend'
       unauthorized('Delete status, should not be allowed to sign in.') if user && user.status && user.status.downcase == 'delete'
     end
 
