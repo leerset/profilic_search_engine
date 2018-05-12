@@ -14,7 +14,7 @@ module V1
         bad_request('upload file type is invalid') unless DownloadFile::CONTENT_TYPES.include?(file[:type])
         download_file = DownloadFile.create
         download_file.update_download(file)
-        {download_url: download_file.download_url}
+        {link: download_file.download_url}
       end
 
     end
