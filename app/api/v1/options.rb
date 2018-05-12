@@ -124,26 +124,26 @@ module V1
               User.where(status: ['delete']).includes(:user_organization_statuses).
                 where(user_organization_statuses: {organization: organization})
             else
-              User.where(status: ['active', 'suspended']).includes(:user_organization_statuses).
+              User.where(status: ['active', 'suspend']).includes(:user_organization_statuses).
                 where(user_organization_statuses: {organization: organization})
             end
           else
-            statuses = current_user.oa?(organization) ? ['active', 'suspended'] : ['active']
-            User.where(status: statuses).includes(:user_organization_statuses).
-              where(user_organization_statuses: {organization: organization, status: statuses})
+            global_statuses = current_user.oa?(organization) ? ['active', 'suspend'] : ['active']
+            User.where(status: global_statuses).includes(:user_organization_statuses).
+              where(user_organization_statuses: {organization: organization, status: ['active', 'inactive']})
           end
         else
           if current_user.god?
             if status.present? && status.downcase == 'delete'
               User.where(status: ['delete'])
             else
-              User.where(status: ['active', 'suspended'])
+              User.where(status: ['active', 'suspend'])
             end
           else
             managed_organizations = current_user.managed_organizations
             only_member_organizations = current_user.only_member_organizations
-            users = User.where(status: ['active', 'suspended']).includes(:user_organization_statuses).
-              where(user_organization_statuses: {organization_id: managed_organizations.map(&:id), status: ['active', 'suspended']}).
+            users = User.where(status: ['active', 'suspend']).includes(:user_organization_statuses).
+              where(user_organization_statuses: {organization_id: managed_organizations.map(&:id), status: ['active', 'inactive']}).
               or(
                 User.where(status: ['active']).includes(:user_organization_statuses).
                   where(user_organization_statuses: {organization_id: only_member_organizations.map(&:id), status: ['active']})
