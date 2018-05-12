@@ -23,7 +23,7 @@ module V1
       params do
         requires 'user_id', type: Integer, desc: "user_id"
         requires 'organization_id', type: Integer, desc: "organization id"
-        requires 'status', type: String, values: ['Active', 'Inactive', 'Suspended', 'Deleted'], desc: "status"
+        requires 'status', type: String, values: ['Active', 'Inactive', 'Suspend', 'Delete'], desc: "status"
         optional 'title', type: String, desc: "title"
         optional 'phone', type: String, desc: "phone"
       end
@@ -58,7 +58,7 @@ module V1
         return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
         user_organization_status = user.user_organization_statuses.find_or_create_by(organization_id: organization.id)
         user_organization_status.update(
-          status: 'Deleted'
+          status: 'Delete'
         )
         user.user_organizations.where(organization: organization).destroy_all
         resp_ok('user_organization_statuses' =>
