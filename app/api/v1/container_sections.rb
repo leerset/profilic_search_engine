@@ -77,8 +77,8 @@ module V1
         authenticate!
         invention = Invention.find_by(id: params[:invention_id])
         return data_not_found(MISSING_INV) if invention.nil?
-        unless current_user.inventor?(invention) || current_user.co_inventor?(invention)
-          return permission_denied(NOT_CO_INVENTOR_DENIED)
+        unless current_user.edit_access?(invention)
+          return permission_denied('Not permission to edit')
         end
         if (summary = params[:summary]).present?
           invention.update(description: summary)
