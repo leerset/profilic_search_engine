@@ -63,14 +63,14 @@ module V1
           optional :innovative_aspects, type: String, desc: "c_construction innovative_aspects"
           optional :why_hasnt_done_before, type: String, desc: "c_construction why_hasnt_done_before"
         end
-        optional :c_comparative_advantages, type: Array do
-          optional :id, type: String, desc: "c_comparative_advantage id"
-          optional :delete, type: Boolean, desc: "c_comparative_advantage delete"
-          optional :c_type, type: String, desc: "c_comparative_advantage type"
-          optional :completion, type: Boolean, desc: "c_comparative_advantage completion"
-          optional :competing_howworks, type: String, desc: "c_comparative_advantage competing_howworks"
-          optional :shortcomings, type: String, desc: "c_comparative_advantage shortcomings"
-          optional :howovercomes_shortcomings, type: String, desc: "c_comparative_advantage howovercomes_shortcomings"
+        optional :c_comparativeadvantages, type: Array do
+          optional :id, type: String, desc: "c_comparativeadvantage id"
+          optional :delete, type: Boolean, desc: "c_comparativeadvantage delete"
+          optional :c_type, type: String, desc: "c_comparativeadvantage type"
+          optional :completion, type: Boolean, desc: "c_comparativeadvantage completion"
+          optional :competing_howworks, type: String, desc: "c_comparativeadvantage competing_howworks"
+          optional :shortcomings, type: String, desc: "c_comparativeadvantage shortcomings"
+          optional :howovercomes_shortcomings, type: String, desc: "c_comparativeadvantage howovercomes_shortcomings"
         end
       end
       put :update do
@@ -104,20 +104,20 @@ module V1
             container_section.c_constructions.create(c_permit_params)
           end
         end
-        c_comparative_advantages = params[:c_comparative_advantages].presence || []
-        c_comparative_advantages.each do |cc|
+        c_comparativeadvantages = params[:c_comparativeadvantages].presence || []
+        c_comparativeadvantages.each do |cc|
           c_permit_params = ActionController::Parameters.new(cc).permit(
             :c_type, :completion, :competing_howworks, :shortcomings, :howovercomes_shortcomings
           )
-          c_comparative_advantage = CConstruction.find_by_id(cc[:id])
-          if c_comparative_advantage.present?
+          c_comparativeadvantage = CConstruction.find_by_id(cc[:id])
+          if c_comparativeadvantage.present?
             if cc[:delete].present? && cc[:delete] == true
-              c_comparative_advantage.destroy
+              c_comparativeadvantage.destroy
             else
-              c_comparative_advantage.update_attributes(c_permit_params)
+              c_comparativeadvantage.update_attributes(c_permit_params)
             end
           else
-            container_section.c_comparative_advantages.create(c_permit_params)
+            container_section.c_comparativeadvantages.create(c_permit_params)
           end
         end
         resp_ok("invention" => InventionSerializer.new(invention))
@@ -125,7 +125,7 @@ module V1
 
       desc "update container_section completion"
       params do
-        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary / c_construction c_comparative_advantage"
+        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary / c_construction c_comparativeadvantage"
         optional :invention_id, type: Integer, desc: "invention_id"
         optional :component_id, type: Integer, desc: "component id"
         exactly_one_of :invention_id, :component_id
