@@ -8,6 +8,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
     :comparativeadvantages_advantagessummary,
     :comparativeadvantages_relevantbackground,
     :c_construction,
+    :c_comparativeadvantage,
     :created_time, :updated_time
 
   def c_construction
@@ -15,6 +16,14 @@ class ContainerSectionSerializer < ActiveModel::Serializer
       completion: object.c_construction_completion,
       comments: CommentSerializer.build_array(object.c_construction_comments),
       components: CConstructionSerializer.build_array(object.c_constructions)
+    }
+  end
+
+  def c_comparativeadvantage
+    {
+      completion: object.c_comparativeadvantage_completion,
+      comments: CommentSerializer.build_array(object.c_comparativeadvantage_comments),
+      components: CComparativeadvantageSerializer.build_array(object.c_comparativeadvantages)
     }
   end
 

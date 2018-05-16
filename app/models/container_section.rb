@@ -4,6 +4,7 @@ class ContainerSection < ApplicationRecord
   has_many :container_section_comments, dependent: :destroy
   has_many :comments, through: :container_section_comments
   has_many :c_constructions
+  has_many :c_comparativeadvantage
 
   has_many :summary_container_section_comments,
     -> { where(section_name: 'summary') }, class_name: 'ContainerSectionComment'
@@ -98,13 +99,13 @@ has_many :references_comments, through: :references_container_section_comments, 
     -> { where(section_name: 'c_construction') }, class_name: 'ContainerSectionComment'
   has_many :c_construction_comments, through: :c_construction_container_section_comments, source: :comment
 
-  has_many :c_comparative_advantage_container_section_comments,
-    -> { where(section_name: 'c_comparative_advantage') }, class_name: 'ContainerSectionComment'
-  has_many :c_comparative_advantage_comments, through: :c_comparative_advantage_container_section_comments, source: :comment
+  has_many :c_comparativeadvantage_container_section_comments,
+    -> { where(section_name: 'c_comparativeadvantage') }, class_name: 'ContainerSectionComment'
+  has_many :c_comparativeadvantage_comments, through: :c_comparativeadvantage_container_section_comments, source: :comment
 
   COMPONENT_NAMES = [
     'c_construction',
-    'c_comparative_advantage',
+    'c_comparativeadvantage',
   ]
 
 end
