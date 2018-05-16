@@ -109,7 +109,7 @@ module V1
           c_permit_params = ActionController::Parameters.new(cc).permit(
             :c_type, :completion, :competing_howworks, :shortcomings, :howovercomes_shortcomings
           )
-          c_comparativeadvantage = CConstruction.find_by_id(cc[:id])
+          c_comparativeadvantage = CComparativeadvantage.find_by_id(cc[:id])
           if c_comparativeadvantage.present?
             if cc[:delete].present? && cc[:delete] == true
               c_comparativeadvantage.destroy
