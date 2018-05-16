@@ -4,7 +4,7 @@ class ContainerSection < ApplicationRecord
   has_many :container_section_comments, dependent: :destroy
   has_many :comments, through: :container_section_comments
   has_many :c_constructions
-  has_many :c_comparativeadvantage
+  has_many :c_comparativeadvantages
 
   has_many :summary_container_section_comments,
     -> { where(section_name: 'summary') }, class_name: 'ContainerSectionComment'
