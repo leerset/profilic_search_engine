@@ -6,6 +6,16 @@ class UserSerializer < ActiveModel::Serializer
     :resume, :resume_filepath,
     :global_roles, :organization_roles, :invention_roles,
     :user_organization_statuses
+  attribute :global_status, if: :god?
+
+  def god?
+    god = instance_options[:god]
+    god.present? && god
+  end
+
+  def global_status
+    object.status
+  end
 
   def fullname
     [object.firstname, object.lastname].compact.join(' ')

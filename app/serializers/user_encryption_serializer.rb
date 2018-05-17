@@ -7,6 +7,27 @@ class UserEncryptionSerializer < ActiveModel::Serializer
     :resume, :resume_filepath,
     :global_roles, :organization_roles, :invention_roles,
     :user_organization_statuses
+  attribute :global_status, if: :god?
+
+  def god?
+    god = instance_options[:god]
+    god.present? && god
+  end
+
+  def global_status
+    object.status
+  end
+
+  # def self.eager_load_array(array)
+  #   array.includes(
+  #     :inventions,
+  #     :user_organizations,
+  #     :organizations,
+  #     :user_organization_statuses,
+  #     :user_roles,
+  #     :addresses
+  #   )
+  # end
 
   def drafts_amount
     0
@@ -38,11 +59,13 @@ class UserEncryptionSerializer < ActiveModel::Serializer
   end
 
   def home_address
-    AddressSerializer.new(object.home_address) if object.home_address
+    h_address = object.home_address
+    AddressSerializer.new(h_address) if h_address
   end
 
   def work_address
-    AddressSerializer.new(object.work_address) if object.work_address
+    w_address = object.work_address
+    AddressSerializer.new(w_address) if w_address
   end
 
   def organizations

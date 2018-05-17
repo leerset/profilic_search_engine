@@ -161,7 +161,7 @@ module V1
         # organizations = current_user.managed_organizations
         users = users.order("users.#{sortcolumn} #{sortorder}").page(page).per(size)
         if current_user.god?
-          resp_ok("users" => UserSerializer.build_array(users))
+          resp_ok("users" => UserSerializer.build_array(users, god: true))
         else
           resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
         end
@@ -177,7 +177,7 @@ module V1
         return data_not_found(MISSING_USR) if user.nil?
         orgs = (current_user.member_organizations & user.organizations)
         if user == current_user || current_user.god?
-          resp_ok("user" => UserEncryptionSerializer.new(user))
+          resp_ok("user" => UserEncryptionSerializer.new(user, god: current_user.god?))
         elsif orgs.any?
           resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
         else

@@ -1,6 +1,16 @@
 class UserSimpleSerializer < ActiveModel::Serializer
   attributes :id, :email, :status, :created_time, :updated_time,
     :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone
+  attribute :global_status, if: :god?
+
+  def god?
+    god = instance_options[:god]
+    god.present? && god
+  end
+
+  def global_status
+    object.status
+  end
 
   def fullname
     [object.firstname, object.lastname].compact.join(' ')
