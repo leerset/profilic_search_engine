@@ -1,5 +1,14 @@
 class OrganizationSimpleSerializer < ActiveModel::Serializer
-  attributes :id, :name, :business_address, :created_time, :updated_time
+  attributes :id, :name, :business_address, :created_time, :updated_time,
+    :highest_role
+
+  def highest_role
+    user = instance_options[:user]
+    return nil if user.nil?
+    role = user.highest_role(object)
+    return nil if role.nil?
+    RoleSerializer.new(role)
+  end
 
   def self.eager_load_array(array)
     array.includes(

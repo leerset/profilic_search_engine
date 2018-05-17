@@ -3,6 +3,15 @@ class PeopleCommonSerializer < ActiveModel::Serializer
     :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone, :personal_summary,
     :home_address, :work_address,
     :resume, :resume_filepath
+  attribute :global_status, if: :god?
+
+  def god?
+    object.god?
+  end
+
+  def global_status
+    object.status
+  end
 
   def fullname
     [object.firstname, object.lastname].compact.join(' ')

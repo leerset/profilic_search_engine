@@ -87,7 +87,7 @@ class UserSerializer < ActiveModel::Serializer
     else
       object.organizations.distinct
     end
-    OrganizationSimpleSerializer.build_array(current_organizations)
+    OrganizationSimpleSerializer.build_array(current_organizations, user: object)
   end
 
   def expires_time

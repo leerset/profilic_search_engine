@@ -17,4 +17,8 @@ class InventionOpportunity < ApplicationRecord
     'application/pdf'
   ]
 
+  def self.autoset_inactive
+    InventionOpportunity.where(status: 'Active').where(" closing_date < NOW() ").update_all(status: 'Inactive')
+  end
+
 end

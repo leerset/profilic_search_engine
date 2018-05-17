@@ -5,6 +5,15 @@ class PeopleSerializer < ActiveModel::Serializer
     :resume, :resume_filepath,
     :global_roles, :organization_roles, :invention_roles,
     :user_organization_statuses
+  attribute :global_status, if: :god?
+
+  def god?
+    object.god?
+  end
+
+  def global_status
+    object.status
+  end
 
   def fullname
     [object.firstname, object.lastname].compact.join(' ')
@@ -39,7 +48,7 @@ class PeopleSerializer < ActiveModel::Serializer
   end
 
   def organizations
-    OrganizationListSerializer.build_array(object.organizations)
+    OrganizationListSerializer.build_array(object.organizations, user: object)
   end
 
   def expires_time

@@ -1,6 +1,15 @@
 class OrganizationListSerializer < ActiveModel::Serializer
   attributes :id, :name, :business_address, :created_time, :updated_time,
-    :admins_amount, :inventors_amount, :submissions_amount, :inventions_amount
+    :admins_amount, :inventors_amount, :submissions_amount, :inventions_amount,
+    :highest_role
+
+  def highest_role
+    user = instance_options[:user]
+    return nil if user.nil?
+    role = user.highest_role(object)
+    return nil if role.nil?
+    RoleSerializer.new(role)
+  end
 
   def admins_amount
     object.administrators.count

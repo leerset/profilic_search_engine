@@ -70,7 +70,7 @@ class UserEncryptionSerializer < ActiveModel::Serializer
 
   def organizations
     current_organizations = object.organizations.distinct
-    OrganizationSimpleSerializer.build_array(current_organizations)
+    OrganizationSimpleSerializer.build_array(current_organizations, user: object)
   end
 
   def expires_time

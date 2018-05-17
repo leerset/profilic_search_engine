@@ -49,6 +49,16 @@ class User < ApplicationRecord
     Invention.where(organization: member_organizations, bulk_read_access: 'anyone-organization')
   end
 
+  def highest_role(organization)
+    if oa?(organization)
+      Role.find_by(code: 'organization_administrator')
+    elsif member?(organization)
+      Role.find_by(code: 'organization_member')
+    else
+      nil
+    end
+  end
+
   def read_access?(invention)
     case invention.bulk_read_access
     when 'anyone-organization'
