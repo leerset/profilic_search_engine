@@ -125,7 +125,7 @@ module V1
 
       desc "update container_section completion"
       params do
-        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary / c_construction c_comparativeadvantage"
+        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary / c_construction c_comparativeadvantages"
         optional :invention_id, type: Integer, desc: "invention_id"
         optional :component_id, type: Integer, desc: "component id"
         exactly_one_of :invention_id, :component_id
@@ -154,7 +154,7 @@ module V1
         else
           case section_name
           when *ContainerSection::COMPONENT_NAMES
-            component = section_name.camelcase.constantize.find_by(id: component_id)
+            component = ContainerSection::COMPONENT_CLASS_MAPPING[section_name].find_by(id: component_id)
             return data_not_found(MISSING_COMPONENT) if component.nil?
             invention = component.container_section.invention
             return data_not_found(MISSING_INV) if invention.nil?

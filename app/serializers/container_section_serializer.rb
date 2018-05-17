@@ -21,8 +21,8 @@ class ContainerSectionSerializer < ActiveModel::Serializer
 
   def c_comparativeadvantages
     {
-      completion: object.c_comparativeadvantage_completion,
-      comments: CommentSerializer.build_array(object.c_comparativeadvantage_comments),
+      completion: object.c_comparativeadvantages_completion,
+      comments: CommentSerializer.build_array(object.c_comparativeadvantages_comments),
       components: CComparativeadvantageSerializer.build_array(object.c_comparativeadvantages)
     }
   end

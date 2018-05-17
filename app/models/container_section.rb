@@ -99,13 +99,17 @@ has_many :references_comments, through: :references_container_section_comments, 
     -> { where(section_name: 'c_construction') }, class_name: 'ContainerSectionComment'
   has_many :c_construction_comments, through: :c_construction_container_section_comments, source: :comment
 
-  has_many :c_comparativeadvantage_container_section_comments,
-    -> { where(section_name: 'c_comparativeadvantage') }, class_name: 'ContainerSectionComment'
-  has_many :c_comparativeadvantage_comments, through: :c_comparativeadvantage_container_section_comments, source: :comment
+  has_many :c_comparativeadvantages_container_section_comments,
+    -> { where(section_name: 'c_comparativeadvantages') }, class_name: 'ContainerSectionComment'
+  has_many :c_comparativeadvantages_comments, through: :c_comparativeadvantages_container_section_comments, source: :comment
 
   COMPONENT_NAMES = [
     'c_construction',
-    'c_comparativeadvantage',
+    'c_comparativeadvantages',
   ]
 
+  COMPONENT_CLASS_MAPPING = {
+    'c_construction' => CConstruction,
+    'c_comparativeadvantages' => CComparativeadvantage
+  }
 end
