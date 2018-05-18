@@ -17,7 +17,8 @@
 #   runner "AnotherModel.prune_old_records"
 # end
 
-every 1.day, ['6:00 am', '18:00 pm'] do
+# job_type :runner,  "cd :path && bin/rails runner -e :development ':task' :output"
+every 1.day, at: ['6:00 am', '18:00 pm'] do
   runner "InventionOpportunity.autoset_inactive"
 end
 
