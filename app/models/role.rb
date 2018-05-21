@@ -1,7 +1,7 @@
 class Role < ApplicationRecord
 
   ACCESS_ROLE_MAPPING = {
-    1 => 'co-inventor',
+    1 => 'co_inventor',
     2 => 'mentor',
     3 => 'commenter',
   }
