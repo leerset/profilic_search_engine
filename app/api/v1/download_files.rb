@@ -8,8 +8,10 @@ module V1
       desc "upload file"
       params do
         requires :file, type: File, desc: "upload image file (png, jpeg)"
+        requires :auth, type: String, desc: "current user access token"
       end
       put :upload do
+        check_auth(params[:auth])
         file = params[:file]
         bad_request('upload file type is invalid') unless DownloadFile::CONTENT_TYPES.include?(file[:type])
         download_file = DownloadFile.create

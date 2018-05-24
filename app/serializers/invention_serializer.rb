@@ -4,7 +4,9 @@ class InventionSerializer < ActiveModel::Serializer
     :bulk_read_access, :archived,
     :inventor, :co_inventors, :collaborators,
     :upload_files, :container_section,
-    :organization, :opportunity, :comments, :searches
+    :organization, :opportunity, :comments, :searches,
+    :last_modifier, :last_modified_time
+  attribute :archived, if: :owner?
 
   def self.eager_load_array(array)
     array.includes(
@@ -19,6 +21,19 @@ class InventionSerializer < ActiveModel::Serializer
       [invention_opportunity: {organization: :addresses}],
       [user_inventions: :role]
     )
+  end
+
+  def owner?
+    (user_id = instance_options[:user_id]).present? && object.owner?(user_id)
+  end
+
+  def last_modifier
+    return nil if object.last_modifier.nil?
+    UserInventionSerializer.new(object.last_modifier)
+  end
+
+  def last_modified_time
+    object.updated_at.to_i
   end
 
   def scratchpad

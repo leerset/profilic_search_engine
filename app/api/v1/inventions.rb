@@ -52,10 +52,11 @@ module V1
         else
           params[:invention][:invention_opportunity_id] = nil
         end
+        params[:invention][:user_id] = current_user.id
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
           :invention_opportunity_id, :organization_id,
           :title, :description, :keywords, :action, :action_note, :phase,
-          :bulk_read_access
+          :bulk_read_access, :user_id
         )
         invention = Invention.create!(permit_invention_params)
         inventor_role = Role.find_by(role_type: 'invention', code: 'inventor')
@@ -148,12 +149,12 @@ module V1
             else
               params[:invention][:invention_opportunity_id] = nil
             end
-
+            params[:invention][:user_id] = current_user.id
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
               :invention_opportunity_id,
               :organization_id,
               :title, :description, :keywords, :action, :action_note, :phase,
-              :bulk_read_access, :archived
+              :bulk_read_access, :archived, :user_id
             )
             invention.update_attributes(permit_invention_params)
             if (description = params[:invention][:description]).present?
@@ -208,9 +209,9 @@ module V1
           return permission_denied('Not permission to edit')
         end
         if params[:phase].present?
-          invention.update_attributes(phase: params[:phase])
+          invention.update_attributes(phase: params[:phase], user: current_user)
         else
-          invention.update_attributes(phase: nil)
+          invention.update_attributes(phase: nil, user: current_user)
         end
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
@@ -227,7 +228,7 @@ module V1
         unless current_user.inventor?(invention)
           return permission_denied(NOT_INVENTOR_DENIED)
         end
-        invention.update_attributes(archived: params[:archived])
+        invention.update_attributes(archived: params[:archived], user: current_user)
         resp_ok("invention" => InventionSerializer.new(invention, user_id: current_user.id))
       end
 

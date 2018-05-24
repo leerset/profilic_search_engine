@@ -16,6 +16,13 @@ class API < Grape::API
       I18n.locale = locale
     end
 
+    def check_auth(access_token)
+      user = User.find_by(access_token: access_token)
+      unauthorized unless user
+      unauthorized('You have not signed in for a long time, please login again.') if user.expired?
+      check_user_status(user)
+    end
+
     def authenticate!
       Rails.logger.debug request.headers['Authorization']
       unauthorized unless current_user

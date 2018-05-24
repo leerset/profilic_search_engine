@@ -11,6 +11,8 @@ class Invention < ApplicationRecord
   has_many :searches, through: :invention_searches
   has_one :scratchpad, dependent: :destroy
   has_one :container_section, dependent: :destroy
+  belongs_to :user, optional: true
+  # alias :last_modifier :user
 
   # enum bulk_read_access: [
   #   'anyone-organization',
@@ -25,6 +27,11 @@ class Invention < ApplicationRecord
 
   def owner?(user_id)
     user_inventions.select {|ui| ui.user_id == user_id && ui.role.code == "inventor"}.any?
+  end
+
+  def last_modifier
+    return nil if self.user_id.nil?
+    user_inventions.select {|ui| ui.user_id == self.user_id}.first
   end
 
   def inventor

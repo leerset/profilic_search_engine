@@ -1,7 +1,8 @@
 class InventionListSerializer < ActiveModel::Serializer
   attributes :id, :title, :description, :keywords, :created_time, :updated_time,
     :phase, :role, :bulk_read_access,
-    :inventor, :organization, :opportunity, :comments_count
+    :inventor, :organization, :opportunity, :comments_count,
+    :last_modifier, :last_modified_time
   attribute :archived, if: :owner?
 
   def self.eager_load_array(array)
@@ -21,6 +22,15 @@ class InventionListSerializer < ActiveModel::Serializer
 
   def comments_count
     object.comments.size
+  end
+
+  def last_modifier
+    return nil if object.last_modifier.nil?
+    UserInventionSerializer.new(object.last_modifier)
+  end
+
+  def last_modified_time
+    object.updated_at.to_i
   end
 
   def inventor

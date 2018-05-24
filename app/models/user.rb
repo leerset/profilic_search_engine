@@ -106,10 +106,23 @@ class User < ApplicationRecord
 
   def join_organization(organization)
     organization_member_role = Role.find_by(code: 'organization_member')
-    return false if organization_member_role.nil?
-    user_organizations.find_or_create_by(organization_id: organization.id, role_id: organization_member_role.id)
-    user_organization_statuses.find_or_create_by(organization_id: organization.id).update(status: 'Active')
-    return true
+    raise 'No organization_member role found' if organization_member_role.nil?
+    user_organizations.find_or_create_by(organization: organization, role: organization_member_role)
+    user_organization_statuses.find_or_create_by(organization: organization).update(status: 'Active')
+  end
+
+  def make_oa(organization)
+    join_organization(organization)
+    organization_administrator_role = Role.find_by(code: 'organization_administrator')
+    raise 'No organization_administrator role found' if organization_administrator_role.nil?
+    user_organizations.find_or_create_by(organization: organization, role: organization_administrator_role)
+  end
+
+  def remove_oa(organization)
+    organization_administrator_role = Role.find_by(code: 'organization_administrator')
+    raise 'No organization_administrator role found' if organization_administrator_role.nil?
+    user_organization = user.user_organizations.find_by(organization: organization.id, role: organization_administrator_role)
+    user_organization.destroy if user_organization.present?
   end
 
   def home_address
