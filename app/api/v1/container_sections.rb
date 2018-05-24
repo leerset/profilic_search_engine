@@ -45,6 +45,7 @@ module V1
         optional :comparativeadvantages_innovativeaspects, type: String, desc: "comparativeadvantages_innovativeaspects content"
         optional :comparativeadvantages_advantagessummary, type: String, desc: "comparativeadvantages_advantagessummary content"
         optional :comparativeadvantages_relevantbackground, type: String, desc: "comparativeadvantages_relevantbackground content"
+        optional :comparativeadvantages_specificrelevantbackground, type: String, desc: "comparativeadvantages_specificrelevantbackground content"
 
         optional :economics_need, type: String, desc: "economics_need content"
         optional :economics_enduser, type: String, desc: "economics_enduser content"
