@@ -7,6 +7,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
     :comparativeadvantages_innovativeaspects,
     :comparativeadvantages_advantagessummary,
     :comparativeadvantages_relevantbackground,
+    :comparativeadvantages_specificrelevantbackground,
     :c_construction,
     :c_comparativeadvantages,
     :created_time, :updated_time
@@ -120,6 +121,14 @@ class ContainerSectionSerializer < ActiveModel::Serializer
       completion: object.comparativeadvantages_relevantbackground_completion,
       content: object.comparativeadvantages_relevantbackground || "",
       comments: CommentSerializer.build_array(object.comparativeadvantages_relevantbackground_comments)
+    }
+  end
+
+  def comparativeadvantages_specificrelevantbackground
+    {
+      completion: object.comparativeadvantages_specificrelevantbackground_completion,
+      content: object.comparativeadvantages_specificrelevantbackground || "",
+      comments: CommentSerializer.build_array(object.comparativeadvantages_specificrelevantbackground_comments)
     }
   end
 

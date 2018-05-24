@@ -54,25 +54,29 @@ class ContainerSection < ApplicationRecord
     -> { where(section_name: 'comparativeadvantages_relevantbackground') }, class_name: 'ContainerSectionComment'
   has_many :comparativeadvantages_relevantbackground_comments, through: :comparativeadvantages_relevantbackground_container_section_comments, source: :comment
 
-has_many :economics_need_container_section_comments,
-  -> { where(section_name: 'economics_need') }, class_name: 'ContainerSectionComment'
-has_many :economics_need_comments, through: :economics_need_container_section_comments, source: :comment
+  has_many :comparativeadvantages_specificrelevantbackground_container_section_comments,
+    -> { where(section_name: 'comparativeadvantages_specificrelevantbackground') }, class_name: 'ContainerSectionComment'
+  has_many :comparativeadvantages_specificrelevantbackground_comments, through: :comparativeadvantages_specificrelevantbackground_container_section_comments, source: :comment
 
-has_many :economics_enduser_container_section_comments,
-  -> { where(section_name: 'economics_enduser') }, class_name: 'ContainerSectionComment'
-has_many :economics_enduser_comments, through: :economics_enduser_container_section_comments, source: :comment
+  has_many :economics_need_container_section_comments,
+    -> { where(section_name: 'economics_need') }, class_name: 'ContainerSectionComment'
+  has_many :economics_need_comments, through: :economics_need_container_section_comments, source: :comment
 
-has_many :economics_keyresources_container_section_comments,
-  -> { where(section_name: 'economics_keyresources') }, class_name: 'ContainerSectionComment'
-has_many :economics_keyresources_comments, through: :economics_keyresources_container_section_comments, source: :comment
+  has_many :economics_enduser_container_section_comments,
+    -> { where(section_name: 'economics_enduser') }, class_name: 'ContainerSectionComment'
+  has_many :economics_enduser_comments, through: :economics_enduser_container_section_comments, source: :comment
 
-has_many :economics_capitalexpenditure_container_section_comments,
-  -> { where(section_name: 'economics_capitalexpenditure') }, class_name: 'ContainerSectionComment'
-has_many :economics_capitalexpenditure_comments, through: :economics_capitalexpenditure_container_section_comments, source: :comment
+  has_many :economics_keyresources_container_section_comments,
+    -> { where(section_name: 'economics_keyresources') }, class_name: 'ContainerSectionComment'
+  has_many :economics_keyresources_comments, through: :economics_keyresources_container_section_comments, source: :comment
 
-has_many :references_container_section_comments,
-  -> { where(section_name: 'references') }, class_name: 'ContainerSectionComment'
-has_many :references_comments, through: :references_container_section_comments, source: :comment
+  has_many :economics_capitalexpenditure_container_section_comments,
+    -> { where(section_name: 'economics_capitalexpenditure') }, class_name: 'ContainerSectionComment'
+  has_many :economics_capitalexpenditure_comments, through: :economics_capitalexpenditure_container_section_comments, source: :comment
+
+  has_many :references_container_section_comments,
+    -> { where(section_name: 'references') }, class_name: 'ContainerSectionComment'
+  has_many :references_comments, through: :references_container_section_comments, source: :comment
 
   SECTION_NAMES = [
     'summary',
@@ -87,6 +91,7 @@ has_many :references_comments, through: :references_container_section_comments, 
     'comparativeadvantages_innovativeaspects',
     'comparativeadvantages_advantagessummary',
     'comparativeadvantages_relevantbackground',
+    'comparativeadvantages_specificrelevantbackground',
 
     'economics_need',
     'economics_enduser',
