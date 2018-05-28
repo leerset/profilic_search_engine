@@ -177,6 +177,12 @@ class User < ApplicationRecord
     organizations.uniq.map{|a| oa?(a)}.uniq == [true]
   end
 
+  def god_or_manager?(user_id)
+    user = User.find_by_id(user_id)
+    return false if user.nil?
+    user.god? || (user.managed_organizations & self.member_organizations).any?
+  end
+
   def managed_organizations
     if self.god?
       Organization.all

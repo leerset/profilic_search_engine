@@ -13,6 +13,10 @@ class UserSerializer < ActiveModel::Serializer
     god.present? && god
   end
 
+  def god_or_manager?
+    (user_id = instance_options[:user_id]).present? && object.god_or_manager?(user_id)
+  end
+
   def global_status
     object.status
   end
@@ -39,9 +43,9 @@ class UserSerializer < ActiveModel::Serializer
   def user_organization_statuses
     manage_organizations = instance_options[:managed_organizations]
     current_user_organization_statuses = if manage_organizations
-      object.user_organization_statuses.where(organization: manage_organizations)
+      object.user_organization_statuses.includes(:user, :organization).where(organization: manage_organizations)
     else
-      object.user_organization_statuses
+      object.user_organization_statuses.includes(:user, :organization)
     end
     UserOrganizationStatusSerializer.build_array(current_user_organization_statuses)
   end
@@ -73,11 +77,11 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def home_address
-    AddressSerializer.new(object.home_address) if object.home_address
+    AddressSerializer.new(object.home_address, show_phone_number: god_or_manager?) if object.home_address
   end
 
   def work_address
-    AddressSerializer.new(object.work_address) if object.work_address
+    AddressSerializer.new(object.work_address, show_phone_number: god_or_manager?) if object.work_address
   end
 
   def organizations
