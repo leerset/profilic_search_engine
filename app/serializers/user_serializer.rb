@@ -9,8 +9,7 @@ class UserSerializer < ActiveModel::Serializer
   attribute :global_status, if: :god?
 
   def god?
-    god = instance_options[:god]
-    god.present? && god
+    (god = instance_options[:god]).present? && god
   end
 
   def god_or_manager?

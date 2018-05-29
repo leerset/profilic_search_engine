@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CComparativeAdvantageTest < ActiveSupport::TestCase
+class CComparativeadvantageTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

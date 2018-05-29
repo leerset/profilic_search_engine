@@ -5,11 +5,9 @@ one:
   code: MyString
   filepath: MyString
   enable: false
-  attachment: 
 
 two:
   name: MyString
   code: MyString
   filepath: MyString
   enable: false
-  attachment: 
