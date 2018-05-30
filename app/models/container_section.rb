@@ -71,4 +71,9 @@ class ContainerSection < ApplicationRecord
     'c_construction' => CConstruction,
     'c_comparativeadvantages' => CComparativeadvantage
   }
+
+  SERIALIZER_CLASS_MAPPING = {
+    'c_construction' => CConstructionSerializer,
+    'c_comparativeadvantages' => CComparativeadvantageSerializer
+  }
 end
