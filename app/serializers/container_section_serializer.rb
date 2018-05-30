@@ -19,7 +19,7 @@ class ContainerSectionSerializer < ActiveModel::Serializer
       {
         completion: object.send("#{name}_completion"),
         comments: CommentSerializer.build_array(object.send("#{name}_comments")),
-        components: ContainerSection::SERIALIZER_CLASS_MAPPING(name).build_array(object.send(name))
+        components: ContainerSection::SERIALIZER_CLASS_MAPPING[name].build_array(object.send(name))
       }
     }
   end
