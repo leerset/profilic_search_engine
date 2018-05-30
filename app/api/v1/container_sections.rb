@@ -53,6 +53,15 @@ module V1
         optional :economics_capitalexpenditure, type: String, desc: "economics_capitalexpenditure content"
         optional :references, type: String, desc: "references content"
 
+        optional :economics_estimatedincrementalcost, type: String, desc: "economics_estimatedincrementalcost content"
+        optional :economics_feasiblyeconomical, type: String, desc: "economics_feasiblyeconomical content"
+        optional :economics_whomake, type: String, desc: "economics_whomake content"
+        optional :economics_howmakemoney, type: String, desc: "economics_howmakemoney content"
+        optional :economics_howdelivered, type: String, desc: "economics_howdelivered content"
+        optional :economics_economicburden, type: String, desc: "economics_economicburden content"
+        optional :economics_currentsolutioncosts, type: String, desc: "economics_currentsolutioncosts content"
+        optional :economics_consumercosts, type: String, desc: "economics_consumercosts content"
+
         optional :c_constructions, type: Array do
           optional :id, type: String, desc: "c_construction id"
           optional :delete, type: Boolean, desc: "c_construction delete"
