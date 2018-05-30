@@ -1,13 +1,18 @@
 class ContainerSectionSerializer < ActiveModel::Serializer
-  attributes :id, :invention_id, :draw, :significance,
+  attributes :id, :invention_id,
+    :summary, :draw, :significance,
     :landscape, :problem_summary, :gap, :problem_significance,
-    :summary,
     :construction_howused,
     :construction_prototype,
     :comparativeadvantages_innovativeaspects,
     :comparativeadvantages_advantagessummary,
     :comparativeadvantages_relevantbackground,
     :comparativeadvantages_specificrelevantbackground,
+    :economics_need,
+    :economics_enduser,
+    :economics_keyresources,
+    :economics_capitalexpenditure,
+    :references,
     :c_construction,
     :c_comparativeadvantages,
     :created_time, :updated_time
@@ -129,6 +134,46 @@ class ContainerSectionSerializer < ActiveModel::Serializer
       completion: object.comparativeadvantages_specificrelevantbackground_completion,
       content: object.comparativeadvantages_specificrelevantbackground || "",
       comments: CommentSerializer.build_array(object.comparativeadvantages_specificrelevantbackground_comments)
+    }
+  end
+
+  def economics_need
+    {
+      completion: object.economics_need_completion,
+      content: object.economics_need || "",
+      comments: CommentSerializer.build_array(object.economics_need_comments)
+    }
+  end
+
+  def economics_enduser
+    {
+      completion: object.economics_enduser_completion,
+      content: object.economics_enduser || "",
+      comments: CommentSerializer.build_array(object.economics_enduser_comments)
+    }
+  end
+
+  def economics_keyresources
+    {
+      completion: object.economics_keyresources_completion,
+      content: object.economics_keyresources || "",
+      comments: CommentSerializer.build_array(object.economics_keyresources_comments)
+    }
+  end
+
+  def economics_capitalexpenditure
+    {
+      completion: object.economics_capitalexpenditure_completion,
+      content: object.economics_capitalexpenditure || "",
+      comments: CommentSerializer.build_array(object.economics_capitalexpenditure_comments)
+    }
+  end
+
+  def references
+    {
+      completion: object.references_completion,
+      content: object.references || "",
+      comments: CommentSerializer.build_array(object.references_comments)
     }
   end
 
