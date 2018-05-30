@@ -10,6 +10,8 @@ class Grape::API
   NOT_ORG_USR_DENIED = 'not organization user, permission denied.'
   NOT_GOD_AUTH_DENIED = 'not GOD, not Auth, permission denied.'
 
+  INACTIVE_USER_DENIED = 'inactive in organization, permission denied.'
+
   # data_not_found
   MISSING_CONCEPT = 'no concept found'
   MISSING_ORG = 'no organization found.'

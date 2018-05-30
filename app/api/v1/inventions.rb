@@ -39,6 +39,7 @@ module V1
           organization = Organization.find_by(id: organization_id)
           return data_not_found(MISSING_ORG) if organization.nil?
           return permission_denied(NOT_ORG_USR_DENIED) unless organization.users.include?(current_user)
+          return permission_denied(INACTIVE_USER_DENIED) if current_user.inactive?(organization)
         else
           params[:invention][:organization_id] = nil
         end

@@ -74,6 +74,10 @@ class User < ApplicationRecord
     inventor?(invention) || user_inventions.where(invention: invention, access: [1,2]).any?
   end
 
+  def inactive?(organization)
+    user_organizations.where(organization: organization, status: 'Inactive').any?
+  end
+
   def visible_inventions(includes = [])
     invention_ids = (inventions.map(&:id) | organization_inventions.map(&:id)).uniq
     Invention.includes(includes).where(id: invention_ids)

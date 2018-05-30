@@ -21,6 +21,7 @@ module V1
         organization = Organization.find_by(id: params[:organization_id])
         return data_not_found(MISSING_ORG) if organization.nil?
         return permission_denied(NOT_GOD_OA_DENIED) unless current_user.god? || current_user.oa?(organization)
+        return permission_denied(INACTIVE_USER_DENIED) if current_user.inactive?(organization)
         invention_opportunity = organization.invention_opportunities.find_by(title: params[:invention_opportunity][:title])
         return data_exist(EXIST_IO_TITLE) if invention_opportunity.present?
         close_date_timestamp = params[:invention_opportunity][:closing_date]
