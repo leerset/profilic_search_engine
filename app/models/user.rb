@@ -75,7 +75,7 @@ class User < ApplicationRecord
   end
 
   def inactive?(organization)
-    user_organizations.where(organization: organization, status: 'Inactive').any?
+    user_organization_statuses.where(organization: organization, status: 'Inactive').any?
   end
 
   def visible_inventions(includes = [])
