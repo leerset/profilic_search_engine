@@ -6,6 +6,7 @@ class ContainerSection < ApplicationRecord
   has_many :c_constructions
   alias_attribute :c_construction, :c_constructions
   has_many :c_comparativeadvantages
+  has_many :c_milestones
 
   SECTION_NAMES = [
     'summary',
@@ -69,11 +70,13 @@ class ContainerSection < ApplicationRecord
 
   COMPONENT_CLASS_MAPPING = {
     'c_construction' => CConstruction,
-    'c_comparativeadvantages' => CComparativeadvantage
+    'c_comparativeadvantages' => CComparativeadvantage,
+    'c_milestones' => CMilestone
   }
 
   SERIALIZER_CLASS_MAPPING = {
     'c_construction' => CConstructionSerializer,
-    'c_comparativeadvantages' => CComparativeadvantageSerializer
+    'c_comparativeadvantages' => CComparativeadvantageSerializer,
+    'c_milestones' => CMilestoneSerializer
   }
 end

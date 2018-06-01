@@ -6,23 +6,11 @@ class CConstructionSerializer < ActiveModel::Serializer
   end
 
   def items
-    {
-      ideal_example: {
-        content: object.ideal_example
-      },
-      properties: {
-        content: object.properties
-      },
-      how_made: {
-        content: object.how_made
-      },
-      innovative_aspects: {
-        content: object.innovative_aspects
-      },
-      why_hasnt_done_before: {
-        content: object.why_hasnt_done_before
-      }
-    }
+    result = {}
+    CConstruction::ItemNames.each do |item_name|
+      result[item_name.to_sym] = {content: object.send(item_name)}
+    end
+    result
   end
 
   def created_time

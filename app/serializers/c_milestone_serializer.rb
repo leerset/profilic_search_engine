@@ -1,4 +1,4 @@
-class CComparativeadvantageSerializer < ActiveModel::Serializer
+class CMilestoneSerializer < ActiveModel::Serializer
   attributes :id, :type, :completion, :items, :created_time, :updated_time
 
   def type
@@ -7,7 +7,7 @@ class CComparativeadvantageSerializer < ActiveModel::Serializer
 
   def items
     result = {}
-    CComparativeadvantage::ItemNames.each do |item_name|
+    CMilestone::ItemNames.each do |item_name|
       result[item_name.to_sym] = {content: object.send(item_name)}
     end
     result

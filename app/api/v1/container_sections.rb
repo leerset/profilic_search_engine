@@ -82,6 +82,19 @@ module V1
           optional :shortcomings, type: String, desc: "c_comparativeadvantage shortcomings"
           optional :howovercomes_shortcomings, type: String, desc: "c_comparativeadvantage howovercomes_shortcomings"
         end
+        optional :c_milestones, type: Array do
+          optional :id, type: String, desc: "c_milestones id"
+          optional :delete, type: Boolean, desc: "c_milestones delete"
+          optional :c_type, type: String, desc: "c_milestones type"
+          optional :completion, type: Boolean, desc: "c_milestones completion"
+          optional :title, type: String, desc: "c_milestones title"
+          optional :key_points, type: String, desc: "c_milestones key_points"
+          optional :resources_needed, type: String, desc: "c_milestones resources_needed"
+          optional :deliverables, type: String, desc: "c_milestones deliverables"
+          optional :measure_of_success, type: String, desc: "c_milestones measure_of_success"
+          optional :key_risks, type: String, desc: "c_milestones key_risks"
+          optional :suggested_approach, type: String, desc: "c_milestones suggested_approach"
+        end
       end
       put :update do
         authenticate!
@@ -130,12 +143,28 @@ module V1
             container_section.c_comparativeadvantages.create(c_permit_params)
           end
         end
+        c_milestones = params[:c_milestones].presence || []
+        c_milestones.each do |cc|
+          c_permit_params = ActionController::Parameters.new(cc).permit(
+            :c_type, :completion, :title, :key_points, :resources_needed, :deliverables, :measure_of_success, :key_risks, :suggested_approach
+          )
+          c_milestone = CMilestone.find_by_id(cc[:id])
+          if c_milestone.present?
+            if cc[:delete].present? && cc[:delete] == true
+              c_milestone.destroy
+            else
+              c_milestone.update_attributes(c_permit_params)
+            end
+          else
+            container_section.c_milestones.create(c_permit_params)
+          end
+        end
         resp_ok("invention" => InventionSerializer.new(invention))
       end
 
       desc "update container_section completion"
       params do
-        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary / c_construction c_comparativeadvantages"
+        requires :section_name, type: String, desc: "draw significance landscape problem_summary gap problem_significance summary / c_construction c_comparativeadvantages c_milestones"
         optional :invention_id, type: Integer, desc: "invention_id"
         optional :component_id, type: Integer, desc: "component id"
         exactly_one_of :invention_id, :component_id
