@@ -52,6 +52,7 @@ class ContainerSection < ApplicationRecord
   COMPONENT_NAMES = [
     'c_construction',
     'c_comparativeadvantages',
+    'c_milestones'
   ]
 
   COMPONENT_NAMES.each do |name|
