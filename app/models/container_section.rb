@@ -6,7 +6,7 @@ class ContainerSection < ApplicationRecord
   has_many :c_constructions
   alias_attribute :c_construction, :c_constructions
   has_many :c_comparativeadvantages
-  has_many :c_milestones
+  has_many :c_developments
 
   SECTION_NAMES = [
     'summary',
@@ -52,7 +52,7 @@ class ContainerSection < ApplicationRecord
   COMPONENT_NAMES = [
     'c_construction',
     'c_comparativeadvantages',
-    'c_milestones'
+    'c_development'
   ]
 
   COMPONENT_NAMES.each do |name|
@@ -72,12 +72,12 @@ class ContainerSection < ApplicationRecord
   COMPONENT_CLASS_MAPPING = {
     'c_construction' => CConstruction,
     'c_comparativeadvantages' => CComparativeadvantage,
-    'c_milestones' => CMilestone
+    'c_development' => CDevelopment
   }
 
   SERIALIZER_CLASS_MAPPING = {
     'c_construction' => CConstructionSerializer,
     'c_comparativeadvantages' => CComparativeadvantageSerializer,
-    'c_milestones' => CMilestoneSerializer
+    'c_development' => CDevelopmentSerializer
   }
 end

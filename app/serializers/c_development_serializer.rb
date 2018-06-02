@@ -1,4 +1,4 @@
-class CMilestoneSerializer < ActiveModel::Serializer
+class CDevelopmentSerializer < ActiveModel::Serializer
   attributes :id, :type, :completion, :items, :created_time, :updated_time
 
   def type
@@ -7,7 +7,7 @@ class CMilestoneSerializer < ActiveModel::Serializer
 
   def items
     result = {}
-    CMilestone::ItemNames.each do |item_name|
+    CDevelopment::ItemNames.each do |item_name|
       result[item_name.to_sym] = {content: object.send(item_name)}
     end
     result
