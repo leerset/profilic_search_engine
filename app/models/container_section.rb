@@ -7,6 +7,7 @@ class ContainerSection < ApplicationRecord
   alias_attribute :c_construction, :c_constructions
   has_many :c_comparativeadvantages
   has_many :c_developments
+  alias_attribute :c_development, :c_developments
 
   SECTION_NAMES = [
     'summary',
