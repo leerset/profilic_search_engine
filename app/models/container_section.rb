@@ -38,6 +38,7 @@ class ContainerSection < ApplicationRecord
     'economics_economicburden',
     'economics_currentsolutioncosts',
     'economics_consumercosts',
+    'specificquestions'
   ]
 
   SECTION_NAMES.each do |name|

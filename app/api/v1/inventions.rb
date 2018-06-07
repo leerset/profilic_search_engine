@@ -13,6 +13,8 @@ module V1
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (65535)"
           optional :keywords, type: String, desc: "keywords (200)"
+          optional :search_list, type: String, desc: "search_list (200)"
+          optional :search_results, type: String, desc: "search_results (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, default: "phase-1", desc: "phase, e.g. Full Authoring"
@@ -56,7 +58,8 @@ module V1
         params[:invention][:user_id] = current_user.id
         permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
           :invention_opportunity_id, :organization_id,
-          :title, :description, :keywords, :action, :action_note, :phase,
+          :title, :description, :keywords, :search_list, :search_results,
+          :action, :action_note, :phase,
           :bulk_read_access, :user_id
         )
         invention = Invention.create!(permit_invention_params)
@@ -109,6 +112,8 @@ module V1
           optional :title, type: String, desc: "title (100)"
           optional :description, type: String, desc: "description (200)"
           optional :keywords, type: String, desc: "keywords (200)"
+          optional :search_list, type: String, desc: "search_list (200)"
+          optional :search_results, type: String, desc: "search_results (200)"
           optional :action, type: String, desc: "action (Brainstorm, Solution Report, Sent to Reviewer)"
           optional :action_note, type: String, desc: "action note (500)"
           optional :phase, type: String, desc: "phase, e.g. Full Authoring"
@@ -154,7 +159,8 @@ module V1
             permit_invention_params = ActionController::Parameters.new(params[:invention]).permit(
               :invention_opportunity_id,
               :organization_id,
-              :title, :description, :keywords, :action, :action_note, :phase,
+              :title, :description, :keywords, :search_list, :search_results,
+              :action, :action_note, :phase,
               :bulk_read_access, :archived, :user_id
             )
             invention.update_attributes(permit_invention_params)
