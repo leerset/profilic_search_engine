@@ -121,6 +121,14 @@ module V1
           optional :archived, type: Boolean, desc: "archived"
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
+        optional :searches, type: Array do
+          optional :id, type: Integer, desc: "search id"
+          optional :remove, type: Boolean, desc: "remove boolean"
+          optional :title, type: String, desc: "title"
+          optional :url, type: String, desc: "url"
+          optional :note, type: String, desc: "note"
+          optional :tag, type: String, desc: "tag"
+        end
         # optional :co_inventors, type: Array[Integer], desc: "co_inventors id array, e.g. [1,2,3]"
         optional :co_inventors, type: Array do
           optional :user_id, type: Integer, desc: "user_id"
@@ -167,6 +175,20 @@ module V1
             if (description = params[:invention][:description]).present?
               container_section = invention.container_section || invention.create_container_section
               container_section.update_attributes(summary: description)
+            end
+          end
+          if (searches = params[:searches]).present?
+            searches.each do |search|
+              current_search = Search.find_by_id(search[:id])
+              remove = search[:remove]
+              if current_search && remove.present? && remove.to_s.downcase == 'true'
+                current_search.destroy
+                next
+              end
+              permit_search_params = ActionController::Parameters.new(search).permit(
+                :title, :url, :note, :tag
+              )
+              invention.searches.create!(permit_search_params)
             end
           end
           if (scratchpad_content = params[:scratchpad]).present?
