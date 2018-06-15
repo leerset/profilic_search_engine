@@ -188,7 +188,11 @@ module V1
               permit_search_params = ActionController::Parameters.new(search).permit(
                 :title, :url, :note, :tag
               )
-              invention.searches.create!(permit_search_params)
+              if current_search
+                current_search.update!(permit_search_params)
+              else
+                invention.searches.create!(permit_search_params)
+              end
             end
           end
           if (scratchpad_content = params[:scratchpad]).present?
