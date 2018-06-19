@@ -122,7 +122,7 @@ module V1
         end
         optional :scratchpad, type: String, desc: "scratchpad content (65535)"
         optional :searches, type: Array do
-          optional :id, type: Integer, desc: "search id"
+          optional :id, type: String, desc: "search id (String)"
           optional :remove, type: Boolean, desc: "remove boolean"
           optional :title, type: String, desc: "title"
           optional :url, type: String, desc: "url"
@@ -179,7 +179,8 @@ module V1
           end
           if (searches = params[:searches]).present?
             searches.each do |search|
-              current_search = Search.find_by_id(search[:id])
+              search_id = search[:id].to_i
+              current_search = Search.find_by_id(search_id)
               remove = search[:remove]
               if current_search && remove.present? && remove.to_s.downcase == 'true'
                 current_search.destroy
