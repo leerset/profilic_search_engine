@@ -253,9 +253,9 @@ module V1
               Mailer.review_invention_notification_email(mentor.user, invention, 'Invention in phase-4 Notification.').deliver
             end
           elsif invention.phase && invention.phase.downcase == 'phase-5'
-            Mailer.review_invention_notification_email(invention.inventor.user, invention, 'Invention in phase-5 Notification.').deliver
+            Mailer.view_completion_invention_notification_email(invention.inventor.user, invention, 'Invention in phase-5 Notification.').deliver
             invention.co_inventors.each do |co_inventor|
-              Mailer.review_invention_notification_email(co_inventor.user, invention, 'Invention in phase-5 Notification.').deliver
+              Mailer.view_completion_invention_notification_email(co_inventor.user, invention, 'Invention in phase-5 Notification.').deliver
             end
           end
         else

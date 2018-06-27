@@ -60,6 +60,16 @@ class Mailer < ApplicationMailer
     mail(to: user.email, subject: @subject)
   end
 
+  def view_completion_invention_notification_email(user, invention, status = nil)
+    @host = Settings.host
+    @user = user
+    @invention = invention
+    @status = status
+    @url = "inventions/#{invention.id}"
+    @subject = add_prefix_and_suffix_to_subject("Prolific View Completion Invention Notification")
+    mail(to: user.email, subject: @subject)
+  end
+
   def verify_email(user)
     @user = user
     @token = generate_token
