@@ -243,7 +243,21 @@ module V1
           return permission_denied('Not permission to edit')
         end
         if params[:phase].present?
+          # only mentor can update phase-4 to phase-5
+          if params[:phase].downcase == 'phase-5'
+            return permission_denied('Not permission to edit') unless current_user.mentor?(invention)
+          end
           invention.update_attributes(phase: params[:phase], user: current_user)
+          if invention.phase && invention.phase.downcase == 'phase-4'
+            invention.mentors.each do |mentor|
+              Mailer.review_invention_notification_email(mentor.user, invention, 'Invention in phase-4 Notification.').deliver
+            end
+          elsif invention.phase && invention.phase.downcase == 'phase-5'
+            Mailer.review_invention_notification_email(invention.inventor.user, invention, 'Invention in phase-5 Notification.').deliver
+            invention.co_inventors.each do |co_inventor|
+              Mailer.review_invention_notification_email(co_inventor.user, invention, 'Invention in phase-5 Notification.').deliver
+            end
+          end
         else
           invention.update_attributes(phase: nil, user: current_user)
         end
