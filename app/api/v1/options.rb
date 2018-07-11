@@ -163,7 +163,7 @@ module V1
         if current_user.god?
           resp_ok("users" => UserSerializer.build_array(users, god: true))
         else
-          resp_ok("users" => UserSerializer.build_array(users, managed_organizations: current_user.member_organizations))
+          resp_ok("users" => UserSerializer.build_array(users, user_id: current_user.id, managed_organizations: current_user.member_organizations))
         end
       end
 
@@ -181,7 +181,7 @@ module V1
         elsif current_user.god?
           resp_ok("user" => UserEncryptionSerializer.new(user, god: true))
         elsif orgs.any?
-          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.managed_organizations))
+          resp_ok("user" => UserEncryptionSerializer.new(user, user_id: current_user.id, managed_organizations: orgs))
         else
           return permission_denied(NOT_GOD_OA_MEMBER_DENIED)
         end

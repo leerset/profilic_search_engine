@@ -10,9 +10,7 @@ module V1
       end
       get :detail do
         authenticate!
-        resp_ok(
-          'user' => PeopleSerializer.new(current_user)
-        )
+        resp_ok('user' => PeopleSerializer.new(current_user, myself: true))
       end
 
       desc 'get people'
@@ -26,9 +24,9 @@ module V1
         orgs = (current_user.managed_organizations & user.organizations)
         return permission_denied(NOT_GOD_OA_DENIED) if !current_user.god? && orgs.empty?
         if current_user.god?
-          resp_ok("user" => UserSerializer.new(user))
-        elsif current_user.managed_organizations.any?
-          resp_ok("user" => UserSerializer.new(user, managed_organizations: current_user.member_organizations))
+          resp_ok("user" => PeopleSerializer.new(user, god: true))
+        elsif orgs.any?
+          resp_ok("user" => PeopleSerializer.new(user, user_id: current_user.id, managed_organizations: orgs))
         else
           return permission_denied(NOT_GOD_OA_DENIED)
         end
@@ -91,7 +89,7 @@ module V1
             user.update_work_address(permit_address_params)
           end
         end
-        resp_ok('user' => PeopleSerializer.new(user))
+        resp_ok('user' => PeopleSerializer.new(user, user_id: current_user.id))
       end
 
       desc 'update people global status'
@@ -105,7 +103,7 @@ module V1
         return data_not_found(MISSING_USR) if user.nil?
         return permission_denied(NOT_GOD_DENIED) unless current_user.god?
         user.update(status: params[:status])
-        resp_ok('user' => PeopleSerializer.new(user))
+        resp_ok('user' => PeopleSerializer.new(user, god: true))
       end
 
       desc 'update people himself'
@@ -160,7 +158,7 @@ module V1
             user.update_work_address(permit_address_params)
           end
         end
-        resp_ok('user' => PeopleSerializer.new(user))
+        resp_ok('user' => PeopleSerializer.new(user, myself: true))
       end
 
 ##### global status

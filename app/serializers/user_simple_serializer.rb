@@ -3,9 +3,16 @@ class UserSimpleSerializer < ActiveModel::Serializer
     :fullname, :firstname, :lastname, :citizenship, :screen_name, :employer, :time_zone
   attribute :global_status, if: :god?
 
+  def myself?
+    (myself = instance_options[:myself]).present? && myself
+  end
+
   def god?
-    god = instance_options[:god]
-    god.present? && god
+    (god = instance_options[:god]).present? && god
+  end
+
+  def manager?
+    (user_id = instance_options[:user_id]).present? && object.manager?(User.find_by_id(user_id))
   end
 
   def global_status

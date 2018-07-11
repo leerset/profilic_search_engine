@@ -10,17 +10,15 @@ class UserEncryptionSerializer < ActiveModel::Serializer
   attribute :global_status, if: :god?
 
   def myself?
-    myself = instance_options[:myself]
-    myself.present? && myself
+    (myself = instance_options[:myself]).present? && myself
   end
 
   def god?
-    god = instance_options[:god]
-    god.present? && god
+    (god = instance_options[:god]).present? && god
   end
 
-  def god_or_manager?
-    (user_id = instance_options[:user_id]).present? && object.god_or_manager?(user_id)
+  def manager?
+    (user_id = instance_options[:user_id]).present? && object.manager?(User.find_by_id(user_id))
   end
 
   def global_status
@@ -74,12 +72,12 @@ class UserEncryptionSerializer < ActiveModel::Serializer
 
   def home_address
     h_address = object.home_address
-    AddressSerializer.new(h_address, show_phone_number: myself? || god? || god_or_manager?) if h_address
+    AddressSerializer.new(h_address, show_phone_number: myself? || god? || manager?) if h_address
   end
 
   def work_address
     w_address = object.work_address
-    AddressSerializer.new(w_address, show_phone_number: myself? || god? || god_or_manager?) if w_address
+    AddressSerializer.new(w_address, show_phone_number: myself? || god? || manager?) if w_address
   end
 
   def organizations
