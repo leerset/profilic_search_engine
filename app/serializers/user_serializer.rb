@@ -20,6 +20,10 @@ class UserSerializer < ActiveModel::Serializer
     (user_id = instance_options[:user_id]).present? && object.manager?(User.find_by_id(user_id))
   end
 
+  def global_status
+    object.status
+  end
+
   def fullname
     [object.firstname, object.lastname].compact.join(' ')
   end
