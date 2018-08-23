@@ -36,4 +36,7 @@ class Grape::API
   EXIST_ROL = 'role name already exist.'
   EXIST_ORG = 'organization name already exist.'
   EXIST_IO_TITLE = 'invention opportunity title already exist.'
+  # unknown attribute name
+  UNKNOWN_ATTRIBUTE_NAME = 'unknown attribute name'
+
 end
